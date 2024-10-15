@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "723708134846",
+    "project_id": "pit-app-d99c5",
+    "storage_bucket": "pit-app-d99c5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723708134846:android:ada84162a4e0b927ce25ef",
+        "android_client_info": {
+          "package_name": "com.example.pitapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzleOi-WImraCzrI5hhg6ALLr5Eazj1BM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

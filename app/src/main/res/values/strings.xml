@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">PITApp</string>
+
+    <string name="loading">Loading…</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+
+    <!--    Reset password screen messages -->
+    <string name="toast_reset_password_sent">If you\'re registered, you\'ll receive a password reset link shortly.</string>
+    <string name="toast_reset_password_failed">Failed to send password reset email.</string>
+    <string name="send_password_reset">Send password reset</string>>
+
+    <!--    Login screen messages -->
+    <string name="login_failed">Invalid credentials, please try again.</string>
+    <string name="login">Login</string>
+    <string name="register_here">Don\'t have an account? Register here</string>
+    <string name="forgot_password">Forgot your password?</string>
+
+<!--    Register screen messages -->
+    <string name="register">Register</string>
+    <string name="email_already_registered">This email is already registered. Try logging in.</string>
+
+                                  <!--      REGEX MESSAGES              -->
+    <string name="regex_email">Invalid email format.</string>
+    <string name="regex_password">Password must be at least 6 characters long.</string>
+    <string name="regex_confirm_password">Passwords do not match.</string>
+
+
+</resources>
