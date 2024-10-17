@@ -2,15 +2,22 @@ package com.example.pitapp.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.NavigateNext
+import androidx.compose.material.icons.automirrored.filled.NextPlan
+import androidx.compose.material.icons.automirrored.filled.NextWeek
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
@@ -34,11 +41,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
 import com.example.pitapp.utils.AuthManager
+import com.example.pitapp.utils.isValidEmail
+import com.example.pitapp.utils.isValidPassword
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -58,23 +68,17 @@ fun RegisterDataScreen(
     val coroutineScope = rememberCoroutineScope()
 
 
-    fun isValidEmail(email: String): Boolean {
-        val ipnEmailPattern = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]?ipn\\.mx$")
-        return ipnEmailPattern.matches(email)
-    }
-
-    fun isValidPassword(password: String): Boolean {
-        return password.length >= 6
-    }
 
     if (!isLoadingScreen) {
-        BackScaffold(navController = navController, authManager = authManager, topBarTitle = null) {
-
-
+        BackScaffold(
+            navController = navController,
+            authManager = authManager,
+            topBarTitle = null
+        ) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(32.dp),
+                    .padding(horizontal = 32.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -94,11 +98,12 @@ fun RegisterDataScreen(
                     OutlinedTextField(
                         value = email,
                         onValueChange = {
-                            email = it
+                            email = it.trimEnd()
                             errorMessage = null
                         },
                         label = { Text(text = stringResource(id = R.string.email)) },
                         modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next
@@ -108,7 +113,7 @@ fun RegisterDataScreen(
                     OutlinedTextField(
                         value = password,
                         onValueChange = {
-                            password = it
+                            password = it.trimEnd()
                             errorMessage = null
                         },
                         label = { Text(text = stringResource(id = R.string.password)) },
@@ -122,6 +127,7 @@ fun RegisterDataScreen(
                                 )
                             }
                         },
+                        singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Next
@@ -131,7 +137,7 @@ fun RegisterDataScreen(
                     OutlinedTextField(
                         value = confirmPassword,
                         onValueChange = {
-                            confirmPassword = it
+                            confirmPassword = it.trimEnd()
                             errorMessage = null
                         },
                         label = { Text(text = stringResource(id = R.string.confirm_password)) },
@@ -147,6 +153,7 @@ fun RegisterDataScreen(
                                 )
                             }
                         },
+                        singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done
@@ -157,7 +164,8 @@ fun RegisterDataScreen(
                     errorMessage?.let {
                         Text(
                             text = stringResource(id = it.toInt()),
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -197,7 +205,19 @@ fun RegisterDataScreen(
                             .padding(horizontal = 16.dp),
                         enabled = email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()
                     ) {
-                        Text(text = stringResource(id = R.string.register))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = stringResource(id = R.string.next))
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null
+                            )
+                        }
+
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }

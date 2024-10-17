@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PITApp</string>
+
+    <string name="loading">Cargando…</string>
+
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+
+    <!--    Mensajes de la pantalla de restablecimiento de contraseña -->
+    <string name="toast_reset_password_sent">Si estás registrado, recibirás un enlace para restablecer tu contraseña en breve.</string>
+    <string name="toast_reset_password_failed">No se pudo enviar el correo de restablecimiento de contraseña.</string>
+    <string name="send_password_reset">Enviar restablecimiento de contraseña</string>
+
+    <!--    Mensajes de la pantalla de inicio de sesión -->
+    <string name="login_failed">Credenciales inválidas, por favor intenta nuevamente.</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="register_here">¿No tienes una cuenta? Regístrate aquí</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+
+    <!--    Mensajes de la pantalla de registro -->
+    <string name="next">Siguiente</string>
+    <string name="register">Registrarse</string>
+    <string name="email_already_registered">Este correo ya está registrado. Intenta iniciar sesión.</string>
+    <string name="names">Nombre(s)</string>
+    <string name="surnames">Apellido(s)</string>
+    <string name="upload_image">Subir imagen</string>
+    <string name="your_email_is">Tu correo es %s</string>
+    <string name="error_uploading_data">Error al subir los datos.</string>
+
+    <!--      Mensajes de REGEX              -->
+    <string name="regex_email">Formato de correo inválido, debes usar un correo institucional.</string>
+    <string name="regex_password">La contraseña debe tener al menos 6 caracteres.</string>
+    <string name="regex_confirm_password">Las contraseñas no coinciden.</string>
+
+    <!--    Mensajes de dialogo para cerrar de sesion -->
+    <string name="log_out_message">¿Estás seguro que quieres cerrar sesión?</string>
+    <string name="yes_log_out">Sí, quiero</string>
+
+
+</resources>

@@ -33,11 +33,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
 import com.example.pitapp.utils.AuthManager
+import com.example.pitapp.utils.isValidEmail
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,9 +55,6 @@ fun ResetPasswordScreen(
     val context = LocalContext.current
 
 
-    fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
     BackScaffold(
         navController = navController,
         authManager = authManager,
@@ -65,7 +64,7 @@ fun ResetPasswordScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -78,9 +77,10 @@ fun ResetPasswordScreen(
                 Spacer(modifier = Modifier.height(32.dp))
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { email = it.trimEnd() },
                     label = { Text(text = stringResource(id = R.string.email)) },
                     modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Done
@@ -91,7 +91,8 @@ fun ResetPasswordScreen(
                 errorMessage?.let {
                     Text(
                         text = stringResource(id = it.toInt()),
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -111,14 +112,14 @@ fun ResetPasswordScreen(
                                 Toast.makeText(
                                     context,
                                     R.string.toast_reset_password_sent,
-                                    Toast.LENGTH_SHORT
+                                    Toast.LENGTH_LONG
                                 ).show()
                             } else {
                                 errorMessage = result.exceptionOrNull()?.message
                                 Toast.makeText(
                                     context,
                                     R.string.toast_reset_password_failed,
-                                    Toast.LENGTH_SHORT
+                                    Toast.LENGTH_LONG
                                 ).show()
                             }
                         }

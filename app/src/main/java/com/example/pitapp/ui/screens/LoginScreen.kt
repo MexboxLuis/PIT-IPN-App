@@ -41,9 +41,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 import com.example.pitapp.utils.AuthManager
+import com.example.pitapp.utils.isValidEmail
+import com.example.pitapp.utils.isValidPassword
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -62,20 +65,13 @@ fun LoginScreen(
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var isLoadingScreen by remember { mutableStateOf(false) }
 
-    fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    fun isValidPassword(password: String): Boolean {
-        return password.length >= 6
-    }
     Scaffold {
         Box(modifier = Modifier.fillMaxSize()) {
             if (!isLoadingScreen) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(32.dp),
+                        .padding(horizontal = 32.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -94,7 +90,7 @@ fun LoginScreen(
                         OutlinedTextField(
                             value = email,
                             onValueChange = {
-                                email = it
+                                email = it.trimEnd()
                                 errorMessage = null
                             },
                             label = { Text(text = stringResource(id = R.string.email)) },
@@ -108,7 +104,7 @@ fun LoginScreen(
                         OutlinedTextField(
                             value = password,
                             onValueChange = {
-                                password = it
+                                password = it.trimEnd()
                                 errorMessage = null
                             },
                             label = { Text(text = stringResource(id = R.string.password)) },
@@ -133,7 +129,8 @@ fun LoginScreen(
                         errorMessage?.let {
                             Text(
                                 text = stringResource(id = it.toInt()),
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
