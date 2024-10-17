@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -56,8 +57,7 @@ fun RegisterAllDataScreen(
     authManager: AuthManager,
     fireStoreManager: FireStoreManager,
     email: String,
-    password: String,
-    onRegisterSuccess: () -> Unit
+    onRegisterDataSuccess: () -> Unit
 ) {
     val imageUri = remember { mutableStateOf<Uri?>(null) }
     val launcher =
@@ -149,10 +149,8 @@ fun RegisterAllDataScreen(
                                         selectedImageUri
                                     )
                                     if (dataResult.isSuccess) {
-                                        onRegisterSuccess()
-                                        authManager.loginWithEmail(email, password)
+                                        onRegisterDataSuccess()
                                     } else {
-                                        authManager.deleteUser()
                                         Toast.makeText(
                                             context,
                                             "Error al registrar datos: ${dataResult.exceptionOrNull()?.localizedMessage}",
@@ -166,7 +164,7 @@ fun RegisterAllDataScreen(
                         modifier = Modifier.fillMaxWidth(0.8f),
                         enabled = name.value.text.isNotEmpty() && surname.value.text.isNotEmpty()
                     ) {
-                        Text("Register")
+                        Text(text = stringResource(id = R.string.register))
                     }
                 }
             }

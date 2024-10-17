@@ -59,6 +59,10 @@ fun HomeScreen(
                 } else {
                     permissionLevel = -1
                 }
+
+                if (result.getOrNull() == null) {
+                    navController.navigate("registerAllDataScreen/${email}")
+                }
             }
         }
 

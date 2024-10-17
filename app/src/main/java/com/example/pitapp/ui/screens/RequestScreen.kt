@@ -50,11 +50,9 @@ fun RequestsScreen(
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Escuchar actualizaciones en tiempo real de la colección 'saved_users'
     LaunchedEffect(Unit) {
         firestoreManager.getAllUsersSnapshot { result ->
             if (result.isSuccess) {
-                // Filtrar solo los usuarios con permiso 0
                 users = result.getOrNull()?.filter { it.permission == 0 } ?: emptyList()
             } else if (result.isFailure) {
                 errorMessage = result.exceptionOrNull()?.message
@@ -130,11 +128,9 @@ fun UserRow(user: UserData, firestoreManager: FireStoreManager) {
         IconButton(
             onClick = {
                 scope.launch {
-                    val result = firestoreManager.updateUserPermission(user.email, 1)  // Usar el email para buscar el documento
+                    val result = firestoreManager.updateUserPermission(user.email, 1)
                     if (result.isSuccess) {
                         println("Permiso actualizado correctamente.")
-                        // Aquí actualizas la lista de usuarios si es necesario para reflejar el cambio en la UI
-                        // users = users.map { if (it.email == user.email) it.copy(permission = 1) else it }
                     } else if (result.isFailure) {
                         println("Error al actualizar el permiso: ${result.exceptionOrNull()?.message}")
                     }

@@ -46,6 +46,7 @@ import kotlinx.coroutines.launch
 fun RegisterDataScreen(
     navController: NavHostController,
     authManager: AuthManager,
+    onRegisterSuccess: () -> Unit
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -54,12 +55,12 @@ fun RegisterDataScreen(
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isLoadingScreen by remember { mutableStateOf(false) }
-    var loginHere by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
 
     fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        val ipnEmailPattern = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]?ipn\\.mx$")
+        return ipnEmailPattern.matches(email)
     }
 
     fun isValidPassword(password: String): Boolean {
@@ -183,8 +184,7 @@ fun RegisterDataScreen(
                                 isLoadingScreen = true
                                 val authResult = authManager.registerWithEmail(email, password)
                                 if (authResult.isSuccess) {
-                                    authManager.logout()
-                                    navController.navigate("registerAllDataScreen/$email/$password")
+                                    onRegisterSuccess()
                                 } else {
                                     errorMessage = R.string.email_already_registered.toString()
                                 }

@@ -16,10 +16,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.utils.AuthManager
-import com.example.pitapp.utils.currentRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,8 +28,7 @@ fun BackScaffold(
     content: @Composable () -> Unit
 ) {
 
-    val actualRoute = currentRoute(navController)
-    val routePattern = Regex("^registerAllDataScreen/.+$")
+
 
     Scaffold(
 
@@ -40,10 +37,6 @@ fun BackScaffold(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            if (routePattern.matches(actualRoute ?: "")) {
-                                authManager.deleteUser()
-                            }
-
                             navController.popBackStack()
                         }
                     ) {
@@ -58,24 +51,13 @@ fun BackScaffold(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-//                        if (topBarTitle != null) {
-//                            Text(
-//                                text = if (routePattern.matches(actualRoute ?: "")) {
-//                                    "authManager.deleteUser()"
-//                                } else topBarTitle,
-//                                modifier = Modifier.padding(start = 10.dp),
-//                                style = MaterialTheme.typography.titleLarge
-//                            )
-//                        }
-                        Text(
-                            text = if (routePattern.matches(actualRoute ?: "")) {
-                                "Delete User" // Or any appropriate title
-                            } else topBarTitle ?: "",
-                            // ...
-                        )
-
-
+                        if (topBarTitle != null) {
+                            Text(
+                                text = topBarTitle,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                     }
 
                 },

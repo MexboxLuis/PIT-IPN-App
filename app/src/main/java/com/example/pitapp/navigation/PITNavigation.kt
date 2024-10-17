@@ -59,24 +59,23 @@ fun PITNavigation(
             RegisterDataScreen(
                 navController = navController,
                 authManager = authManager,
+                onRegisterSuccess = { navController.navigate("homeScreen") }
             )
         }
+
         composable(
-            route = "registerAllDataScreen/{email}/{password}",
+            route = "registerAllDataScreen/{email}",
             arguments = listOf(
                 navArgument("email") { type = NavType.StringType },
-                navArgument("password") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            val password = backStackEntry.arguments?.getString("password") ?: ""
             RegisterAllDataScreen(
                 navController = navController,
                 authManager = authManager,
                 fireStoreManager = fireStoreManager,
                 email = email,
-                password = password,
-                onRegisterSuccess = { navController.navigate("homeScreen") }
+                onRegisterDataSuccess = { navController.navigate("homeScreen") }
             )
         }
 
