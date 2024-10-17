@@ -183,6 +183,7 @@ fun RegisterDataScreen(
                                 isLoadingScreen = true
                                 val authResult = authManager.registerWithEmail(email, password)
                                 if (authResult.isSuccess) {
+                                    authManager.logout()
                                     navController.navigate("registerAllDataScreen/$email/$password")
                                 } else {
                                     errorMessage = R.string.email_already_registered.toString()

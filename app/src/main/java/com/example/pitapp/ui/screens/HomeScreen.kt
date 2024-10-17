@@ -67,7 +67,11 @@ fun HomeScreen(
         } else {
             when (permissionLevel) {
                 1, 2 -> {
-                    MainScaffold(navController = navController, authManager = authManager) {
+                    MainScaffold(
+                        navController = navController,
+                        authManager = authManager,
+                        firestoreManager = firestoreManager
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -120,10 +124,10 @@ fun HomeScreen(
                                     ClaseCard(
                                         clase,
                                         onClick = {
-                                        navController.navigate(
-                                            "classDetailScreen/${clase.tutoria}/${clase.tutor}/${clase.hora}"
-                                        )
-                                    }
+                                            navController.navigate(
+                                                "classDetailScreen/${clase.tutoria}/${clase.tutor}/${clase.hora}"
+                                            )
+                                        }
                                     )
                                 }
                             }
@@ -136,7 +140,9 @@ fun HomeScreen(
                     Scaffold { padding ->
                         Box(modifier = Modifier.padding(padding))
                         Column(
-                            modifier = Modifier.fillMaxSize().padding(32.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {

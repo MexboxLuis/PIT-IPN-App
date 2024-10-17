@@ -18,6 +18,7 @@ import com.example.pitapp.ui.screens.HomeScreen
 import com.example.pitapp.ui.screens.LoginScreen
 import com.example.pitapp.ui.screens.RegisterAllDataScreen
 import com.example.pitapp.ui.screens.RegisterDataScreen
+import com.example.pitapp.ui.screens.RequestsScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
@@ -95,6 +96,15 @@ fun PITNavigation(
                 firestoreManager = fireStoreManager
             )
         }
+
+        composable(route = "requestsScreen") {
+            RequestsScreen(
+                navController = navController,
+                authManager = authManager,
+                firestoreManager = fireStoreManager
+            )
+        }
+
         composable(route = "agendarScreen") {
             AgendarClaseScreen(navController, authManager)
         }
@@ -111,7 +121,7 @@ fun PITNavigation(
             val tutor = backStackEntry.arguments?.getString("tutor") ?: ""
             val startTime = backStackEntry.arguments?.getString("startTime") ?: ""
             val studentList =
-                listOf("Alumno1", "Alumno2", "Alumno3")
+                listOf("Alvara Garcia Vasquez", "Emilia Rodríguez", "Ernesto Sánchez", "Mequizboxix Luis")
 
             ClassDetailScreen(
                 navController = navController,

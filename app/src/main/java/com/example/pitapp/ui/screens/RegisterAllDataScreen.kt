@@ -142,22 +142,16 @@ fun RegisterAllDataScreen(
                             isLoadingScreen = true
                             coroutineScope.launch {
                                 val selectedImageUri = imageUri.value
-
-                                // Registrar el usuario
-                                val authResult = authManager.registerWithEmail(email, password)
-                                if (authResult.isSuccess) {
-                                    // Registrar los datos del usuario en Firestore
                                     val dataResult = fireStoreManager.registerUserData(
                                         email,
                                         name.value.text,
                                         surname.value.text,
                                         selectedImageUri
                                     )
-
                                     if (dataResult.isSuccess) {
                                         onRegisterSuccess()
+                                        authManager.loginWithEmail(email, password)
                                     } else {
-                                        // Eliminar el usuario si falla el registro de datos
                                         authManager.deleteUser()
                                         Toast.makeText(
                                             context,
@@ -165,13 +159,6 @@ fun RegisterAllDataScreen(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Error al registrar usuario: ${authResult.exceptionOrNull()?.localizedMessage}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
                                 delay(1000)
                                 isLoadingScreen = false
                             }

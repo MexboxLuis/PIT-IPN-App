@@ -82,6 +82,48 @@ class FireStoreManager(
         }
     }
 
+    fun getAllUsersSnapshot(onResult: (Result<List<UserData>>) -> Unit) {
+        firestore.collection("saved_users")
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    onResult(Result.failure(exception))
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && !snapshot.isEmpty) {
+                    val users = snapshot.documents.mapNotNull { document ->
+                        document.toObject(UserData::class.java)
+                    }
+                    onResult(Result.success(users))
+                } else {
+                    onResult(Result.success(emptyList()))
+                }
+            }
+    }
+
+
+    suspend fun updateUserPermission(email: String, newPermission: Int): Result<Unit> {
+        return try {
+            val querySnapshot = firestore.collection("saved_users")
+                .whereEqualTo("email", email)
+                .get()
+                .await()
+
+            if (!querySnapshot.isEmpty) {
+                val document = querySnapshot.documents[0]
+                document.reference.update("permission", newPermission).await()
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("No se encontró ningún usuario con el email: $email"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Error al actualizar el permiso: ${e.localizedMessage}"))
+        }
+    }
+
+
+
+
 
 //
 //    suspend fun updateDocumentText(documentId: String, newText: String): Result<Boolean> {
