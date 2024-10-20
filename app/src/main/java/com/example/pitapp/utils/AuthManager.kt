@@ -1,6 +1,5 @@
 package com.example.pitapp.utils
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -43,25 +42,6 @@ class AuthManager(private val auth: FirebaseAuth) {
         }
     }
 
-    fun deleteUser() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            currentUser.delete()
-                .addOnCompleteListener { deleteTask ->
-                    if (deleteTask.isSuccessful) {
-                        Log.d("AuthManager", "User account deleted.")
-                    } else {
-                        Log.e("AuthManager", "Failed to delete user: ${deleteTask.exception?.localizedMessage}")
-                    }
-                }
-        } else {
-            Log.e("AuthManager", "No user is currently signed in.")
-        }
-    }
-
-
-
-
     fun getCurrentUser(): Result<FirebaseUser?> {
         return try {
             val currentUser = auth.currentUser
@@ -88,18 +68,6 @@ class AuthManager(private val auth: FirebaseAuth) {
         val currentUser = auth.currentUser
         return currentUser?.email
     }
-
-    suspend fun isUserRegistered(email: String): Boolean {
-        return try {
-            val signInMethods = auth.fetchSignInMethodsForEmail(email).await()
-            signInMethods?.signInMethods?.isNotEmpty() ?: false
-        } catch (e: FirebaseAuthInvalidUserException) {
-            false
-        } catch (e: Exception) {
-            false
-        }
-    }
-
 
     fun isUserLoggedIn(): Boolean {
         return auth.currentUser != null

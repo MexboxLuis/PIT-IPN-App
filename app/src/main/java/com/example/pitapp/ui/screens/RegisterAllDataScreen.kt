@@ -115,7 +115,7 @@ fun RegisterAllDataScreen(
                                 Image(
                                     painter = rememberAsyncImagePainter(imageUri.value),
                                     contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
+                                    modifier = Modifier.fillMaxSize().clip(CircleShape),
                                     contentScale = ContentScale.Crop
                                 )
                             } else {

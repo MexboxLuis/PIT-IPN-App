@@ -25,14 +25,13 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-//cambiar nombre de clase y archivos
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun AgendarClaseScreen(navController: NavHostController, authManager: AuthManager) {
     val calendar = Calendar.getInstance()
     val context = LocalContext.current
 
-    // Estado para los campos
+
     val tutorName = rememberSaveable { mutableStateOf("") }
     val tutoria = rememberSaveable { mutableStateOf("") }
     val tema = rememberSaveable { mutableStateOf("") }
@@ -40,7 +39,7 @@ fun AgendarClaseScreen(navController: NavHostController, authManager: AuthManage
     val selectedDate = rememberSaveable { mutableStateOf(calendar.time) }
     val selectedTime = rememberSaveable { mutableStateOf("") }
 
-    // Función para abrir el DatePicker
+
     val datePickerDialog = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
@@ -71,7 +70,6 @@ fun AgendarClaseScreen(navController: NavHostController, authManager: AuthManage
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Campo de fecha
             OutlinedTextField(
                 value = SimpleDateFormat(
                     "dd/MM/yyyy",
@@ -85,7 +83,6 @@ fun AgendarClaseScreen(navController: NavHostController, authManager: AuthManage
                 enabled = false
             )
 
-            // Campo de nombre del tutor
             OutlinedTextField(
                 value = tutorName.value,
                 onValueChange = { tutorName.value = it },
@@ -93,7 +90,6 @@ fun AgendarClaseScreen(navController: NavHostController, authManager: AuthManage
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Campo de tutoría
             OutlinedTextField(
                 value = tutoria.value,
                 onValueChange = { tutoria.value = it },
@@ -101,7 +97,6 @@ fun AgendarClaseScreen(navController: NavHostController, authManager: AuthManage
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Campo de hora (puedes usar un TimePicker si prefieres)
             OutlinedTextField(
                 value = selectedTime.value,
                 onValueChange = { selectedTime.value = it },

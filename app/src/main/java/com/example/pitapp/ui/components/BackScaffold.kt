@@ -75,7 +75,6 @@ fun BackScaffold(
                             Text(
                                 text = topBarTitle,
                                 style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }

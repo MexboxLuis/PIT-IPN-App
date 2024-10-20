@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,6 +37,7 @@ import androidx.navigation.NavHostController
 import com.example.pitapp.ui.components.MainScaffold
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -44,24 +46,23 @@ fun HomeScreen(
     firestoreManager: FireStoreManager
 ) {
     if (authManager.isUserLoggedIn()) {
-        val email = authManager.getCurrentUser().getOrNull()?.email
-
         var permissionLevel by rememberSaveable { mutableIntStateOf(-1) }
+        val coroutineScope = rememberCoroutineScope()
 
-        LaunchedEffect(email) {
-            email?.let {
-                val result = firestoreManager.getUserDataByEmail(it)
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                val result = firestoreManager.getUserData()
+
                 if (result.isSuccess) {
                     result.getOrNull()?.let { userData ->
                         permissionLevel = userData.permission
-                        println("Permiso obtenido: $permissionLevel")
+                        println("Permission obtained: $permissionLevel")
                     }
                 } else {
-                    permissionLevel = -1
-                }
-
-                if (result.getOrNull() == null) {
-                    navController.navigate("registerAllDataScreen/${email}")
+                    println("Failed to retrieve user data: ${result.exceptionOrNull()?.message}")
+                    authManager.getUserEmail()?.let { email ->
+                        navController.navigate("registerAllDataScreen/$email")
+                    }
                 }
             }
         }
@@ -212,6 +213,9 @@ fun HomeScreen(
                 }
             }
         }
+    }
+    else{
+        navController.navigate("loginScreen")
     }
 }
 

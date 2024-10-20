@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,19 +53,30 @@ fun MainScaffold(
 ) {
 
     val actualRoute = currentRoute(navController)
-    if (authManager.isUserLoggedIn()) {
-        val email = authManager.getCurrentUser().getOrNull()?.email
+    var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
 
+    if (showLogoutDialog) {
+        LogoutDialog(
+            onDismiss = { showLogoutDialog = false },
+            onConfirm = {
+                authManager.logout()
+                navController.navigate("loginScreen")
+                showLogoutDialog = false}
+        )
+    }
+
+    if (authManager.isUserLoggedIn()) {
         var permissionLevel by rememberSaveable { mutableIntStateOf(-1) }
-        LaunchedEffect(email) {
-            email?.let {
-                val result = firestoreManager.getUserDataByEmail(it)
-                if (result.isSuccess) {
-                    result.getOrNull()?.let { userData ->
-                        permissionLevel = userData.permission
-                        println("Permiso obtenido: $permissionLevel")
-                    }
+
+        LaunchedEffect(Unit) {
+            val result = firestoreManager.getUserData()
+            if (result.isSuccess) {
+                result.getOrNull()?.let { userData ->
+                    permissionLevel = userData.permission
+                    println("Permission obtained: $permissionLevel")
                 }
+            } else {
+                println("Failed to retrieve user data: ${result.exceptionOrNull()?.message}")
             }
         }
 
@@ -101,8 +113,7 @@ fun MainScaffold(
                     actions = {
                         IconButton(
                             onClick = {
-                                authManager.logout()
-                                navController.navigate("loginScreen")
+                                showLogoutDialog = true
                             }
                         ) {
                             Icon(
