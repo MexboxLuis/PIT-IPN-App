@@ -38,5 +38,10 @@
     <string name="log_out_message">¿Estás seguro que quieres cerrar sesión?</string>
     <string name="yes_log_out">Sí, quiero</string>
 
+<!--    Scaffold -->
+
+    <string name="home">Inicio</string>
+    <string name="requests">Solicitudes</string>
+
 
 </resources>

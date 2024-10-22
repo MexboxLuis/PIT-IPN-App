@@ -4,6 +4,7 @@ import android.net.Uri
 import com.example.pitapp.data.UserData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.type.Date
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
@@ -56,7 +57,13 @@ class FireStoreManager(
                 .await()
 
             if (documentSnapshot.exists()) {
-                val userData = documentSnapshot.toObject(UserData::class.java)
+                val userData = UserData(
+                    email = documentSnapshot.getString("email") ?: "",
+                    name = documentSnapshot.getString("name") ?: "",
+                    surname = documentSnapshot.getString("surname") ?: "",
+                    profilePictureUrl = documentSnapshot.getString("profilePictureUrl"),
+                    permission = documentSnapshot.getLong("permission")?.toInt() ?: 0
+                )
                 Result.success(userData)
             } else {
                 Result.failure(Exception("No user data found for this email."))
@@ -96,5 +103,8 @@ class FireStoreManager(
             Result.failure(Exception("Error updating the permit: ${e.localizedMessage}"))
         }
     }
+
+
+
 }
 

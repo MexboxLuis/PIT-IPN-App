@@ -4,6 +4,12 @@ import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -12,16 +18,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
-import com.example.pitapp.ui.screens.AgendarClaseScreen
+import com.example.pitapp.data.UserData
 import com.example.pitapp.ui.screens.ClassDetailScreen
+import com.example.pitapp.ui.screens.ErrorScreen
 import com.example.pitapp.ui.screens.HomeScreen
 import com.example.pitapp.ui.screens.LoginScreen
 import com.example.pitapp.ui.screens.RegisterAllDataScreen
 import com.example.pitapp.ui.screens.RegisterDataScreen
+import com.example.pitapp.ui.screens.RequestedPermissionScreen
 import com.example.pitapp.ui.screens.RequestsScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
+import com.example.pitapp.ui.screens.ScheduleClassScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -37,19 +47,55 @@ fun PITNavigation(
     val activity = LocalContext.current as? Activity
     val isUserLoggedIn = authManager.isUserLoggedIn()
 
-    BackHandler(enabled = currentRoute in listOf("homeScreen", "loginScreen")) {
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val result = fireStoreManager.getUserData()
+            userData = if (result.isSuccess) {
+                result.getOrNull()
+            } else {
+                null
+            }
+        }
+    }
+
+    val startDestination = when {
+        !isUserLoggedIn -> "loginScreen"
+
+        isUserLoggedIn -> "homeScreen"
+
+        else -> "errorScreen"
+    }
+
+
+    BackHandler(
+        enabled = currentRoute in listOf(
+            "homeScreen",
+            "loginScreen",
+            "errorScreen"
+        )
+    ) {
         activity?.moveTaskToBack(true)
     }
 
     NavHost(
         navController = navController,
-        startDestination = if (isUserLoggedIn) "homeScreen" else "loginScreen",
+        startDestination = startDestination,
         modifier = Modifier.fillMaxSize()
     ) {
+        composable(route = "errorScreen") {
+            ErrorScreen()
+        }
+
+
         composable(route = "loginScreen") {
             LoginScreen(
                 authManager = authManager,
-                onLoginSuccess = { navController.navigate("homeScreen") },
+                onLoginSuccess = {
+                    navController.navigate("homeScreen")
+                },
                 onRegisterClick = { navController.navigate("registerDataScreen") },
                 onResetPasswordClick = { navController.navigate("resetPasswordScreen") }
             )
@@ -86,13 +132,20 @@ fun PITNavigation(
                 onPasswordResetSent = { navController.navigate("loginScreen") },
             )
         }
-
-
         composable(route = "homeScreen") {
             HomeScreen(
                 navController = navController,
                 authManager = authManager,
-                firestoreManager = fireStoreManager
+                fireStoreManager = fireStoreManager
+            )
+        }
+
+        composable(route = "requestedScreen") {
+            RequestedPermissionScreen(
+                onExit = {
+                    authManager.logout()
+                    navController.navigate("loginScreen")
+                }
             )
         }
 
@@ -104,8 +157,8 @@ fun PITNavigation(
             )
         }
 
-        composable(route = "agendarScreen") {
-            AgendarClaseScreen(navController, authManager)
+        composable(route = "scheduleClassScreen") {
+            ScheduleClassScreen(navController, authManager, fireStoreManager)
         }
 
         composable(
@@ -120,7 +173,12 @@ fun PITNavigation(
             val tutor = backStackEntry.arguments?.getString("tutor") ?: ""
             val startTime = backStackEntry.arguments?.getString("startTime") ?: ""
             val studentList =
-                listOf("Alvara Garcia Vasquez", "Emilia Rodríguez", "Ernesto Sánchez", "Mequizboxix Luis")
+                listOf(
+                    "Alvara Garcia Vasquez",
+                    "Emilia Rodríguez",
+                    "Ernesto Sánchez",
+                    "Mequizboxix Luis"
+                )
 
             ClassDetailScreen(
                 navController = navController,

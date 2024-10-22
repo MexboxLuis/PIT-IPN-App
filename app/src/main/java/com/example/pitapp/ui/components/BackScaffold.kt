@@ -43,9 +43,15 @@ fun BackScaffold(
         LogoutDialog(
             onDismiss = { showLogoutDialog = false },
             onConfirm = {
+                navController.navigate("loginScreen"){
+                    popUpTo("homeScreen") {
+                        inclusive = true
+                    }
+                }
+                showLogoutDialog = false
                 authManager.logout()
-                navController.navigate("loginScreen")
-                showLogoutDialog = false}
+            }
+
         )
     }
 
