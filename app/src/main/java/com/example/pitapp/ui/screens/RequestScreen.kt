@@ -44,14 +44,14 @@ import kotlinx.coroutines.launch
 fun RequestsScreen(
     navController: NavHostController,
     authManager: AuthManager,
-    firestoreManager: FireStoreManager
+    fireStoreManager: FireStoreManager
 ) {
     var users by remember { mutableStateOf<List<UserData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        firestoreManager.getAllUsersSnapshot { result ->
+        fireStoreManager.getAllUsersSnapshot { result ->
             if (result.isSuccess) {
                 users = result.getOrNull()?.filter { it.permission == 0 } ?: emptyList()
             } else if (result.isFailure) {
@@ -64,7 +64,7 @@ fun RequestsScreen(
     MainScaffold(
         navController = navController,
         authManager = authManager,
-        firestoreManager = firestoreManager
+        fireStoreManager = fireStoreManager
     ) {
         if (isLoading) {
             CircularProgressIndicator()
@@ -76,7 +76,7 @@ fun RequestsScreen(
         } else {
             LazyColumn {
                 items(users) { user ->
-                    UserRow(user, firestoreManager)
+                    UserRow(user, fireStoreManager)
                 }
             }
         }
@@ -85,7 +85,7 @@ fun RequestsScreen(
 
 
 @Composable
-fun UserRow(user: UserData, firestoreManager: FireStoreManager) {
+fun UserRow(user: UserData, fireStoreManager: FireStoreManager) {
     val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
@@ -128,7 +128,7 @@ fun UserRow(user: UserData, firestoreManager: FireStoreManager) {
         IconButton(
             onClick = {
                 scope.launch {
-                    val result = firestoreManager.updateUserPermission(user.email, 1)
+                    val result = fireStoreManager.updateUserPermission(user.email, 1)
                     if (result.isSuccess) {
                         println("Permiso actualizado correctamente.")
                     } else if (result.isFailure) {

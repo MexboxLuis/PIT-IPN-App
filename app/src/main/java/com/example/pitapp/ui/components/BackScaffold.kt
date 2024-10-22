@@ -87,7 +87,7 @@ fun BackScaffold(
 
                 },
                 actions = {
-                    if (isRegisteringDataScreen == true) {
+                    if (isRegisteringDataScreen == true || actualRoute == "profileScreen") {
                         IconButton(
                             onClick = { showLogoutDialog = true }
                         ) {

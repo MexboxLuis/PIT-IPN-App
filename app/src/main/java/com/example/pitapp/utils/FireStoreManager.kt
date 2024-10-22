@@ -4,7 +4,6 @@ import android.net.Uri
 import com.example.pitapp.data.UserData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.type.Date
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
@@ -46,17 +45,23 @@ class FireStoreManager(
         }
     }
 
-    suspend fun getUserData(): Result<UserData?> {
-        return try {
-            val email = authManager.getUserEmail()
-                ?: return Result.failure(Exception("User is not logged in or email not available."))
+    fun getUserData(onDataChanged: (Result<UserData?>) -> Unit) {
+        val email = authManager.getUserEmail()
 
-            val documentSnapshot = firestore.collection("saved_users")
-                .document(email)
-                .get()
-                .await()
+        if (email == null) {
+            onDataChanged(Result.failure(Exception("User is not logged in or email not available.")))
+            return
+        }
 
-            if (documentSnapshot.exists()) {
+        val documentReference = firestore.collection("saved_users").document(email)
+
+        documentReference.addSnapshotListener { documentSnapshot, error ->
+            if (error != null) {
+                onDataChanged(Result.failure(Exception("Error retrieving user data: ${error.localizedMessage}")))
+                return@addSnapshotListener
+            }
+
+            if (documentSnapshot != null && documentSnapshot.exists()) {
                 val userData = UserData(
                     email = documentSnapshot.getString("email") ?: "",
                     name = documentSnapshot.getString("name") ?: "",
@@ -64,14 +69,31 @@ class FireStoreManager(
                     profilePictureUrl = documentSnapshot.getString("profilePictureUrl"),
                     permission = documentSnapshot.getLong("permission")?.toInt() ?: 0
                 )
-                Result.success(userData)
+                onDataChanged(Result.success(userData))
             } else {
-                Result.failure(Exception("No user data found for this email."))
+                onDataChanged(Result.failure(Exception("No user data found for this email.")))
             }
-        } catch (e: Exception) {
-            Result.failure(Exception("Error retrieving user data: ${e.localizedMessage}"))
         }
     }
+
+    fun updateUserData(name: String, surname: String, profilePictureUrl: String?, onResult: (Result<Unit>) -> Unit) {
+        val email = authManager.getUserEmail()
+            ?: return onResult(Result.failure(Exception("User is not logged in or email not available.")))
+
+        val userUpdates = mapOf(
+            "name" to name,
+            "surname" to surname,
+            "profilePictureUrl" to profilePictureUrl
+        )
+
+        firestore.collection("saved_users")
+            .document(email)
+            .update(userUpdates)
+            .addOnSuccessListener { onResult(Result.success(Unit)) }
+            .addOnFailureListener { e -> onResult(Result.failure(e)) }
+    }
+
+
 
     fun getAllUsersSnapshot(onResult: (Result<List<UserData>>) -> Unit) {
         firestore.collection("saved_users")

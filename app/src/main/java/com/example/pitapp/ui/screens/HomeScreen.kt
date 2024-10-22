@@ -22,13 +22,12 @@ fun HomeScreen(
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-    var hasNavigatedToRegister by remember { mutableStateOf(false) } // Agregar este estado
-    val coroutineScope = rememberCoroutineScope()
+    var hasNavigatedToRegister by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val result = fireStoreManager.getUserData()
+        isLoading = true
 
+        fireStoreManager.getUserData { result ->
             if (result.isSuccess) {
                 userData = result.getOrNull()
                 println("User data retrieved: $userData")
@@ -39,6 +38,7 @@ fun HomeScreen(
             isLoading = false
         }
     }
+
 
     if (isLoading) {
         LoadingScreen()

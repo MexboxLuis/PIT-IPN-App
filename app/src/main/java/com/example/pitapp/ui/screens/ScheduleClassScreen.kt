@@ -40,7 +40,7 @@ import java.util.Locale
 fun ScheduleClassScreen(
     navController: NavHostController,
     authManager: AuthManager,
-    firestoreManager: FireStoreManager
+    fireStoreManager: FireStoreManager
 ) {
     val calendar = Calendar.getInstance()
     val context = LocalContext.current
@@ -54,20 +54,22 @@ fun ScheduleClassScreen(
     var selectedDate by rememberSaveable { mutableStateOf(calendar.time) }
     var selectedTime by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val result = firestoreManager.getUserData()
+//    LaunchedEffect(Unit) {
+//        coroutineScope.launch {
+//            val result = fireStoreManager.getUserData()
+//
+//            if (result.isSuccess) {
+//                userData = result.getOrNull()
+//                println("User data retrieved: $userData")
+//            } else {
+//                println("Failed to retrieve user data: ${result.exceptionOrNull()?.message}")
+//            }
+//
+//            isLoading = false
+//        }
+//    }
 
-            if (result.isSuccess) {
-                userData = result.getOrNull()
-                println("User data retrieved: $userData")
-            } else {
-                println("Failed to retrieve user data: ${result.exceptionOrNull()?.message}")
-            }
-
-            isLoading = false
-        }
-    }
+//    rehacer todo paro jaja
 
 
     val datePickerDialog = DatePickerDialog(

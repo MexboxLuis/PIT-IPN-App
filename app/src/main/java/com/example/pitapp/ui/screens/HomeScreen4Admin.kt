@@ -16,7 +16,7 @@ fun HomeScreen4Admin(
     MainScaffold(
         navController = navController,
         authManager = authManager,
-        firestoreManager = firestoreManager
+        fireStoreManager = firestoreManager
     ) {
         // Contenido de la pantalla
 
