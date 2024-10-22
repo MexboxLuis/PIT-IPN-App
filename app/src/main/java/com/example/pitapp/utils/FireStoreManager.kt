@@ -4,6 +4,9 @@ import android.net.Uri
 import com.example.pitapp.data.UserData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
@@ -76,21 +79,61 @@ class FireStoreManager(
         }
     }
 
-    fun updateUserData(name: String, surname: String, profilePictureUrl: String?, onResult: (Result<Unit>) -> Unit) {
+    suspend fun updateUserData(
+        name: String,
+        surname: String,
+        newImageUri: Uri?,
+        oldProfilePictureUrl: String?,
+        onResult: (Result<Unit>) -> Unit
+    ) {
         val email = authManager.getUserEmail()
             ?: return onResult(Result.failure(Exception("User is not logged in or email not available.")))
 
-        val userUpdates = mapOf(
-            "name" to name,
-            "surname" to surname,
-            "profilePictureUrl" to profilePictureUrl
-        )
+        val storageRef = storage.reference
 
-        firestore.collection("saved_users")
-            .document(email)
-            .update(userUpdates)
-            .addOnSuccessListener { onResult(Result.success(Unit)) }
-            .addOnFailureListener { e -> onResult(Result.failure(e)) }
+        fun updateFireStore(profilePictureUrl: String?) {
+            val userUpdates = mapOf(
+                "name" to name,
+                "surname" to surname,
+                "profilePictureUrl" to profilePictureUrl
+            )
+
+            firestore.collection("saved_users")
+                .document(email)
+                .update(userUpdates)
+                .addOnSuccessListener { onResult(Result.success(Unit)) }
+                .addOnFailureListener { e -> onResult(Result.failure(e)) }
+        }
+
+        suspend fun handleImageUpload() {
+            try {
+                val newProfilePictureUrl: String? = newImageUri?.let { uri ->
+                    oldProfilePictureUrl?.let {
+                        val oldImageRef = storage.getReferenceFromUrl(it)
+                        oldImageRef.delete().await()
+                    }
+
+                    val newImageRef = storageRef.child("$email/images/${UUID.randomUUID()}.jpg")
+                    newImageRef.putFile(uri).await()
+                    newImageRef.downloadUrl.await().toString()
+                }
+
+                if (newImageUri == null && oldProfilePictureUrl != null) {
+                    val oldImageRef = storage.getReferenceFromUrl(oldProfilePictureUrl)
+                    oldImageRef.delete().await()
+                    updateFireStore(null)
+                } else {
+                    updateFireStore(newProfilePictureUrl)
+                }
+
+            } catch (e: Exception) {
+                onResult(Result.failure(Exception("Failed to upload image: ${e.localizedMessage}")))
+            }
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            handleImageUpload()
+        }
     }
 
 

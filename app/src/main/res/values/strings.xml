@@ -43,6 +43,12 @@
     <string name="home">Home</string>
     <string name="requests">Requests</string>
 
+<!--    Profile Screen-->
+    <string name="save_changes">Save changes</string>
+    <string name="profile">Profile</string>
+    <string name="error_saving">Error when saving changes.</string>
+
+
 
 
 
