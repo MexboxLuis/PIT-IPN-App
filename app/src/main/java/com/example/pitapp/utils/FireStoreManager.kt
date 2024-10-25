@@ -2,6 +2,7 @@ package com.example.pitapp.utils
 
 import android.net.Uri
 import com.example.pitapp.data.UserData
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
@@ -137,7 +138,6 @@ class FireStoreManager(
     }
 
 
-
     fun getAllUsersSnapshot(onResult: (Result<List<UserData>>) -> Unit) {
         firestore.collection("saved_users")
             .addSnapshotListener { snapshot, exception ->
@@ -166,6 +166,38 @@ class FireStoreManager(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception("Error updating the permit: ${e.localizedMessage}"))
+        }
+    }
+
+    suspend fun createClass(
+        tutoring: String,
+        topic: String,
+        classroom: String,
+        durationHours: Int,
+        durationMinutes: Int,
+        isFreeTime: Boolean
+    ): Result<Boolean> {
+        return try {
+            val expectedDuration = if (isFreeTime) null else (durationHours * 60 + durationMinutes)
+
+            val classData = hashMapOf(
+                "tutoring" to tutoring,
+                "topic" to topic,
+                "classroom" to classroom,
+                "startTime" to FieldValue.serverTimestamp(),
+                "expectedDuration" to expectedDuration,
+                "realDuration" to null,
+                "students" to null
+            )
+
+
+            firestore.collection("saved_classes")
+                .add(classData)
+                .await()
+
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to create class: ${e.localizedMessage}"))
         }
     }
 

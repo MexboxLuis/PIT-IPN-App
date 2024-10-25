@@ -48,7 +48,10 @@
     <string name="profile">Profile</string>
     <string name="error_saving">Error when saving changes.</string>
 
-
+<!--    Modal bottom sheet-->
+    <string name="headline_sheet">Make a class for your students.</string>
+    <string name="create_class">Start class now</string>
+    <string name="schedule_class">Schedule class</string>
 
 
 

@@ -66,6 +66,9 @@ fun ProfileScreen(
     var newImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         newImageUri = uri
+        if (newImageUri == null) {
+            profilePictureUrl = null
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -97,7 +100,11 @@ fun ProfileScreen(
         ) {
             userData?.let {
                 ProfileImage(
-                    imageUrl = if (newImageUri != null) newImageUri.toString() else profilePictureUrl,
+                    imageUrl = when {
+                        newImageUri != null -> newImageUri.toString()
+                        profilePictureUrl != null -> profilePictureUrl
+                        else -> null
+                    },
                     onImageClick = { launcher.launch("image/*") }
                 )
 

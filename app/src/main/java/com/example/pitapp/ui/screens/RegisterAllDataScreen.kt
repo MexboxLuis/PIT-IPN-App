@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,12 +25,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,12 +61,15 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
+import com.example.pitapp.ui.components.GenericDropDonMenu
+import com.example.pitapp.ui.model.MenuItem
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterAllDataScreen(
     navController: NavHostController,
@@ -77,12 +88,19 @@ fun RegisterAllDataScreen(
     var name by rememberSaveable { mutableStateOf("") }
     var surname by rememberSaveable { mutableStateOf("") }
     var isLoadingScreen by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
+    val menuItems = listOf(
+        MenuItem("Edit", Icons.Outlined.Edit) { /* Handle edit! */ },
+        MenuItem("Settings", Icons.Outlined.Settings) { /* Handle settings! */ },
+        MenuItem("Send Feedback", Icons.Outlined.Email) { /* Handle send feedback! */ }
+    )
+
 
     if (!isLoadingScreen) {
         BackScaffold(navController = navController, authManager = authManager, topBarTitle = null) {
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 32.dp)
@@ -91,134 +109,163 @@ fun RegisterAllDataScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                item {
-                    Image(
-                        painter = painterResource(id = R.drawable.pit_logo),
-                        contentDescription = null,
-                        modifier = Modifier.size(84.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        " ",
-                        style = MaterialTheme.typography.headlineLarge,
-                    )
-                    Text(
-                        text = stringResource(id = R.string.your_email_is, email),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                Image(
+                    painter = painterResource(id = R.drawable.pit_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(84.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    " ",
+                    style = MaterialTheme.typography.headlineLarge,
+                )
+                Text(
+                    text = stringResource(id = R.string.your_email_is, email),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
 
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Box(modifier = Modifier.padding(16.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .size(150.dp)
-                                .background(
-                                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (imageUri.value != null) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(imageUri.value),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize().clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(100.dp)
-                                )
-                            }
-                        }
-                        IconButton(
-                            onClick = { launcher.launch("image/*") },
-                            modifier = Modifier.align(Alignment.TopEnd)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Box(modifier = Modifier.padding(16.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .size(150.dp)
+                            .background(
+                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (imageUri.value != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(imageUri.value),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(32.dp)
+                                    .fillMaxSize()
                                     .clip(CircleShape),
+                                contentScale = ContentScale.Crop
                             )
-                        }
-                    }
-
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text(text = stringResource(id = R.string.names)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Next
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedTextField(
-                        value = surname,
-                        onValueChange = { surname = it },
-                        label = { Text(text = stringResource(id = R.string.surnames)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            isLoadingScreen = true
-                            coroutineScope.launch {
-                                val selectedImageUri = imageUri.value
-                                val dataResult = fireStoreManager.registerUserData(
-                                    email,
-                                    name.trimEnd(),
-                                    surname.trimEnd(),
-                                    selectedImageUri
-                                )
-                                if (dataResult.isSuccess) {
-                                    onRegisterDataSuccess()
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.error_uploading_data,
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                                delay(1000)
-                                isLoadingScreen = false
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        enabled = name.isNotEmpty() && surname.isNotEmpty()
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = stringResource(id = R.string.register))
-                            Spacer(modifier = Modifier.width(16.dp))
+                        } else {
                             Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null,
+                                modifier = Modifier.size(100.dp)
                             )
                         }
-
                     }
-                    Spacer(modifier = Modifier.height(32.dp))
+                    IconButton(
+                        onClick = { launcher.launch("image/*") },
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape),
+                        )
+                    }
                 }
+
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(text = stringResource(id = R.string.names)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = surname,
+                    onValueChange = { surname = it },
+                    label = { Text(text = stringResource(id = R.string.surnames)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        isLoadingScreen = true
+                        coroutineScope.launch {
+                            val selectedImageUri = imageUri.value
+                            val dataResult = fireStoreManager.registerUserData(
+                                email,
+                                name.trimEnd(),
+                                surname.trimEnd(),
+                                selectedImageUri
+                            )
+                            if (dataResult.isSuccess) {
+                                onRegisterDataSuccess()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    R.string.error_uploading_data,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            delay(1000)
+                            isLoadingScreen = false
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    enabled = name.isNotEmpty() && surname.isNotEmpty()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = stringResource(id = R.string.register))
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null
+                        )
+                    }
+
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+//                ExposedDropdownMenuBox(
+//                    expanded = isExpanded,
+//                    onExpandedChange = { isExpanded = !isExpanded }
+//                ) {
+//                    TextField(
+//                        modifier = Modifier.menuAnchor(),
+//                        value = selectedSection.getDisplayName(context),
+//                        onValueChange = {},
+//                        readOnly = true,
+//                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
+//                    )
+//                    ExposedDropdownMenu(
+//                        expanded = isExpanded,
+//                        onDismissRequest = { isExpanded = false }
+//                    ) {
+//                        menuItems.forEach { section ->
+//                            DropdownMenuItem(
+//                                text = { Text(text = section.getDisplayName(context)) },
+//                                onClick = {
+//                                    selectedSection = section
+//                                    isExpanded = false
+//                                },
+//                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+//                            )
+//                        }
+//                    }
+//                }
+                Spacer(modifier = Modifier.height(32.dp))
+
             }
         }
     } else {

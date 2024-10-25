@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PITApp</string>
+    <string name="app_name">Programa Institucional de Tutorias</string>
 
     <string name="loading">Cargando…</string>
 
@@ -47,6 +47,11 @@
     <string name="save_changes">Guardar cambios</string>
     <string name="profile">Perfil</string>
     <string name="error_saving">Error al guardar los cambios.</string>
+
+    <!--    Modal bottom sheet-->
+    <string name="headline_sheet">Haz una clase para tus alumnos.</string>
+    <string name="create_class">Iniciar clase</string>
+    <string name="schedule_class">Agendar clase</string>
 
 
 </resources>

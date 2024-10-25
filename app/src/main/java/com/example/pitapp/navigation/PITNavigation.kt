@@ -23,6 +23,7 @@ import com.example.pitapp.ui.screens.RequestedPermissionScreen
 import com.example.pitapp.ui.screens.RequestsScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
 import com.example.pitapp.ui.screens.ScheduleClassScreen
+import com.example.pitapp.ui.screens.StartClassNowScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 
@@ -141,9 +142,20 @@ fun PITNavigation(
             )
         }
 
+        composable(route = "startClassNowScreen"){
+            StartClassNowScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
+            )
+        }
 
         composable(route = "scheduleClassScreen") {
-            ScheduleClassScreen(navController, authManager, fireStoreManager)
+            ScheduleClassScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
+            )
         }
 
         composable(

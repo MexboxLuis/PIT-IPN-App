@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -26,11 +27,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +41,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -46,6 +51,7 @@ import com.example.pitapp.data.UserData
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import com.example.pitapp.utils.currentRoute
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +63,8 @@ fun MainScaffold(
 ) {
     var userData by remember { mutableStateOf<UserData?>(null) }
     val actualRoute = currentRoute(navController)
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         fireStoreManager.getUserData { result ->
@@ -76,8 +84,8 @@ fun MainScaffold(
                         painter = painterResource(id = R.drawable.pit_logo),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(start = 10.dp)
-                            .size(32.dp)
+                            .padding(start = 24.dp)
+                            .size(48.dp)
                             .clip(CircleShape)
                             .clickable { }
                     )
@@ -89,9 +97,13 @@ fun MainScaffold(
                     ) {
 
                         Text(
-                            text = "PIT App",
-                            modifier = Modifier.padding(start = 10.dp),
-                            style = MaterialTheme.typography.titleLarge
+                            text = stringResource(id = R.string.app_name),
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .fillMaxWidth(0.8f),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontFamily = FontFamily.Serif,
+                            textAlign = TextAlign.Center
                         )
 
                     }
@@ -104,7 +116,11 @@ fun MainScaffold(
                             contentDescription = null,
                             modifier = Modifier
                                 .size(42.dp)
-                                .border(2.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(32.dp))
+                                .border(
+                                    2.dp,
+                                    MaterialTheme.colorScheme.onSurface,
+                                    RoundedCornerShape(32.dp)
+                                )
                                 .clip(CircleShape)
                                 .clickable {
                                     navController.navigate("profileScreen")
@@ -172,21 +188,31 @@ fun MainScaffold(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("scheduleClassScreen") },
-                containerColor = Color.Transparent,
+                onClick = {
+                    scope.launch {
+                        sheetState.show()
+                    }
+                },
                 shape = CircleShape,
+                modifier = Modifier.size(if (sheetState.isVisible) 64.dp else 52.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
                     contentDescription = null,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(64.dp)
                 )
             }
         }
-
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             content()
         }
     }
+
+    CreateClassSheet(
+        sheetState = sheetState,
+        scope = scope,
+        onStartNowClick = { navController.navigate("startClassNowScreen") },
+        onScheduleClick = { navController.navigate("scheduleClassScreen") }
+    )
 }

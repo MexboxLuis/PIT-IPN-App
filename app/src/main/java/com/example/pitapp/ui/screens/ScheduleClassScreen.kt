@@ -46,7 +46,7 @@ fun ScheduleClassScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(false) }
     var userData by remember { mutableStateOf<UserData?>(null) }
     var tutoring by rememberSaveable { mutableStateOf("") }
     var topic by rememberSaveable { mutableStateOf("") }
