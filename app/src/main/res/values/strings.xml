@@ -53,6 +53,10 @@
     <string name="create_class">Start class now</string>
     <string name="schedule_class">Schedule class</string>
 
+<!--    Error screen-->
+    <string name="error_screen_message">Check your internet connection or contact the administrator.</string>
+
+
 
 
 </resources>

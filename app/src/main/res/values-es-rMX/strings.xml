@@ -53,5 +53,8 @@
     <string name="create_class">Iniciar clase</string>
     <string name="schedule_class">Agendar clase</string>
 
+    <!--    Error screen-->
+    <string name="error_screen_message">Verifica tu conexión a internet o contacta al administrador.</string>
+
 
 </resources>

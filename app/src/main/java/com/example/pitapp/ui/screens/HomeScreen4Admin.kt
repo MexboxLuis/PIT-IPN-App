@@ -24,7 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.pitapp.ui.components.MainScaffold
+import com.example.pitapp.ui.components.AdminScaffold
+import com.example.pitapp.ui.components.TutorScaffold
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 
@@ -33,10 +34,10 @@ fun HomeScreen4Admin(
     navController: NavHostController,
     authManager: AuthManager,
     firestoreManager: FireStoreManager,
+    onPermissionRequestsClick: () -> Unit
 ) {
-    MainScaffold(
+    AdminScaffold(
         navController = navController,
-        authManager = authManager,
         fireStoreManager = firestoreManager
     ) {
         Column(
@@ -47,27 +48,34 @@ fun HomeScreen4Admin(
         ) {
             AdminCard(
                 title = "Requests",
-                image = Icons.Default.Email
+                image = Icons.Default.Email,
+                onClick = { onPermissionRequestsClick() }
             )
             AdminCard(
                 title = "Tutores",
-                image = Icons.Default.Person
+                image = Icons.Default.Person,
+                onClick = { }
             )
             AdminCard(
                 title = "Clases",
-                image = Icons.Default.Class
+                image = Icons.Default.Class,
+                onClick = { }
             )
         }
     }
 }
 
 @Composable
-fun AdminCard(title: String, image: ImageVector) {
+fun AdminCard(
+    title: String,
+    image: ImageVector,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { /* Añadir lógica de navegación o acción aquí */ },
+            .clickable { onClick() },
     ) {
         Row(
             modifier = Modifier

@@ -31,17 +31,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.example.pitapp.R
 import com.example.pitapp.data.UserData
-import com.example.pitapp.ui.components.MainScaffold
+import com.example.pitapp.ui.components.BackScaffold
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun RequestsScreen(
+fun PermissionRequestsScreen(
     navController: NavHostController,
     authManager: AuthManager,
     fireStoreManager: FireStoreManager
@@ -61,10 +63,10 @@ fun RequestsScreen(
         }
     }
 
-    MainScaffold(
+    BackScaffold(
         navController = navController,
         authManager = authManager,
-        fireStoreManager = fireStoreManager
+        topBarTitle = stringResource(id = R.string.requests)
     ) {
         if (isLoading) {
             CircularProgressIndicator()

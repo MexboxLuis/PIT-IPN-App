@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.pitapp.ui.components.MainScaffold
+import com.example.pitapp.ui.components.TutorScaffold
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 
@@ -24,7 +24,7 @@ fun HomeScreen4Tutor(
     fireStoreManager: FireStoreManager,
 ) {
 
-    MainScaffold(
+    TutorScaffold(
         navController = navController,
         authManager = authManager,
         fireStoreManager = fireStoreManager

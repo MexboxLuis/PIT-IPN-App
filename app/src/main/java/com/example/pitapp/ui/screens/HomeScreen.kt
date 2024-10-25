@@ -68,7 +68,8 @@ fun HomeScreen(
             2 -> HomeScreen4Admin(
                 navController = navController,
                 authManager = authManager,
-                firestoreManager = fireStoreManager
+                firestoreManager = fireStoreManager,
+                onPermissionRequestsClick = { navController.navigate("permissionRequestsScreen") }
             )
             else -> ErrorScreen()
         }
