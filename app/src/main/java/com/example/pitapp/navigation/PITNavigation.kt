@@ -24,6 +24,7 @@ import com.example.pitapp.ui.screens.PermissionRequestsScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
 import com.example.pitapp.ui.screens.ScheduleClassScreen
 import com.example.pitapp.ui.screens.StartClassNowScreen
+import com.example.pitapp.ui.screens.TutorsScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 
@@ -128,6 +129,14 @@ fun PITNavigation(
 
         composable(route = "permissionRequestsScreen") {
             PermissionRequestsScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
+            )
+        }
+
+        composable(route = "tutorsScreen") {
+            TutorsScreen(
                 navController = navController,
                 authManager = authManager,
                 fireStoreManager = fireStoreManager

@@ -10,133 +10,113 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.pitapp.data.ClassData
 import com.example.pitapp.ui.components.TutorScaffold
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
+import com.google.firebase.Timestamp
 
 @Composable
 fun HomeScreen4Tutor(
     navController: NavHostController,
     authManager: AuthManager,
-    fireStoreManager: FireStoreManager,
+    fireStoreManager: FireStoreManager
 ) {
+    val classes = remember { mutableStateOf<List<ClassData>>(emptyList()) }
+    val currentUserEmail = authManager.getUserEmail() ?: ""
 
+    LaunchedEffect(currentUserEmail) {
+        fireStoreManager.fetchClassesForTutor { fetchedClasses ->
+            classes.value = fetchedClasses.getOrDefault(emptyList())
+        }
+    }
     TutorScaffold(
         navController = navController,
         authManager = authManager,
         fireStoreManager = fireStoreManager
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            val clases = listOf(
-                Clase(
-                    "Carlos Sánchez",
-                    "Matemáticas",
-                    "10/10/2024",
-                    "10:00 AM",
-                    "Salón 101",
-                    listOf("Alumno1", "Alumno2", "Alumno3")
-                ),
-                Clase(
-                    "María López",
-                    "Física",
-                    "11/10/2024",
-                    "12:00 PM",
-                    "Salón 203",
-                    listOf("Alumno4", "Alumno6")
-                ),
-                Clase(
-                    "Jorge Pérez",
-                    "Química",
-                    "12/10/2024",
-                    "9:00 AM",
-                    "Salón 102",
-                    listOf(
-                        "Alumno7",
-                        "Alumno8",
-                        "Alumno9",
-                        "Alumno10",
-                        "Alumno11",
-                        "Alumno12",
-                        "Alumno10",
-                        "Alumno11",
-                        "Alumno12"
-                    )
-                ),
-                Clase(
-                    "Mamarre Zamora",
-                    "Programación",
-                    "12/10/2024",
-                    "9:00 AM",
-                    "Salón 102",
-                    listOf("Alumno10", "Alumno11", "Alumno12", "Alumno10", "Alumno11", "Alumno12")
-                )
-            )
 
-            LazyColumn {
-                item {
-                    Text(
-                        text = "Mis Clases:",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                }
-                items(clases) { clase ->
-                    ClaseCard(
-                        clase,
-                        onClick = {
-                            navController.navigate(
-                                "classDetailScreen/${clase.tutoria}/${clase.tutor}/${clase.hora}"
-                            )
-                        }
-                    )
-                }
+        LazyColumn {
+            item {
+                Text(
+                    text = "My Classes:",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+            items(classes.value) { classItem ->
+                val isUpcoming = classItem.startTime.seconds > Timestamp.now().seconds
+                val opacity = if (isUpcoming) 0.5f else 1f // Apply opacity if upcoming
+                val studentCount = classItem.students.size.takeIf { !isUpcoming }
+                    ?: 0 // Show students only if started
+
+                ClassCard(
+                    classItem = classItem,
+                    opacity = opacity,
+                    studentCount = studentCount,
+                    onClick = {
+
+                    }
+                )
             }
         }
     }
-
 }
 
-
 @Composable
-fun ClaseCard(clase: Clase, onClick: () -> Unit = {}) {
+fun ClassCard(classItem: ClassData, opacity: Float, studentCount: Int, onClick: () -> Unit) {
     Column(modifier = Modifier
         .fillMaxSize()
-        .clickable { onClick() }) {
-
+        .padding(vertical = 8.dp, horizontal = 16.dp)
+        .clickable { onClick() }
+        .alpha(opacity)) {
 
         HorizontalDivider()
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Text(text = clase.tutoria, style = MaterialTheme.typography.titleLarge)
-            Text(text = "Fecha: ${clase.fecha}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Hora: ${clase.hora}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Lugar: ${clase.lugar}", style = MaterialTheme.typography.bodySmall)
+            Text(text = classItem.topic, style = MaterialTheme.typography.titleLarge)
+            Text(text = "Tutor: ${classItem.email}")
             Text(
-                text = "No. de Alumnos: ${clase.alumnos.size}",
+                text = "Classroom: ${classItem.classroom}",
                 style = MaterialTheme.typography.bodySmall
             )
+            if (studentCount >= 0) {
+                Text(
+                    text = "No. of Students: $studentCount",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            ///time left
+            if (classItem.expectedDuration == null) {
+//                Text(
+//                    text = ,
+//                    style = MaterialTheme.typography.bodySmall
+//                )
+            }
+            else {
+                val startTime = classItem.startTime.toDate()
+                val expectedTime = classItem.expectedDuration.let {
+                    startTime.time + it * 60 * 1000
+                }
+                val timeDifference = expectedTime.minus(System.currentTimeMillis()) ?: 0
+                Text(
+                    text = if (timeDifference <= 0) "Class Finished" else "Class time left: ${timeDifference / (1000 * 60)} minutes",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
         }
         HorizontalDivider()
     }
-
 }
 
 
 
-data class Clase(
-    val tutor: String,
-    val tutoria: String,
-    val fecha: String,
-    val hora: String,
-    val lugar: String,
-    val alumnos: List<String>
-)
 

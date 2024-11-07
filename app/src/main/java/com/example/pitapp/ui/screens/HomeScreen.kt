@@ -5,13 +5,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.example.pitapp.data.UserData
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -42,10 +40,9 @@ fun HomeScreen(
 
     if (isLoading) {
         LoadingScreen()
-    }
-    else if (userData == null && authManager.isUserLoggedIn() && !hasNavigatedToRegister) {
+    } else if (userData == null && authManager.isUserLoggedIn() && !hasNavigatedToRegister) {
         hasNavigatedToRegister = true
-        navController.navigate("registerAllDataScreen/${authManager.getUserEmail()}"){
+        navController.navigate("registerAllDataScreen/${authManager.getUserEmail()}") {
             popUpTo(navController.graph.startDestinationId) {
                 inclusive = true
             }
@@ -69,8 +66,11 @@ fun HomeScreen(
                 navController = navController,
                 authManager = authManager,
                 firestoreManager = fireStoreManager,
-                onPermissionRequestsClick = { navController.navigate("permissionRequestsScreen") }
+                onPermissionRequestsClick = { navController.navigate("permissionRequestsScreen") },
+                onTutorsClick = { navController.navigate("tutorsScreen") },
+                onClassesClick = { }
             )
+
             else -> ErrorScreen()
         }
 

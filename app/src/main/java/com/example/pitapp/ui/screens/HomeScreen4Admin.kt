@@ -34,7 +34,9 @@ fun HomeScreen4Admin(
     navController: NavHostController,
     authManager: AuthManager,
     firestoreManager: FireStoreManager,
-    onPermissionRequestsClick: () -> Unit
+    onPermissionRequestsClick: () -> Unit,
+    onTutorsClick: () -> Unit,
+    onClassesClick: () -> Unit
 ) {
     AdminScaffold(
         navController = navController,
@@ -54,12 +56,12 @@ fun HomeScreen4Admin(
             AdminCard(
                 title = "Tutores",
                 image = Icons.Default.Person,
-                onClick = { }
+                onClick = { onTutorsClick() }
             )
             AdminCard(
                 title = "Clases",
                 image = Icons.Default.Class,
-                onClick = { }
+                onClick = { onClassesClick() }
             )
         }
     }
