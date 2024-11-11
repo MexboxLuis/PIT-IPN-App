@@ -68,7 +68,7 @@ fun HomeScreen(
                 firestoreManager = fireStoreManager,
                 onPermissionRequestsClick = { navController.navigate("permissionRequestsScreen") },
                 onTutorsClick = { navController.navigate("tutorsScreen") },
-                onClassesClick = { }
+                onClassesClick = { navController.navigate("tutorClassesScreen") }
             )
 
             else -> ErrorScreen()

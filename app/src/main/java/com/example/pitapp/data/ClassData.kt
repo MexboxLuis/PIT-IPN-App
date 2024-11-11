@@ -14,5 +14,14 @@ data class ClassData(
     val realDuration: Long? = null
 )
 
+data class Student(
+    val name: String = "",
+    val studentId: String = "", // Student ID
+    val academicProgram: String = "", // Career program
+    val email: String = "",
+    val status: String = "", // Regular or Irregular
+    val signature: String = "" // Signature
+)
+
 
 

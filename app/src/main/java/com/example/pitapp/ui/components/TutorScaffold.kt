@@ -53,25 +53,25 @@ fun TutorScaffold(
         },
 
         bottomBar = {
-            BottomAppBar {
-                NavigationBar {
-                    NavigationBarItem(
-                        selected = actualRoute == "homeScreen",
-                        onClick = {
-                            if (actualRoute != "homeScreen")
-                                navController.navigate("homeScreen")
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(text = stringResource(id = R.string.home)) }
-                    )
-                }
-
-            }
+//            BottomAppBar {
+//                NavigationBar {
+//                    NavigationBarItem(
+//                        selected = actualRoute == "homeScreen",
+//                        onClick = {
+//                            if (actualRoute != "homeScreen")
+//                                navController.navigate("homeScreen")
+//                        },
+//                        icon = {
+//                            Icon(
+//                                imageVector = Icons.Default.Home,
+//                                contentDescription = null
+//                            )
+//                        },
+//                        label = { Text(text = stringResource(id = R.string.home)) }
+//                    )
+//                }
+//
+//            }
         },
         floatingActionButton = {
             FloatingActionButton(

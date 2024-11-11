@@ -204,7 +204,7 @@ class FireStoreManager(
         }
     }
 
-    fun getClasses(email: String, onResult: (Result<List<ClassData>>) -> Unit) {
+    fun getClasses(email: String, onResult: (Result<List<Pair<String, ClassData>>>) -> Unit) {
         if (email.isEmpty()) {
             onResult(Result.failure(Exception("User email is required.")))
             return
@@ -227,7 +227,8 @@ class FireStoreManager(
                     val realDuration = document.getLong("realDuration")
                     val students = document.get("students") as? List<String> ?: emptyList()
 
-                    ClassData(
+                    // Retornamos el ID del documento junto con los datos
+                    document.id to ClassData(
                         email = email,
                         tutoring = tutoring,
                         topic = topic,
@@ -242,6 +243,36 @@ class FireStoreManager(
                 onResult(Result.success(classList))
             }
     }
+
+    fun getClassDetails(documentId: String, onResult: (Result<ClassData?>) -> Unit) {
+        firestore.collection("saved_classes")
+            .document(documentId)
+            .get()
+            .addOnSuccessListener { document ->
+                val classData = document.toObject(ClassData::class.java)
+                onResult(Result.success(classData))
+            }
+            .addOnFailureListener { e ->
+                onResult(Result.failure(Exception("Error fetching class details: ${e.localizedMessage}")))
+            }
+    }
+
+    fun finishClass(documentId: String, startTime: Timestamp, onResult: (Result<Unit>) -> Unit) {
+        val now = Timestamp.now()
+        val realDuration = (now.seconds - startTime.seconds) / 60 // Duración en minutos
+
+        firestore.collection("saved_classes")
+            .document(documentId)
+            .update("realDuration", realDuration)
+            .addOnSuccessListener {
+                onResult(Result.success(Unit))
+            }
+            .addOnFailureListener { e ->
+                onResult(Result.failure(Exception("Error al finalizar la clase: ${e.localizedMessage}")))
+            }
+    }
+
+
 
 
 }

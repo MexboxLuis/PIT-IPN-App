@@ -49,11 +49,12 @@ fun TutorClassList(
     fireStoreManager: FireStoreManager,
     navController: NavHostController
 ) {
-    val classes = remember { mutableStateOf<List<ClassData>>(emptyList()) }
+
+    val classes = remember { mutableStateOf<List<Pair<String, ClassData>>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        fireStoreManager.getClasses(email) { fetchedClasses ->
-            classes.value = fetchedClasses.getOrDefault(emptyList())
+        fireStoreManager.getClasses(email) { result ->
+            classes.value = result.getOrDefault(emptyList())
         }
     }
 
@@ -65,7 +66,8 @@ fun TutorClassList(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         }
-        items(classes.value) { classItem ->
+
+        items(classes.value) { (documentId, classItem) ->
             val classState = determineClassState(classItem)
             val opacity = if (classState == ClassState.UPCOMING) 0.5f else 1f
             val studentCount =
@@ -77,14 +79,13 @@ fun TutorClassList(
                 studentCount = studentCount,
                 classState = classState,
                 onClick = {
-                    navController.navigate("classDetailScreen")
+                    navController.navigate("classDetailScreen/$documentId")
                 }
             )
-
-
         }
     }
 }
+
 
 enum class ClassState { IN_PROGRESS, UPCOMING, FINISHED }
 

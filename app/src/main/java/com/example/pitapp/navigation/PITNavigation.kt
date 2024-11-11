@@ -24,6 +24,7 @@ import com.example.pitapp.ui.screens.RequestedPermissionScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
 import com.example.pitapp.ui.screens.ScheduleClassScreen
 import com.example.pitapp.ui.screens.StartClassNowScreen
+import com.example.pitapp.ui.screens.TutorClassesScreen
 import com.example.pitapp.ui.screens.TutorsScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
@@ -168,11 +169,23 @@ fun PITNavigation(
         }
 
         composable(
-            route = "classDetailScreen",
-        ) {
+            route = "classDetailScreen/{documentId}",
+            arguments = listOf(navArgument("documentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val documentId = backStackEntry.arguments?.getString("documentId") ?: ""
             ClassDetailScreen(
                 navController = navController,
                 authManager = authManager,
+                fireStoreManager = fireStoreManager,
+                classDocumentId = documentId
+            )
+        }
+
+        composable(route = "tutorClassesScreen") {
+            TutorClassesScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
             )
         }
     }
