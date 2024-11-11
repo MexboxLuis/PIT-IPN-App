@@ -16,11 +16,11 @@ import com.example.pitapp.ui.screens.ClassDetailScreen
 import com.example.pitapp.ui.screens.ErrorScreen
 import com.example.pitapp.ui.screens.HomeScreen
 import com.example.pitapp.ui.screens.LoginScreen
+import com.example.pitapp.ui.screens.PermissionRequestsScreen
 import com.example.pitapp.ui.screens.ProfileScreen
 import com.example.pitapp.ui.screens.RegisterAllDataScreen
 import com.example.pitapp.ui.screens.RegisterDataScreen
 import com.example.pitapp.ui.screens.RequestedPermissionScreen
-import com.example.pitapp.ui.screens.PermissionRequestsScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
 import com.example.pitapp.ui.screens.ScheduleClassScreen
 import com.example.pitapp.ui.screens.StartClassNowScreen
@@ -151,7 +151,7 @@ fun PITNavigation(
             )
         }
 
-        composable(route = "startClassNowScreen"){
+        composable(route = "startClassNowScreen") {
             StartClassNowScreen(
                 navController = navController,
                 authManager = authManager,
@@ -168,34 +168,12 @@ fun PITNavigation(
         }
 
         composable(
-            route = "classDetailScreen/{className}/{tutor}/{startTime}",
-            arguments = listOf(
-                navArgument("className") { type = NavType.StringType },
-                navArgument("tutor") { type = NavType.StringType },
-                navArgument("startTime") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val className = backStackEntry.arguments?.getString("className") ?: ""
-            val tutor = backStackEntry.arguments?.getString("tutor") ?: ""
-            val startTime = backStackEntry.arguments?.getString("startTime") ?: ""
-            val studentList =
-                listOf(
-                    "Alvara Garcia Vasquez",
-                    "Emilia Rodríguez",
-                    "Ernesto Sánchez",
-                    "Mequizboxix Luis"
-                )
-
+            route = "classDetailScreen",
+        ) {
             ClassDetailScreen(
                 navController = navController,
                 authManager = authManager,
-                className = className,
-                tutor = tutor,
-                startTime = startTime,
-                studentList = studentList
             )
         }
-
-
     }
 }

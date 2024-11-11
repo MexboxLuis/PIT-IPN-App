@@ -204,42 +204,42 @@ class FireStoreManager(
         }
     }
 
-    fun fetchClassesForTutor(onResult: (Result<List<ClassData>>) -> Unit) {
+    fun getClasses(email: String, onResult: (Result<List<ClassData>>) -> Unit) {
+        if (email.isEmpty()) {
+            onResult(Result.failure(Exception("User email is required.")))
+            return
+        }
+
         firestore.collection("saved_classes")
-            .whereEqualTo("email", authManager.getUserEmail() ?: "")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
+            .whereEqualTo("email", email)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onResult(Result.failure(Exception("Error fetching class data: ${error.localizedMessage}")))
                     return@addSnapshotListener
                 }
 
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val fetchedClasses = snapshot.documents.mapNotNull { doc ->
-                        val id = doc.id
-                        val tutoring = doc.getString("tutoring") ?: ""
-                        val topic = doc.getString("topic") ?: ""
-                        val classroom = doc.getString("classroom") ?: ""
-                        val email = doc.getString("email") ?: ""
-                        val students = doc.get("students") as? List<String> ?: listOf()
-                        val startTime = doc.getTimestamp("startTime") ?: Timestamp.now()
-                        val expectedDuration = doc.getLong("expectedDuration")
-                        val realDuration = doc.getLong("realDuration")
+                val classList = snapshot?.documents?.mapNotNull { document ->
+                    val tutoring = document.getString("tutoring") ?: ""
+                    val topic = document.getString("topic") ?: ""
+                    val classroom = document.getString("classroom") ?: ""
+                    val startTime = document.getTimestamp("startTime") ?: Timestamp.now()
+                    val expectedDuration = document.getLong("expectedDuration")
+                    val realDuration = document.getLong("realDuration")
+                    val students = document.get("students") as? List<String> ?: emptyList()
 
-                        ClassData(
-                            id = id,
-                            email = email,
-                            tutoring = tutoring,
-                            topic = topic,
-                            classroom = classroom,
-                            startTime = startTime,
-                            students = students,
-                            expectedDuration = expectedDuration,
-                            realDuration = realDuration
-                        )
-                    }
-                    onResult(Result.success(fetchedClasses))
-                } else {
-                    onResult(Result.success(emptyList()))
-                }
+                    ClassData(
+                        email = email,
+                        tutoring = tutoring,
+                        topic = topic,
+                        classroom = classroom,
+                        startTime = startTime,
+                        expectedDuration = expectedDuration,
+                        realDuration = realDuration,
+                        students = students
+                    )
+                } ?: emptyList()
+
+                onResult(Result.success(classList))
             }
     }
 

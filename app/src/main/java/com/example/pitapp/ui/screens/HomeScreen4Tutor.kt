@@ -29,94 +29,113 @@ fun HomeScreen4Tutor(
     authManager: AuthManager,
     fireStoreManager: FireStoreManager
 ) {
-    val classes = remember { mutableStateOf<List<ClassData>>(emptyList()) }
     val currentUserEmail = authManager.getUserEmail() ?: ""
-
-    LaunchedEffect(currentUserEmail) {
-        fireStoreManager.fetchClassesForTutor { fetchedClasses ->
-            classes.value = fetchedClasses.getOrDefault(emptyList())
-        }
-    }
     TutorScaffold(
         navController = navController,
         authManager = authManager,
         fireStoreManager = fireStoreManager
     ) {
-
-        LazyColumn {
-            item {
-                Text(
-                    text = "My Classes:",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-            items(classes.value) { classItem ->
-                val isUpcoming = classItem.startTime.seconds > Timestamp.now().seconds
-                val opacity = if (isUpcoming) 0.5f else 1f // Apply opacity if upcoming
-                val studentCount = classItem.students.size.takeIf { !isUpcoming }
-                    ?: 0 // Show students only if started
-
-                ClassCard(
-                    classItem = classItem,
-                    opacity = opacity,
-                    studentCount = studentCount,
-                    onClick = {
-
-                    }
-                )
-            }
-        }
+        TutorClassList(
+            email = currentUserEmail,
+            fireStoreManager = fireStoreManager,
+            navController = navController
+        )
     }
 }
 
 @Composable
-fun ClassCard(classItem: ClassData, opacity: Float, studentCount: Int, onClick: () -> Unit) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(vertical = 8.dp, horizontal = 16.dp)
-        .clickable { onClick() }
-        .alpha(opacity)) {
+fun TutorClassList(
+    email: String,
+    fireStoreManager: FireStoreManager,
+    navController: NavHostController
+) {
+    val classes = remember { mutableStateOf<List<ClassData>>(emptyList()) }
 
+    LaunchedEffect(Unit) {
+        fireStoreManager.getClasses(email) { fetchedClasses ->
+            classes.value = fetchedClasses.getOrDefault(emptyList())
+        }
+    }
+
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            Text(
+                text = "My Classes:",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+        items(classes.value) { classItem ->
+            val classState = determineClassState(classItem)
+            val opacity = if (classState == ClassState.UPCOMING) 0.5f else 1f
+            val studentCount =
+                classItem.students?.size.takeIf { classState == ClassState.IN_PROGRESS } ?: 0
+
+            ClassCard(
+                classItem = classItem,
+                opacity = opacity,
+                studentCount = studentCount,
+                classState = classState,
+                onClick = {
+                    navController.navigate("classDetailScreen")
+                }
+            )
+
+
+        }
+    }
+}
+
+enum class ClassState { IN_PROGRESS, UPCOMING, FINISHED }
+
+fun determineClassState(classData: ClassData): ClassState {
+    val now = Timestamp.now().seconds
+    return when {
+        classData.realDuration != null -> ClassState.FINISHED
+        classData.startTime.seconds <= now -> ClassState.IN_PROGRESS
+        else -> ClassState.UPCOMING
+    }
+}
+
+@Composable
+fun ClassCard(
+    classItem: ClassData,
+    opacity: Float,
+    studentCount: Int,
+    classState: ClassState,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .clickable { onClick() }
+            .alpha(opacity)
+    ) {
         HorizontalDivider()
         Column(modifier = Modifier.padding(16.dp)) {
-
             Text(text = classItem.topic, style = MaterialTheme.typography.titleLarge)
             Text(text = "Tutor: ${classItem.email}")
             Text(
                 text = "Classroom: ${classItem.classroom}",
                 style = MaterialTheme.typography.bodySmall
             )
-            if (studentCount >= 0) {
+            if (studentCount > 0) {
                 Text(
                     text = "No. of Students: $studentCount",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-            ///time left
-            if (classItem.expectedDuration == null) {
-//                Text(
-//                    text = ,
-//                    style = MaterialTheme.typography.bodySmall
-//                )
-            }
-            else {
-                val startTime = classItem.startTime.toDate()
-                val expectedTime = classItem.expectedDuration.let {
-                    startTime.time + it * 60 * 1000
-                }
-                val timeDifference = expectedTime.minus(System.currentTimeMillis()) ?: 0
-                Text(
-                    text = if (timeDifference <= 0) "Class Finished" else "Class time left: ${timeDifference / (1000 * 60)} minutes",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
+            // Display class state visually
+            Text(
+                text = when (classState) {
+                    ClassState.IN_PROGRESS -> "Class is in progress"
+                    ClassState.UPCOMING -> "Class has not started yet"
+                    ClassState.FINISHED -> "Class has finished"
+                },
+                style = MaterialTheme.typography.bodySmall
+            )
         }
         HorizontalDivider()
     }
 }
-
-
-
-

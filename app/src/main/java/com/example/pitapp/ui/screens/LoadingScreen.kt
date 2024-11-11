@@ -20,7 +20,6 @@ import com.example.pitapp.R
 @Composable
 fun LoadingScreen() {
     Scaffold {
-
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -32,6 +31,5 @@ fun LoadingScreen() {
                 Text(text = stringResource(id = R.string.loading))
                 Spacer(modifier = Modifier.height(32.dp))
             }
-
     }
 }

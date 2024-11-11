@@ -87,8 +87,8 @@ fun TutorCard(tutor: UserData, fireStoreManager: FireStoreManager) {
 
     var classCount by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(tutor.email) {
-        fireStoreManager.fetchClassesForTutor { result ->
+    LaunchedEffect(Unit) {
+        fireStoreManager.getClasses(tutor.email) { result ->
             if (result.isSuccess) {
                 classCount = result.getOrNull()?.size ?: 0
             }
