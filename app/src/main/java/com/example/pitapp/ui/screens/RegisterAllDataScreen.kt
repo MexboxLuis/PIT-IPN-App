@@ -25,20 +25,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,15 +54,12 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
-import com.example.pitapp.ui.components.GenericDropDonMenu
-import com.example.pitapp.ui.model.MenuItem
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterAllDataScreen(
     navController: NavHostController,
@@ -88,15 +78,8 @@ fun RegisterAllDataScreen(
     var name by rememberSaveable { mutableStateOf("") }
     var surname by rememberSaveable { mutableStateOf("") }
     var isLoadingScreen by remember { mutableStateOf(false) }
-    var expanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
-    val menuItems = listOf(
-        MenuItem("Edit", Icons.Outlined.Edit) { /* Handle edit! */ },
-        MenuItem("Settings", Icons.Outlined.Settings) { /* Handle settings! */ },
-        MenuItem("Send Feedback", Icons.Outlined.Email) { /* Handle send feedback! */ }
-    )
-
 
     if (!isLoadingScreen) {
         BackScaffold(navController = navController, authManager = authManager, topBarTitle = null) {

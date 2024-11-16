@@ -67,7 +67,8 @@ fun BackScaffold(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -80,7 +81,8 @@ fun BackScaffold(
                         if (topBarTitle != null) {
                             Text(
                                 text = topBarTitle,
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -93,7 +95,7 @@ fun BackScaffold(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Logout,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                     }

@@ -1,5 +1,6 @@
 package com.example.pitapp.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,15 +24,20 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
+import com.example.pitapp.data.ClassData
+import com.example.pitapp.ui.model.ClassState
+import com.example.pitapp.ui.model.determineClassState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -41,8 +47,19 @@ fun CreateClassSheet(
     sheetState: SheetState,
     scope: CoroutineScope,
     onStartNowClick: () -> Unit,
-    onScheduleClick: () -> Unit
+    onScheduleClick: () -> Unit,
+    classes: List<Pair<String, ClassData>>
 ) {
+
+    val context = LocalContext.current
+
+    val hasClassInProgress = remember(classes) {
+        classes.any { (_, classData) ->
+            determineClassState(classData) == ClassState.IN_PROGRESS
+        }
+    }
+
+
     if (sheetState.isVisible) {
         ModalBottomSheet(
             sheetState = sheetState,
@@ -80,8 +97,17 @@ fun CreateClassSheet(
                             icon = Icons.Default.Schedule,
                             onClick = {
                                 scope.launch {
+                                if (hasClassInProgress) {
+                                    Toast.makeText(
+                                        context,
+                                        "No se puede crear una nueva clase mientras haya una en progreso",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     sheetState.hide()
-                                    onStartNowClick()
+                                } else {
+                                        sheetState.hide()
+                                        onStartNowClick()
+                                    }
                                 }
                             }
                         )

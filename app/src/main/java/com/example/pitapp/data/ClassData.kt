@@ -9,18 +9,18 @@ data class ClassData(
     val topic: String = "",
     val classroom: String = "",
     val startTime: Timestamp = Timestamp.now(),
-    val students: List<String>? = null,
     val expectedDuration: Long? = null,
     val realDuration: Long? = null
 )
 
+
 data class Student(
     val name: String = "",
-    val studentId: String = "", // Student ID
-    val academicProgram: String = "", // Career program
+    val studentId: String = "",
+    val academicProgram: String = "",
     val email: String = "",
-    val status: String = "", // Regular or Irregular
-    val signature: String = "" // Signature
+    val status: String = "",
+    val signature: String = ""
 )
 
 

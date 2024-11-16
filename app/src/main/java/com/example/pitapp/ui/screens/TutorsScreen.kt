@@ -63,7 +63,7 @@ fun TutorsScreen(
     BackScaffold(
         navController = navController,
         authManager = authManager,
-        topBarTitle = stringResource(id = R.string.requests)
+        topBarTitle = "Tutores"
     ) {
         if (isLoading) {
             CircularProgressIndicator()

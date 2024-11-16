@@ -20,6 +20,7 @@ fun HomeScreen(
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var isError by remember { mutableStateOf(false) }
     var hasNavigatedToRegister by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -28,17 +29,18 @@ fun HomeScreen(
         fireStoreManager.getUserData { result ->
             if (result.isSuccess) {
                 userData = result.getOrNull()
-                println("User data retrieved: $userData")
             } else {
-                println("Failed to retrieve user data: ${result.exceptionOrNull()?.message}")
+                isLoading = false
+                isError = true
             }
 
             isLoading = false
         }
     }
 
-
-    if (isLoading) {
+    if (!isLoading && isError)
+        ErrorScreen()
+    else if (isLoading) {
         LoadingScreen()
     } else if (userData == null && authManager.isUserLoggedIn() && !hasNavigatedToRegister) {
         hasNavigatedToRegister = true
@@ -70,12 +72,8 @@ fun HomeScreen(
                 onTutorsClick = { navController.navigate("tutorsScreen") },
                 onClassesClick = { navController.navigate("tutorClassesScreen") }
             )
-
-            else -> ErrorScreen()
         }
-
     }
-
 
 }
 

@@ -2,8 +2,11 @@ package com.example.pitapp.utils
 
 import android.net.Uri
 import com.example.pitapp.data.ClassData
+import com.example.pitapp.data.Student
 import com.example.pitapp.data.UserData
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -191,7 +194,6 @@ class FireStoreManager(
                 "startTime" to (startTime ?: FieldValue.serverTimestamp()),
                 "expectedDuration" to expectedDuration,
                 "realDuration" to null,
-                "students" to null
             )
 
             firestore.collection("saved_classes")
@@ -225,9 +227,7 @@ class FireStoreManager(
                     val startTime = document.getTimestamp("startTime") ?: Timestamp.now()
                     val expectedDuration = document.getLong("expectedDuration")
                     val realDuration = document.getLong("realDuration")
-                    val students = document.get("students") as? List<String> ?: emptyList()
 
-                    // Retornamos el ID del documento junto con los datos
                     document.id to ClassData(
                         email = email,
                         tutoring = tutoring,
@@ -236,8 +236,8 @@ class FireStoreManager(
                         startTime = startTime,
                         expectedDuration = expectedDuration,
                         realDuration = realDuration,
-                        students = students
-                    )
+
+                        )
                 } ?: emptyList()
 
                 onResult(Result.success(classList))
@@ -247,19 +247,21 @@ class FireStoreManager(
     fun getClassDetails(documentId: String, onResult: (Result<ClassData?>) -> Unit) {
         firestore.collection("saved_classes")
             .document(documentId)
-            .get()
-            .addOnSuccessListener { document ->
-                val classData = document.toObject(ClassData::class.java)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onResult(Result.failure(Exception("Error fetching class details: ${error.localizedMessage}")))
+                    return@addSnapshotListener
+                }
+
+                val classData = snapshot?.toObject(ClassData::class.java)
                 onResult(Result.success(classData))
-            }
-            .addOnFailureListener { e ->
-                onResult(Result.failure(Exception("Error fetching class details: ${e.localizedMessage}")))
             }
     }
 
+
     fun finishClass(documentId: String, startTime: Timestamp, onResult: (Result<Unit>) -> Unit) {
         val now = Timestamp.now()
-        val realDuration = (now.seconds - startTime.seconds) / 60 // Duración en minutos
+        val realDuration = (now.seconds - startTime.seconds) / 60
 
         firestore.collection("saved_classes")
             .document(documentId)
@@ -268,12 +270,77 @@ class FireStoreManager(
                 onResult(Result.success(Unit))
             }
             .addOnFailureListener { e ->
-                onResult(Result.failure(Exception("Error al finalizar la clase: ${e.localizedMessage}")))
+                onResult(Result.failure(Exception("Error at the end of the class: ${e.localizedMessage}")))
+            }
+    }
+
+    fun addStudentToClass(
+        classDocumentId: String,
+        student: Student,
+        callback: (Result<Unit>) -> Unit
+    ) {
+        val studentsCollection = FirebaseFirestore.getInstance().collection("saved_classes")
+            .document(classDocumentId)
+            .collection("students")
+
+        val savedStudentsCollection = FirebaseFirestore.getInstance().collection("saved_students")
+
+        savedStudentsCollection.document(student.studentId)
+            .set(student)
+            .addOnSuccessListener {
+                studentsCollection.document(student.studentId)
+                    .set(mapOf("studentId" to student.studentId))
+                    .addOnSuccessListener {
+                        callback(Result.success(Unit))
+                    }
+                    .addOnFailureListener { exception ->
+                        callback(Result.failure(exception))
+                    }
+            }
+            .addOnFailureListener { exception ->
+                callback(Result.failure(exception))
             }
     }
 
 
+    fun getStudents(classDocumentId: String, callback: (Result<List<Student>>) -> Unit) {
+        val studentsCollection = FirebaseFirestore.getInstance().collection("saved_classes")
+            .document(classDocumentId)
+            .collection("students")
 
+        studentsCollection.get()
+            .addOnSuccessListener { querySnapshot ->
+                val studentIds = querySnapshot.documents.mapNotNull { it.getString("studentId") }
+                val savedStudentsCollection =
+                    FirebaseFirestore.getInstance().collection("saved_students")
+                val studentDetailsTasks = studentIds.map { studentId ->
+                    savedStudentsCollection.document(studentId).get()
+                }
+
+                Tasks.whenAllSuccess<DocumentSnapshot>(studentDetailsTasks)
+                    .addOnSuccessListener { documents ->
+                        val students = documents.mapNotNull { it.toObject(Student::class.java) }
+                        callback(Result.success(students))
+                    }
+                    .addOnFailureListener { exception ->
+                        callback(Result.failure(exception))
+                    }
+            }
+            .addOnFailureListener { exception ->
+                callback(Result.failure(exception))
+            }
+    }
+
+    suspend fun isStudentExists(studentId: String, callback: (Boolean) -> Unit) {
+        val savedStudentsCollection = FirebaseFirestore.getInstance().collection("saved_students")
+        savedStudentsCollection.document(studentId).get()
+            .addOnSuccessListener { document ->
+                callback(document.exists())
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
 
 }
 

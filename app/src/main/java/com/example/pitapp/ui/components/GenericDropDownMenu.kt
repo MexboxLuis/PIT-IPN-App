@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import com.example.pitapp.ui.model.MenuItem
 
 @Composable
-fun GenericDropDonMenu(
+fun GenericDropDownMenu(
     menuItems: List<MenuItem>,
     expanded: Boolean,
     onDismissRequest: () -> Unit

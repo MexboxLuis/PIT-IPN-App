@@ -1,8 +1,6 @@
 package com.example.pitapp.ui.screens
 
-import android.app.DatePickerDialog
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,14 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,14 +31,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.data.UserData
+import com.example.pitapp.data.ClassData
 import com.example.pitapp.ui.components.BackScaffold
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 
 @Composable
@@ -51,12 +45,11 @@ fun StartClassNowScreen(
     authManager: AuthManager,
     fireStoreManager: FireStoreManager
 ) {
-    val calendar = Calendar.getInstance()
+
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     var isLoading by remember { mutableStateOf(true) }
-    var userData by remember { mutableStateOf<UserData?>(null) }
     var tutoring by rememberSaveable { mutableStateOf("") }
     var topic by rememberSaveable { mutableStateOf("") }
     var classroom by rememberSaveable { mutableStateOf("") }
@@ -64,10 +57,13 @@ fun StartClassNowScreen(
     var durationHours by rememberSaveable { mutableIntStateOf(0) }
     var durationMinutes by rememberSaveable { mutableIntStateOf(0) }
 
+
+
     val isButtonEnabled =
         (durationHours > 0 || durationMinutes > 0 || isFreeTime) && tutoring.isNotEmpty() && topic.isNotEmpty() && classroom.isNotEmpty()
     if (authManager.isUserLoggedIn())
         isLoading = false
+
 
     if (isLoading) {
         LoadingScreen()
@@ -166,6 +162,7 @@ fun StartClassNowScreen(
                                     "Class created successfully",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                delay(500)
                                 navController.popBackStack()
                             } else {
                                 Toast.makeText(context, "Error creating class", Toast.LENGTH_SHORT)
