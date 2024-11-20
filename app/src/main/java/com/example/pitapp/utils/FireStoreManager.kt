@@ -302,7 +302,6 @@ class FireStoreManager(
             }
     }
 
-
     fun getStudents(classDocumentId: String, callback: (Result<List<Student>>) -> Unit) {
         val studentsCollection = FirebaseFirestore.getInstance().collection("saved_classes")
             .document(classDocumentId)
@@ -311,36 +310,35 @@ class FireStoreManager(
         studentsCollection.get()
             .addOnSuccessListener { querySnapshot ->
                 val studentIds = querySnapshot.documents.mapNotNull { it.getString("studentId") }
+                if (studentIds.isEmpty()) {
+                    callback(Result.success(emptyList()))
+                    return@addOnSuccessListener
+                }
+
                 val savedStudentsCollection =
                     FirebaseFirestore.getInstance().collection("saved_students")
                 val studentDetailsTasks = studentIds.map { studentId ->
                     savedStudentsCollection.document(studentId).get()
                 }
 
-                Tasks.whenAllSuccess<DocumentSnapshot>(studentDetailsTasks)
-                    .addOnSuccessListener { documents ->
-                        val students = documents.mapNotNull { it.toObject(Student::class.java) }
+                Tasks.whenAllComplete(studentDetailsTasks)
+                    .addOnSuccessListener { tasks ->
+                        val students = tasks.mapNotNull { task ->
+                            val result = (task.result as? DocumentSnapshot)
+                            result?.toObject(Student::class.java)
+                        }
                         callback(Result.success(students))
                     }
                     .addOnFailureListener { exception ->
                         callback(Result.failure(exception))
                     }
-            }
-            .addOnFailureListener { exception ->
-                callback(Result.failure(exception))
+
+                    .addOnFailureListener { exception ->
+                        callback(Result.failure(exception))
+                    }
             }
     }
 
-    suspend fun isStudentExists(studentId: String, callback: (Boolean) -> Unit) {
-        val savedStudentsCollection = FirebaseFirestore.getInstance().collection("saved_students")
-        savedStudentsCollection.document(studentId).get()
-            .addOnSuccessListener { document ->
-                callback(document.exists())
-            }
-            .addOnFailureListener {
-                callback(false)
-            }
-    }
 
 }
 

@@ -42,7 +42,7 @@ import com.example.pitapp.utils.FireStoreManager
 fun MainTopAppBar(
     fireStoreManager: FireStoreManager,
     onProfileClick: () -> Unit
-    ){
+) {
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     LaunchedEffect(Unit) {
@@ -118,7 +118,6 @@ fun MainTopAppBar(
                     )
                 }
             }
-
 
         }
     )

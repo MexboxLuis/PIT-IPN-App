@@ -25,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -219,34 +218,6 @@ fun RegisterAllDataScreen(
                     }
 
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-//                ExposedDropdownMenuBox(
-//                    expanded = isExpanded,
-//                    onExpandedChange = { isExpanded = !isExpanded }
-//                ) {
-//                    TextField(
-//                        modifier = Modifier.menuAnchor(),
-//                        value = selectedSection.getDisplayName(context),
-//                        onValueChange = {},
-//                        readOnly = true,
-//                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
-//                    )
-//                    ExposedDropdownMenu(
-//                        expanded = isExpanded,
-//                        onDismissRequest = { isExpanded = false }
-//                    ) {
-//                        menuItems.forEach { section ->
-//                            DropdownMenuItem(
-//                                text = { Text(text = section.getDisplayName(context)) },
-//                                onClick = {
-//                                    selectedSection = section
-//                                    isExpanded = false
-//                                },
-//                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-//                            )
-//                        }
-//                    }
-//                }
                 Spacer(modifier = Modifier.height(32.dp))
 
             }

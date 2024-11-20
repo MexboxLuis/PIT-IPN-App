@@ -1,6 +1,7 @@
 package com.example.pitapp.utils
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -72,6 +73,9 @@ class AuthManager(private val auth: FirebaseAuth) {
     fun isUserLoggedIn(): Boolean {
         return auth.currentUser != null
     }
+
+    //delete user
+
 
 }
 

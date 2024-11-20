@@ -100,7 +100,7 @@ fun CreateClassSheet(
                                 if (hasClassInProgress) {
                                     Toast.makeText(
                                         context,
-                                        "No se puede crear una nueva clase mientras haya una en progreso",
+                                        R.string.class_in_progress,
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     sheetState.hide()
@@ -130,33 +130,4 @@ fun CreateClassSheet(
 }
 
 
-@Composable
-fun ClassInstantIcon(
-    iconTitle: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .padding(16.dp)
-            .clip(CircleShape)
-            .clickable { onClick() }
-            .padding(16.dp)
-
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(48.dp),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = iconTitle,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Normal,
-        )
-    }
-}
 

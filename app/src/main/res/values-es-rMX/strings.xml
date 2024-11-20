@@ -52,9 +52,22 @@
     <string name="headline_sheet">Haz una clase para tus alumnos.</string>
     <string name="create_class">Iniciar clase</string>
     <string name="schedule_class">Agendar clase</string>
+    <string name="class_in_progress">No se puede crear una nueva clase mientras haya una en progreso.</string>
 
     <!--    Error screen-->
     <string name="error_screen_message">Verifica tu conexión a internet o contacta al administrador.</string>
+
+<!--    Home screen 4 admin-->
+    <string name="permission_requests_subtitle">Solicitudes pendientes de tutor.</string>
+    <string name="tutors_subtitle">Todos los tutores registrados.</string>
+    <string name="classes_subtitle">Todas las clases impartidas.</string>
+    <string name="permission_requests_title">Solicitudes de tutor</string>
+    <string name="tutors_title">Tutores registrados</string>
+    <string name="classes_title">Clases impartidas</string>
+
+
+    <!--    PermissionRequestsScreen -->
+    <string name="no_requests">No hay solicitudes de nuevos tutores.</string>
 
 
 </resources>
