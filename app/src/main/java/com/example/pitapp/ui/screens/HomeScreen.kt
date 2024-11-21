@@ -20,7 +20,6 @@ fun HomeScreen(
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-    var isError by remember { mutableStateOf(false) }
     var hasNavigatedToRegister by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -31,18 +30,14 @@ fun HomeScreen(
                 userData = result.getOrNull()
             } else {
                 isLoading = false
-                isError = true
             }
-
             isLoading = false
         }
     }
 
-    if (!isLoading && isError)
-        ErrorScreen()
-    else if (isLoading) {
+    if (isLoading)
         LoadingScreen()
-    } else if (userData == null && authManager.isUserLoggedIn() && !hasNavigatedToRegister) {
+    else if (userData == null && authManager.isUserLoggedIn() && !hasNavigatedToRegister) {
         hasNavigatedToRegister = true
         navController.navigate("registerAllDataScreen/${authManager.getUserEmail()}") {
             popUpTo(navController.graph.startDestinationId) {
@@ -72,6 +67,7 @@ fun HomeScreen(
                 onTutorsClick = { navController.navigate("tutorsScreen") },
                 onClassesClick = { navController.navigate("tutorClassesScreen") }
             )
+            else -> ErrorScreen()
         }
     }
 

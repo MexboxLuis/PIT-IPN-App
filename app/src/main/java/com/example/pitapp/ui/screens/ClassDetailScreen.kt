@@ -63,9 +63,24 @@ import com.example.pitapp.utils.FireStoreManager
 import kotlinx.coroutines.launch
 
 import android.util.Base64
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.graphics.asImageBitmap
 import java.io.ByteArrayOutputStream
 
 @Composable
@@ -79,6 +94,7 @@ fun ClassDetailScreen(
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
     var isError by rememberSaveable { mutableStateOf(false) }
+    var showStudents by remember { mutableStateOf(false) }
     val classData = remember { mutableStateOf<ClassData?>(null) }
     val studentsList = remember { mutableStateOf<List<Student>>(emptyList()) }
     var showAddStudentSheet by remember { mutableStateOf(false) }
@@ -115,16 +131,7 @@ fun ClassDetailScreen(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable {
 
-                        }
-                    ) {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(text = "mostrar estudiantes")
-                    }
                     when (determineClassState(data)) {
                         ClassState.IN_PROGRESS -> {
                             IconButton(
@@ -188,7 +195,32 @@ fun ClassDetailScreen(
                             )
                         }
                     }
+                    if (studentsList.value.isNotEmpty()) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable {
+                                showStudents = !showStudents
+                            }
+                        ) {
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(
+                                text = if (showStudents) "Ocultar estudiantes" else "Mostrar estudiantes",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Icon(
+                                imageVector = if (showStudents) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                                contentDescription = null
+                            )
+                        }
+                        if (showStudents)
+                            StudentListSection(students = studentsList.value)
+                    }
+
                 }
+
+
             }
         } ?: run {
             ErrorScreen()
@@ -239,9 +271,16 @@ fun AddStudentBottomSheet(
     var isSignatureCaptured by remember { mutableStateOf(false) } // Para mostrar el estado de la firma
 
 
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    LaunchedEffect(Unit) {
+        sheetState.expand() // Fuerza que se expanda completamente
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        sheetState = sheetState
     ) {
         Column(
             modifier = Modifier
@@ -283,7 +322,7 @@ fun AddStudentBottomSheet(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Espacio para la firma
+
             Text(
                 text = "Firma del Estudiante",
                 style = MaterialTheme.typography.titleMedium
@@ -306,13 +345,18 @@ fun AddStudentBottomSheet(
                         }
                     )
                 } else {
-                    Text(
-                        text = "Firma capturada.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Green
+                    // Mostrar la firma capturada
+                    Image(
+                        bitmap = signatureBitmap!!.asImageBitmap(),
+                        contentDescription = "Firma Capturada",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(4.dp)
                     )
                 }
             }
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -356,7 +400,7 @@ fun SignaturePad(
     modifier: Modifier = Modifier,
     onSignatureCaptured: (Bitmap) -> Unit
 ) {
-    val androidPath = remember { android.graphics.Path() }
+    val androidPath = remember { Path() }
     val path = remember { androidx.compose.ui.graphics.Path() }
 
     val density = LocalDensity.current
@@ -413,63 +457,56 @@ fun SignaturePad(
 
 
 @Composable
-fun SignatureScreen() {
-    val context = LocalContext.current
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        var signatureBitmap by remember { mutableStateOf<Bitmap?>(null) }
-
-        Text("Firme dentro del cuadro:", style = MaterialTheme.typography.titleMedium)
-
-        SignaturePad(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            onSignatureCaptured = { bitmap ->
-                signatureBitmap = bitmap
-            }
-        )
-
-        Button(onClick = {
-            signatureBitmap?.let {
-
-                Toast.makeText(context, "Firma capturada", Toast.LENGTH_SHORT).show()
-            }
-        }) {
-            Text("Guardar Firma")
-        }
-    }
-}
-
-
-@Composable
 fun StudentListSection(students: List<Student>) {
     var showStudentInfo by rememberSaveable { mutableStateOf(false) }
     var selectedStudent by rememberSaveable { mutableStateOf<Student?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(modifier = Modifier.height(8.dp))
-
-        students.forEach { student ->
-            Row(
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(students) { student ->
+            Card(
                 modifier = Modifier
-                    .padding(vertical = 4.dp)
+                    .fillMaxWidth()
                     .clickable {
                         selectedStudent = student
                         showStudentInfo = true
-                    }
+                    },
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
-                Text(
-                    text = student.studentId,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Estudiante",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(end = 16.dp)
+                    )
+                    Column {
+                        Text(
+                            text = student.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "Boleta: ${student.studentId}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
     }
@@ -478,22 +515,99 @@ fun StudentListSection(students: List<Student>) {
         AlertDialog(
             onDismissRequest = { showStudentInfo = false },
             confirmButton = {
+
+            },
+            title = {
                 Text(
-                    text = "Cerrar",
-                    modifier = Modifier
-                        .clickable { showStudentInfo = false }
-                        .padding(8.dp),
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Información de ${selectedStudent!!.name}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
             },
-            title = { Text(text = "Información de ${selectedStudent!!.studentId}") },
             text = {
-                Column {
-                    Text(text = "Nombre: ${selectedStudent!!.name}")
-                    Text(text = "Boleta: ${selectedStudent!!.studentId}")
-                    Text(text = "Programa Académico: ${selectedStudent!!.academicProgram}")
-                    Text(text = "Email: ${selectedStudent!!.email}")
-                    Text(text = "Estado: ${selectedStudent!!.status}")
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    // Nombre
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Nombre",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = selectedStudent!!.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    // Boleta
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Assignment,
+                            contentDescription = "Boleta",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = selectedStudent!!.studentId,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    // Programa Académico
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Book,
+                            contentDescription = "Programa Académico",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = selectedStudent!!.academicProgram,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    // Email
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Email,
+                            contentDescription = "Email",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = selectedStudent!!.email,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    // Estado
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Estado",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = selectedStudent!!.status,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             },
         )
