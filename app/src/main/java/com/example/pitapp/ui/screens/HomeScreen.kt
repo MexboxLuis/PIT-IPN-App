@@ -46,6 +46,14 @@ fun HomeScreen(
         }
     } else {
         when (userData?.permission) {
+
+            -2 -> RejectedPermissionScreen(
+                onExit = {
+                    authManager.logout()
+                    navController.navigate("loginScreen")
+                }
+            )
+
             0 -> RequestedPermissionScreen(
                 onExit = {
                     authManager.logout()
@@ -67,6 +75,7 @@ fun HomeScreen(
                 onTutorsClick = { navController.navigate("tutorsScreen") },
                 onClassesClick = { navController.navigate("tutorClassesScreen") }
             )
+
             else -> ErrorScreen()
         }
     }

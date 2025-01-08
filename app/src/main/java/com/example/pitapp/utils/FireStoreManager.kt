@@ -10,9 +10,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
@@ -88,60 +86,89 @@ class FireStoreManager(
     suspend fun updateUserData(
         name: String,
         surname: String,
-        newImageUri: Uri?,
-        oldProfilePictureUrl: String?,
-        onResult: (Result<Unit>) -> Unit
-    ) {
+        newImageUri: Uri?
+    ): Result<Unit> {
         val email = authManager.getUserEmail()
-            ?: return onResult(Result.failure(Exception("User is not logged in or email not available.")))
+            ?: return Result.failure(Exception("User is not logged in or email not available."))
 
         val storageRef = storage.reference
 
-        fun updateFireStore(profilePictureUrl: String?) {
-            val userUpdates = mapOf(
-                "name" to name,
-                "surname" to surname,
-                "profilePictureUrl" to profilePictureUrl
-            )
+        suspend fun updateFireStore(profilePictureUrl: String?) {
+            val userUpdates = if (profilePictureUrl != null) {
+                mapOf(
+                    "name" to name,
+                    "surname" to surname,
+                    "profilePictureUrl" to profilePictureUrl
+                )
+            } else {
+                mapOf(
+                    "name" to name,
+                    "surname" to surname,
+                    "profilePictureUrl" to null
+                )
+            }
 
-            firestore.collection("saved_users")
-                .document(email)
-                .update(userUpdates)
-                .addOnSuccessListener { onResult(Result.success(Unit)) }
-                .addOnFailureListener { e -> onResult(Result.failure(e)) }
-        }
-
-        suspend fun handleImageUpload() {
             try {
-                val newProfilePictureUrl: String? = newImageUri?.let { uri ->
-                    oldProfilePictureUrl?.let {
-                        val oldImageRef = storage.getReferenceFromUrl(it)
-                        oldImageRef.delete().await()
-                    }
-
-                    val newImageRef = storageRef.child("$email/images/${UUID.randomUUID()}.jpg")
-                    newImageRef.putFile(uri).await()
-                    newImageRef.downloadUrl.await().toString()
-                }
-
-                if (newImageUri == null && oldProfilePictureUrl != null) {
-                    val oldImageRef = storage.getReferenceFromUrl(oldProfilePictureUrl)
-                    oldImageRef.delete().await()
-                    updateFireStore(null)
-                } else {
-                    updateFireStore(newProfilePictureUrl)
-                }
-
+                firestore.collection("saved_users")
+                    .document(email)
+                    .update(userUpdates)
+                    .await()
             } catch (e: Exception) {
-                onResult(Result.failure(Exception("Failed to upload image: ${e.localizedMessage}")))
+                throw Exception(e.localizedMessage)
             }
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            handleImageUpload()
+        suspend fun deleteOldImageIfNeeded(oldUrl: String?) {
+            oldUrl?.let {
+                val oldImageRef = storage.getReferenceFromUrl(it)
+                try {
+                    oldImageRef.delete().await()
+                } catch (e: StorageException) {
+                    if (e.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) {
+                        throw e
+                    } else {
+
+                    }
+                }
+            }
+        }
+
+        return try {
+            val currentUserData = firestore.collection("saved_users").document(email).get().await()
+            val oldProfilePictureUrl = currentUserData.getString("profilePictureUrl")
+
+            val newProfilePictureUrl: String? = when {
+                newImageUri != null -> {
+                    deleteOldImageIfNeeded(oldProfilePictureUrl)
+                    val newImageRef = storageRef.child("$email/images/${UUID.randomUUID()}.jpg")
+                    newImageRef.putFile(newImageUri).await()
+                    newImageRef.downloadUrl.await().toString()
+                }
+                else -> null
+            }
+
+            updateFireStore(newProfilePictureUrl)
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to update user data: ${e.localizedMessage}"))
         }
     }
 
+    suspend fun deleteImageFromStorage(imageUrl: String?) {
+        imageUrl?.let {
+            try {
+                val imageRef = storage.getReferenceFromUrl(it)
+                imageRef.delete().await()
+            } catch (e: StorageException) {
+                if (e.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) {
+                    throw e
+                } else {
+
+                }
+            }
+        }
+    }
 
     fun getAllUsersSnapshot(onResult: (Result<List<UserData>>) -> Unit) {
         firestore.collection("saved_users")
@@ -274,6 +301,9 @@ class FireStoreManager(
             }
     }
 
+
+//    mi idea en el futuro es que en la clase se mande si es regular o irregular con un booleano y tambien que
+//    se guarde la signature en null y en la clase el bitmap jiji
     fun addStudentToClass(
         classDocumentId: String,
         student: Student,

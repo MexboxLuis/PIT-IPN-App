@@ -1,7 +1,6 @@
 package com.example.pitapp.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -20,7 +19,7 @@ import coil.compose.AsyncImage
 import com.example.pitapp.R
 
 @Composable
-fun ProfileImage(imageUrl: String?, onImageClick: () -> Unit) {
+fun ProfileImage(imageUrl: String?) {
     val placeholder = painterResource(id = R.drawable.pit_logo)
 
     Box(
@@ -29,7 +28,6 @@ fun ProfileImage(imageUrl: String?, onImageClick: () -> Unit) {
             .size(128.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surface)
-            .clickable { onImageClick() }
     ) {
         if (!imageUrl.isNullOrEmpty()) {
             AsyncImage(

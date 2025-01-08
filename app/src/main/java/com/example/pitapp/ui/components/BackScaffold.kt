@@ -62,7 +62,7 @@ fun BackScaffold(
                     if (isRegisteringDataScreen == false) {
                         IconButton(
                             onClick = {
-                                navController.popBackStack()
+                                navController.navigateUp()
                             }
                         ) {
                             Icon(

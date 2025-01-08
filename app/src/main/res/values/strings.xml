@@ -44,8 +44,13 @@
     <string name="requests">Requests</string>
 
 <!--    Profile Screen-->
-    <string name="save_changes">Save changes</string>
     <string name="profile">Profile</string>
+    <string name="edit_data">Edit profile data</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_pic">Add a picture</string>
+    <string name="change_pic">Change picture</string>
+    <string name="save_changes">Save changes</string>
     <string name="error_saving">Error when saving changes.</string>
 
 <!--    Modal bottom sheet-->
@@ -57,6 +62,17 @@
 <!--    Error screen-->
     <string name="error_screen_message">Check your internet connection or contact the administrator.</string>
 
+<!-- Rejected Permission Screen-->
+    <string name="permission_rejected">Your request has been rejected.</string>
+    <string name="permission_rejected_message">If you believe this is an error, please contact the school directly.</string>
+
+
+<!--    Requested Permission Screen  -->
+    <string name="approval_pending">Your request is pending approval.</string>
+    <string name="approval_message">Please wait for an administrator to approve your request.</string>
+    <string name="change_account_button">Sign in with another account</string>
+    <string name="change_account_description">Switch account</string>
+
 
 <!--    Home screen 4 admin-->
     <string name="permission_requests_subtitle">Tutor applications pending.</string>
@@ -67,8 +83,21 @@
     <string name="tutors_title">Tutors</string>
     <string name="classes_title">Classes</string>
 
-<!--    PermissionRequestsScreen -->
+<!--    Permission Requests Screen -->
     <string name="no_requests">There are no requests for new tutors.</string>
+    <string name="no_rejected_users">There are no rejected users.</string>
+    <string name="tutor_requests">Tutors requests</string>
+    <string name="rejected_users">Rejected users</string>
+    <string name="class_count">Class count: %1$d</string>
+    <string name="descend_to_guest">The user has been demoted to guest.</string>
+    <string name="reject_as_tutor">The user has been rejected as a tutor.</string>
+    <string name="error_reject_request">Error rejecting the request.</string>
+    <string name="ascend_to_tutor">The user has been promoted to tutor.</string>
+    <string name="ascend_to_admin">The user has been promoted to administrator.</string>
+    <string name="permission_error">An error occurred.</string>
+
+<!--   CLass Detail Screen  -->
+
 
 
 

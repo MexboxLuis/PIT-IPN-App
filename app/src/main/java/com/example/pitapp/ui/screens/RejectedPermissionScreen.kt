@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Approval
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,9 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 
-
 @Composable
-fun RequestedPermissionScreen(onExit: () -> Unit) {
+fun RejectedPermissionScreen(onExit: () -> Unit) {
     Scaffold { padding ->
         Box(modifier = Modifier.padding(padding))
         Column(
@@ -38,18 +38,20 @@ fun RequestedPermissionScreen(onExit: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = Icons.Default.Approval,
+                imageVector = Icons.Default.Block,
                 contentDescription = null,
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(100.dp),
+                tint = MaterialTheme.colorScheme.error
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = stringResource(R.string.approval_pending),
-                style = MaterialTheme.typography.bodyLarge
+                text = stringResource(R.string.permission_rejected),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.error
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = stringResource(R.string.approval_message),
+                text = stringResource(R.string.permission_rejected_message),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )

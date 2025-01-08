@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AddBox
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Class
 import androidx.compose.material.icons.filled.CoPresent
@@ -44,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.data.ClassData
@@ -55,6 +57,8 @@ import com.example.pitapp.ui.model.determineClassState
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,8 +102,8 @@ fun HomeScreen4Tutor(
                         onValueChange = {},
                         label = { Text("Search in my classes") },
                         modifier = Modifier
-                            .height(48.dp)
-                            .fillMaxWidth(0.65f)
+                            .fillMaxWidth(0.65f),
+                        singleLine = true
                     )
                     IconButton(
                         onClick = { /*TODO*/ }
@@ -148,7 +152,6 @@ fun TutorClassList(
 ) {
 
 
-
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             header()
@@ -187,9 +190,9 @@ fun ClassCard(
 ) {
     val classState = determineClassState(classItem)
     val opacity = when (classState) {
-        ClassState.UPCOMING -> 0.1f
+        ClassState.UPCOMING -> 0.75f
         ClassState.IN_PROGRESS -> 1f
-        ClassState.FINISHED -> 0.5f
+        ClassState.FINISHED -> 0.35f
     }
 
     val classStateText = when (classState) {
@@ -230,14 +233,15 @@ fun ClassCard(
                 Text(
                     text = classItem.topic,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
                 )
                 // Icon with student count
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = when (classState) {
                             ClassState.IN_PROGRESS -> Icons.Default.Person
-                            ClassState.UPCOMING -> Icons.Default.Schedule
+                            ClassState.UPCOMING -> Icons.Default.CalendarMonth
                             ClassState.FINISHED -> Icons.Default.CoPresent
                         },
                         contentDescription = null,
@@ -245,9 +249,19 @@ fun ClassCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${studentsList.size}",
+                        text = when (classState) {
+                            ClassState.IN_PROGRESS -> "${studentsList.size}"
+                            ClassState.UPCOMING -> run {
+                                SimpleDateFormat(
+                                    "dd/MMM",
+                                    Locale.getDefault()
+                                ).format(classItem.startTime.toDate())
+                            }
+                            ClassState.FINISHED -> "${studentsList.size}"
+                        },
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -287,7 +301,12 @@ fun ClassCard(
                 ) {
                     if (classState != ClassState.FINISHED) {
                         val text =
-                            if (classState == ClassState.IN_PROGRESS) classItem.classroom else classItem.startTime
+                            if (classState == ClassState.IN_PROGRESS) classItem.classroom else run {
+                                SimpleDateFormat(
+                                    "HH:mm",
+                                    Locale.getDefault()
+                                ).format(classItem.startTime.toDate())
+                            }
                         val icon =
                             if (classState == ClassState.IN_PROGRESS) Icons.Default.Place else Icons.Default.AccessTime
 
@@ -299,7 +318,7 @@ fun ClassCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "$text",
+                            text = text,
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

@@ -19,7 +19,7 @@ data class Student(
     val studentId: String = "",
     val academicProgram: String = "",
     val email: String = "",
-    val status: String = "",
+    val isRegular: Boolean = true,
     val signature: String = ""
 )
 

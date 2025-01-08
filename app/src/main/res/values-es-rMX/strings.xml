@@ -44,8 +44,13 @@
     <string name="requests">Solicitudes</string>
 
     <!--    Profile Screen-->
-    <string name="save_changes">Guardar cambios</string>
     <string name="profile">Perfil</string>
+    <string name="edit_data">Editar información del perfil</string>
+    <string name="delete">Eliminar</string>
+    <string name="add_pic">Añade una foto</string>
+    <string name="change_pic">Cambiar foto</string>
+    <string name="cancel">Cancel</string>
+    <string name="save_changes">Guardar cambios</string>
     <string name="error_saving">Error al guardar los cambios.</string>
 
     <!--    Modal bottom sheet-->
@@ -56,6 +61,18 @@
 
     <!--    Error screen-->
     <string name="error_screen_message">Verifica tu conexión a internet o contacta al administrador.</string>
+
+
+    <!-- Rejected Permission Screen-->
+    <string name="permission_rejected">Tu solicitud ha sido rechazada.</string>
+    <string name="permission_rejected_message">Si crees que esto es un error, por favor contacta directamente con la escuela.</string>
+
+    <!--    Requested Permission Screen  -->
+    <string name="approval_pending">Tu solicitud está pendiente de aprobación.</string>
+    <string name="approval_message">Por favor, espera a que un administrador acepte tu solicitud.</string>
+    <string name="change_account_button">Iniciar con otra cuenta</string>
+    <string name="change_account_description">Cambiar cuenta</string>
+
 
 <!--    Home screen 4 admin-->
     <string name="permission_requests_subtitle">Solicitudes pendientes de tutor.</string>
@@ -68,6 +85,16 @@
 
     <!--    PermissionRequestsScreen -->
     <string name="no_requests">No hay solicitudes de nuevos tutores.</string>
+    <string name="no_rejected_users">No hay usuarios rechazados.</string>
+    <string name="tutor_requests">Solicitudes de tutores</string>
+    <string name="rejected_users">Usuarios rechazados</string>
+    <string name="class_count">Cantidad de clases: %1$d</string>
+    <string name="descend_to_guest">El usuario ha sido degradado a invitado.</string>
+    <string name="reject_as_tutor">El usuario ha sido rechazado como tutor.</string>
+    <string name="error_reject_request">Error al rechazar la solicitud.</string>
+    <string name="ascend_to_tutor">El usuario ha sido ascendido a tutor.</string>
+    <string name="ascend_to_admin">El usuario ha sido ascendido a administrador.</string>
+    <string name="permission_error">Ocurrió un error.</string>
 
 
 </resources>
