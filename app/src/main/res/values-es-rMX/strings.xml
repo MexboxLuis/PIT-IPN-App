@@ -74,6 +74,12 @@
     <string name="change_account_description">Cambiar cuenta</string>
 
 
+    <!--    Home screen 4 tutor-->
+    <string name="search_my_classes">Buscar en mis clases</string>
+    <string name="class_state_in_progress">La clase está en curso</string>
+    <string name="class_state_upcoming">La clase aún no ha comenzado</string>
+    <string name="class_state_finished">La clase ha terminado</string>
+
 <!--    Home screen 4 admin-->
     <string name="permission_requests_subtitle">Solicitudes pendientes de tutor.</string>
     <string name="tutors_subtitle">Todos los tutores registrados.</string>
@@ -83,18 +89,30 @@
     <string name="classes_title">Clases impartidas</string>
 
 
-    <!--    PermissionRequestsScreen -->
+    <!--    Permission Requests Screen -->
     <string name="no_requests">No hay solicitudes de nuevos tutores.</string>
     <string name="no_rejected_users">No hay usuarios rechazados.</string>
     <string name="tutor_requests">Solicitudes de tutores</string>
     <string name="rejected_users">Usuarios rechazados</string>
     <string name="class_count">Cantidad de clases: %1$d</string>
-    <string name="descend_to_guest">El usuario ha sido degradado a invitado.</string>
-    <string name="reject_as_tutor">El usuario ha sido rechazado como tutor.</string>
-    <string name="error_reject_request">Error al rechazar la solicitud.</string>
-    <string name="ascend_to_tutor">El usuario ha sido ascendido a tutor.</string>
-    <string name="ascend_to_admin">El usuario ha sido ascendido a administrador.</string>
-    <string name="permission_error">Ocurrió un error.</string>
 
+
+    <!--    Tutors  Screen-->
+    <string name="no_tutors_message">No tutors available, you can add one in the permission request section.</string>
+    <string name="go_to_permission_requests">Go to permission requests</string>
+    <string name="search_by_email">Search by email</string>
+    <string name="error_loading_tutors">Error loading tutors: %1$s</string>
+    <string name="no_tutors_found">No se encontraron tutores.</string>
+
+
+    <!--    Tutor Classes List -->
+    <string name="tutor_classes_title">Clases de tutores</string>
+    <string name="loading_classes_error">Error al cargar clases para %1$s</string>
+    <string name="unknown_error">Error desconocido</string>
+    <string name="no_classes_available">No hay clases disponibles</string>
+    <string name="motivate_to_create_class">¡Motívalos a crear su primera clase!</string>
+    <string name="search_classes">Buscar clases</string>
+    <string name="no_filtered_classes">No se encontraron clases para los filtros especificados.</string>
+    <string name="classes_of_tutor">Clases de %1$s</string>
 
 </resources>

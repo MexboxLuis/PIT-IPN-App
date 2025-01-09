@@ -73,6 +73,12 @@
     <string name="change_account_button">Sign in with another account</string>
     <string name="change_account_description">Switch account</string>
 
+<!--    Home screen 4 tutor-->
+    <string name="search_my_classes">Search in my classes</string>
+    <string name="class_state_in_progress">Class is in progress</string>
+    <string name="class_state_upcoming">Class has not started yet</string>
+    <string name="class_state_finished">Class has finished</string>
+
 
 <!--    Home screen 4 admin-->
     <string name="permission_requests_subtitle">Tutor applications pending.</string>
@@ -89,14 +95,34 @@
     <string name="tutor_requests">Tutors requests</string>
     <string name="rejected_users">Rejected users</string>
     <string name="class_count">Class count: %1$d</string>
-    <string name="descend_to_guest">The user has been demoted to guest.</string>
-    <string name="reject_as_tutor">The user has been rejected as a tutor.</string>
-    <string name="error_reject_request">Error rejecting the request.</string>
-    <string name="ascend_to_tutor">The user has been promoted to tutor.</string>
-    <string name="ascend_to_admin">The user has been promoted to administrator.</string>
-    <string name="permission_error">An error occurred.</string>
+
+
+<!--    Tutors Screen-->
+
+    <string name="no_tutors_message">No tutors available, you can add one in the permission request section.</string>
+    <string name="go_to_permission_requests">Go to permission requests</string>
+    <string name="search_by_email">Search by email</string>
+    <string name="error_loading_tutors">Error loading tutors: %1$s</string>
+    <string name="no_tutors_found">No tutors found.</string>
+
+
+<!--    Tutor Classes List -->
+    <string name="tutor_classes_title">Tutors\' Classes</string>
+    <string name="loading_classes_error">Error loading classes for %1$s</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="no_classes_available">No classes available</string>
+    <string name="motivate_to_create_class">Motivate them to create their first class!</string>
+    <string name="search_classes">Search classes</string>
+    <string name="no_filtered_classes">No classes found for the specified filters.</string>
+    <string name="classes_of_tutor">Classes of %1$s</string>
+
+
+
+
 
 <!--   CLass Detail Screen  -->
+    <string name="student_regular" translatable="false">Regular</string>
+    <string name="student_irregular" translatable="false">Irregular</string>
 
 
 

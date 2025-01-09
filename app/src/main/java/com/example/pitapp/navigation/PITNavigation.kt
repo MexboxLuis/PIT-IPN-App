@@ -28,6 +28,7 @@ import com.example.pitapp.ui.screens.TutorClassesScreen
 import com.example.pitapp.ui.screens.TutorsScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
+import com.example.pitapp.utils.PreferencesManager
 
 
 @Composable
@@ -47,6 +48,8 @@ fun PITNavigation(
         isUserLoggedIn -> "homeScreen"
         else -> "errorScreen"
     }
+    val context = LocalContext.current
+    val preferencesManager = PreferencesManager(context)
 
 
     BackHandler(
@@ -115,7 +118,8 @@ fun PITNavigation(
             HomeScreen(
                 navController = navController,
                 authManager = authManager,
-                fireStoreManager = fireStoreManager
+                fireStoreManager = fireStoreManager,
+                preferencesManager = preferencesManager
             )
         }
 

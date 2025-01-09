@@ -1,8 +1,9 @@
 package com.example.pitapp.ui.components
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.pitapp.R
@@ -45,13 +47,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun UserRow(user: UserData, fireStoreManager: FireStoreManager) {
-    val context = LocalContext.current
+    LocalContext.current
     val scope = rememberCoroutineScope()
     var classCount by remember { mutableIntStateOf(0) }
-    if (user.permission == 1) {
 
+    if (user.permission == 1) {
         LaunchedEffect(Unit) {
-            fireStoreManager.getClasses(user.email) { result ->
+            fireStoreManager.getClassesByEmail(user.email) { result ->
                 if (result.isSuccess) {
                     classCount = result.getOrNull()?.size ?: 0
                 }
@@ -91,7 +93,9 @@ fun UserRow(user: UserData, fireStoreManager: FireStoreManager) {
 
             Text(
                 text = "${user.name} ${user.surname}",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontFamily = FontFamily.Serif
             )
             Text(text = user.email, style = MaterialTheme.typography.bodySmall)
             if (user.permission == 1) {
@@ -100,146 +104,87 @@ fun UserRow(user: UserData, fireStoreManager: FireStoreManager) {
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-
         }
 
         var isLoading by remember { mutableStateOf(false) }
 
-        IconButton(
-            onClick = {
-                scope.launch {
-                    isLoading = true
-                    try {
-                        when (user.permission) {
-                            1 -> {
-                                val result = fireStoreManager.updateUserPermission(user.email, 0)
-                                if (result.isSuccess) {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.descend_to_guest,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-
-                            0 -> {
-                                val result = fireStoreManager.updateUserPermission(user.email, -2)
-                                if (result.isSuccess) {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.reject_as_tutor,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.error_reject_request,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-
-                            else -> {
-                                val result = fireStoreManager.updateUserPermission(user.email, 0)
-                                if (result.isSuccess) {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.descend_to_guest,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.permission_error,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        }
-                    } finally {
-                        isLoading = false
-                    }
-                }
-            },
-            enabled = !isLoading
-        ) {
+        Box(contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp
+                    modifier = Modifier
+                        .size(32.dp)
+                        .align(Alignment.Center),
+                    strokeWidth = 3.dp
                 )
             } else {
-                Icon(
-                    imageVector = when (user.permission) {
-                        1 -> Icons.Default.ArrowCircleDown
-                        0 -> Icons.Default.PersonOff
-                        else -> Icons.Default.PersonAddAlt1
-                    },
-                    contentDescription = null
-                )
-            }
-        }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                isLoading = true
+                                try {
+                                    when (user.permission) {
+                                        1 -> {
+                                            fireStoreManager.updateUserPermission(user.email, 0)
+                                        }
 
+                                        0 -> {
+                                            fireStoreManager.updateUserPermission(user.email, -2)
+                                        }
 
-        if (user.permission == 0 || user.permission == 1) {
-
-            IconButton(
-                onClick = {
-                    scope.launch {
-                        isLoading = true
-                        try {
-                            when (user.permission) {
-                                0 -> {
-                                    val result =
-                                        fireStoreManager.updateUserPermission(user.email, 1)
-                                    if (result.isSuccess) {
-                                        Toast.makeText(
-                                            context,
-                                            R.string.ascend_to_tutor,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            R.string.permission_error,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        else -> {
+                                            fireStoreManager.updateUserPermission(user.email, 0)
+                                        }
                                     }
+                                } finally {
+                                    isLoading = false
                                 }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = when (user.permission) {
+                                1 -> Icons.Default.ArrowCircleDown
+                                0 -> Icons.Default.PersonOff
+                                else -> Icons.Default.PersonAddAlt1
+                            },
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
-                                1 -> {
-                                    val result =
-                                        fireStoreManager.updateUserPermission(user.email, 2)
-                                    if (result.isSuccess) {
-                                        Toast.makeText(
-                                            context,
-                                            R.string.ascend_to_admin,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                    if (user.permission == 0 || user.permission == 1) {
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    isLoading = true
+                                    try {
+                                        when (user.permission) {
+                                            0 -> {
+                                                fireStoreManager.updateUserPermission(user.email, 1)
+                                            }
+
+                                            1 -> {
+                                                fireStoreManager.updateUserPermission(user.email, 2)
+                                            }
+                                        }
+                                    } finally {
+                                        isLoading = false
                                     }
                                 }
                             }
-                        } finally {
-                            isLoading = false
+                        ) {
+                            Icon(
+                                imageVector = when (user.permission) {
+                                    0 -> Icons.Default.CheckCircle
+                                    1 -> Icons.Default.ArrowCircleUp
+                                    else -> Icons.Default.CheckCircle
+                                },
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
-                },
-                enabled = !isLoading
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Icon(
-                        imageVector = when (user.permission) {
-                            0 -> Icons.Default.CheckCircle
-                            1 -> Icons.Default.ArrowCircleUp
-                            else -> Icons.Default.CheckCircle
-                        },
-                        contentDescription = null
-                    )
                 }
             }
         }

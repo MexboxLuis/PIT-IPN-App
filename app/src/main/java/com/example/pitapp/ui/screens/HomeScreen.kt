@@ -10,12 +10,14 @@ import androidx.navigation.NavHostController
 import com.example.pitapp.data.UserData
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
+import com.example.pitapp.utils.PreferencesManager
 
 @Composable
 fun HomeScreen(
     navController: NavHostController,
     authManager: AuthManager,
-    fireStoreManager: FireStoreManager
+    fireStoreManager: FireStoreManager,
+    preferencesManager: PreferencesManager
 ) {
 
     var userData by remember { mutableStateOf<UserData?>(null) }
@@ -63,14 +65,13 @@ fun HomeScreen(
 
             1 -> HomeScreen4Tutor(
                 navController = navController,
-                authManager = authManager,
                 fireStoreManager = fireStoreManager
             )
 
             2 -> HomeScreen4Admin(
                 navController = navController,
-                authManager = authManager,
                 firestoreManager = fireStoreManager,
+                preferencesManager = preferencesManager,
                 onPermissionRequestsClick = { navController.navigate("permissionRequestsScreen") },
                 onTutorsClick = { navController.navigate("tutorsScreen") },
                 onClassesClick = { navController.navigate("tutorClassesScreen") }

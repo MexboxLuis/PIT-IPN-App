@@ -24,8 +24,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.pitapp.R
 import com.example.pitapp.data.Student
 import com.example.pitapp.utils.bitmapToBase64
 import com.example.pitapp.utils.stringToBitmap
@@ -127,7 +129,11 @@ fun StudentInfoDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (selectedStudent!!.isRegular) "Regular" else "Irregular", // poner en string la variable
+                        text = if (selectedStudent!!.isRegular) {
+                            stringResource(id = R.string.student_regular)
+                        } else {
+                            stringResource(id = R.string.student_irregular)
+                        },
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )

@@ -53,7 +53,7 @@ fun PermissionRequestsScreen(
             if (result.isSuccess) {
                 users = result.getOrNull()?.filter { it.permission == 0 } ?: emptyList()
                 rejectedUsers = result.getOrNull()?.filter { it.permission == -2 } ?: emptyList()
-            } else if (result.isFailure) {
+            } else {
                 errorMessage = result.exceptionOrNull()?.message
             }
             isLoading = false
@@ -65,107 +65,97 @@ fun PermissionRequestsScreen(
         authManager = authManager,
         topBarTitle = stringResource(id = R.string.permission_requests_title)
     ) {
-        if (isLoading) {
-            CircularProgressIndicator()
-        } else if (errorMessage != null) {
-            ErrorScreen()
-        } else if (users.isEmpty() && rejectedUsers.isEmpty()) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PersonOff,
-                    contentDescription = null,
-                    modifier = Modifier.size(128.dp)
-                )
-                Text(text = stringResource(id = R.string.no_requests))
+        when {
+            isLoading -> {
+                CircularProgressIndicator(modifier = Modifier.fillMaxSize())
             }
-        } else {
+            errorMessage != null -> {
+                ErrorScreen()
+            }
+            else -> {
+                var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
-            var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Top
-            ) {
-                TabRow(selectedTabIndex = selectedTabIndex) {
-                    Tab(
-                        selected = selectedTabIndex == 0,
-                        onClick = { selectedTabIndex = 0 },
-                        text = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                Text(stringResource(id = R.string.tutor_requests))
-                                Icon(
-                                    imageVector = Icons.Default.HowToVote,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                        }
-                    )
-                    Tab(
-                        selected = selectedTabIndex == 1,
-                        onClick = { selectedTabIndex = 1 },
-                        text = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-
-                                ) {
-                                Text(stringResource(id = R.string.rejected_users))
-                                Icon(
-                                    imageVector = Icons.Default.Cancel,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                        }
-                    )
-                }
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Top
                 ) {
-                    when (selectedTabIndex) {
-                        0 -> {
-                            if (users.isNotEmpty()) {
-                                items(users) { user ->
-                                    UserRow(user, fireStoreManager)
-                                }
-                            } else {
-                                item {
-                                    EmptyState(
-                                        icon = Icons.Default.PersonOff,
-                                        message = stringResource(R.string.no_requests)
+                    TabRow(selectedTabIndex = selectedTabIndex) {
+                        Tab(
+                            selected = selectedTabIndex == 0,
+                            onClick = { selectedTabIndex = 0 },
+                            text = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(stringResource(id = R.string.tutor_requests))
+                                    Icon(
+                                        imageVector = Icons.Default.HowToVote,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
                                     )
                                 }
                             }
-                        }
-                        1 -> {
-                            if (rejectedUsers.isNotEmpty()) {
-                                items(rejectedUsers) { user ->
-                                    UserRow(user, fireStoreManager)
-                                }
-                            } else {
-                                item {
-                                    EmptyState(
-                                        icon = Icons.Default.Cancel,
-                                        message = stringResource(R.string.no_rejected_users)
+                        )
+                        Tab(
+                            selected = selectedTabIndex == 1,
+                            onClick = { selectedTabIndex = 1 },
+                            text = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(stringResource(id = R.string.rejected_users))
+                                    Icon(
+                                        imageVector = Icons.Default.Cancel,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
                                     )
+                                }
+                            }
+                        )
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        when (selectedTabIndex) {
+                            0 -> {
+                                if (users.isNotEmpty()) {
+                                    items(users) { user ->
+                                        UserRow(user, fireStoreManager)
+                                    }
+                                } else {
+                                    item {
+                                        EmptyState(
+                                            icon = Icons.Default.PersonOff,
+                                            message = stringResource(R.string.no_requests)
+                                        )
+                                    }
+                                }
+                            }
+                            1 -> {
+                                if (rejectedUsers.isNotEmpty()) {
+                                    items(rejectedUsers) { user ->
+                                        UserRow(user, fireStoreManager)
+                                    }
+                                } else {
+                                    item {
+                                        EmptyState(
+                                            icon = Icons.Default.Cancel,
+                                            message = stringResource(R.string.no_rejected_users)
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-
         }
     }
 }
+
+
 

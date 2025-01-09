@@ -233,8 +233,9 @@ class FireStoreManager(
         }
     }
 
-    fun getClasses(email: String, onResult: (Result<List<Pair<String, ClassData>>>) -> Unit) {
-        if (email.isEmpty()) {
+    fun getClasses(onResult: (Result<List<Pair<String, ClassData>>>) -> Unit) {
+        val email = authManager.getUserEmail()
+        if (email.isNullOrEmpty()) {
             onResult(Result.failure(Exception("User email is required.")))
             return
         }
@@ -270,6 +271,44 @@ class FireStoreManager(
                 onResult(Result.success(classList))
             }
     }
+
+    fun getClassesByEmail(email: String, onResult: (Result<List<Pair<String, ClassData>>>) -> Unit) {
+        if (email.isEmpty()) {
+            onResult(Result.failure(Exception("User email is required.")))
+            return
+        }
+
+        firestore.collection("saved_classes")
+            .whereEqualTo("email", email)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onResult(Result.failure(Exception("Error fetching class data: ${error.localizedMessage}")))
+                    return@addSnapshotListener
+                }
+
+                val classList = snapshot?.documents?.mapNotNull { document ->
+                    val tutoring = document.getString("tutoring") ?: ""
+                    val topic = document.getString("topic") ?: ""
+                    val classroom = document.getString("classroom") ?: ""
+                    val startTime = document.getTimestamp("startTime") ?: Timestamp.now()
+                    val expectedDuration = document.getLong("expectedDuration")
+                    val realDuration = document.getLong("realDuration")
+
+                    document.id to ClassData(
+                        email = email,
+                        tutoring = tutoring,
+                        topic = topic,
+                        classroom = classroom,
+                        startTime = startTime,
+                        expectedDuration = expectedDuration,
+                        realDuration = realDuration,
+                    )
+                } ?: emptyList()
+
+                onResult(Result.success(classList))
+            }
+    }
+
 
     fun getClassDetails(documentId: String, onResult: (Result<ClassData?>) -> Unit) {
         firestore.collection("saved_classes")

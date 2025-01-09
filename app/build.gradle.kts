@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.auth.ktx)
 
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
 
     //icons extended

@@ -68,10 +68,10 @@ import com.example.pitapp.ui.components.BackScaffold
 import com.example.pitapp.ui.components.SignaturePad
 import com.example.pitapp.ui.components.StudentInfoDialog
 import com.example.pitapp.ui.model.ClassState
-import com.example.pitapp.ui.model.determineClassState
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import com.example.pitapp.utils.bitmapToBase64
+import com.example.pitapp.utils.determineClassState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -132,7 +132,6 @@ fun ClassDetailScreen(
 
                     when (determineClassState(data)) {
                         ClassState.IN_PROGRESS -> {
-
 
                             Column(
                                 modifier = Modifier
