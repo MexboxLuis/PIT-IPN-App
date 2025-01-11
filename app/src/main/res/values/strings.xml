@@ -75,6 +75,7 @@
 
 <!--    Home screen 4 tutor-->
     <string name="search_my_classes">Search in my classes</string>
+    <string name="no_classes_found">No classes found, start creating your first class!</string>
     <string name="class_state_in_progress">Class is in progress</string>
     <string name="class_state_upcoming">Class has not started yet</string>
     <string name="class_state_finished">Class has finished</string>

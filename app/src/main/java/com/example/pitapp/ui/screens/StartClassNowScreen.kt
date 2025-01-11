@@ -69,7 +69,7 @@ fun StartClassNowScreen(
     BackScaffold(
         navController = navController,
         authManager = authManager,
-        topBarTitle = "Start Class Now"
+        topBarTitle = stringResource(id = R.string.create_class),
     ) {
         Column(
             modifier = Modifier
@@ -80,7 +80,8 @@ fun StartClassNowScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Tutoring field
+            // Tutoring field aca la profe silvia dice que deberia poderse seleccionar una tutotoria (quizas desde admin puedas agregarla)
+            // si lo agregare esto, un admin, quizas si con un tabrow o algun separador para distinguir entre las 5 carreras
             OutlinedTextField(
                 value = tutoring,
                 onValueChange = { tutoring = it },
@@ -88,7 +89,7 @@ fun StartClassNowScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Topic field
+            // Topic field este campo si se quedara asi tal cual debido a que no habra tanta relevancia en ello a mi parecer
             OutlinedTextField(
                 value = topic,
                 onValueChange = { topic = it },
@@ -96,7 +97,7 @@ fun StartClassNowScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Classroom field
+            // Classroom field en este campo siento que si deberia ser analogo a lo anterior, otro card basciamente donde el admin agregue el salon :)
             OutlinedTextField(
                 value = classroom,
                 onValueChange = { classroom = it },
@@ -104,9 +105,9 @@ fun StartClassNowScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            FieldValue.serverTimestamp()
+//            FieldValue.serverTimestamp() este no sirve de nada aqui debe estar en firestoremanager
 
-            // Free Time and Duration Selector
+            // Free Time and Duration Selector justo aqui se tiene que corregir el tiempo de duracion, no puede ser mayor a 2 horas
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -176,7 +177,7 @@ fun StartClassNowScreen(
                                 "Class created successfully",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            delay(50)
+                            delay(500)
                             navController.popBackStack()
                         } else {
                             Toast.makeText(context, "Error creating class", Toast.LENGTH_SHORT)

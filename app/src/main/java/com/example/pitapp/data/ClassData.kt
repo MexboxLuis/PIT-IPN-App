@@ -2,7 +2,6 @@ package com.example.pitapp.data
 
 import com.google.firebase.Timestamp
 
-
 data class ClassData(
     val email: String = "",
     val tutoring: String = "",
@@ -14,14 +13,7 @@ data class ClassData(
 )
 
 
-data class Student(
-    val name: String = "",
-    val studentId: String = "",
-    val academicProgram: String = "",
-    val email: String = "",
-    val isRegular: Boolean = true,
-    val signature: String = ""
-)
+
 
 
 

@@ -70,6 +70,7 @@ fun TutorClassesScreen(
     val hiddenClassesByUser = remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
     var searchQuery by remember { mutableStateOf("") }
     var isGroupedByTutor by remember { mutableStateOf(true) }
+
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -84,7 +85,7 @@ fun TutorClassesScreen(
                             }
                             hiddenClassesByUser.value =
                                 hiddenClassesByUser.value.toMutableMap().apply {
-                                    this[user.email] = false
+                                    this[user.email] = true
                                 }
                             allClasses = classesByUser.value.values.flatten()
                         } else {
@@ -117,6 +118,7 @@ fun TutorClassesScreen(
             } else if (!errorMessage.isNullOrEmpty()) {
                 Text(text = errorMessage ?: stringResource(id = R.string.unknown_error))
             } else if (allClasses.isEmpty()) {
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -191,7 +193,8 @@ fun TutorClassesScreen(
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
-                        }
+                        },
+                        singleLine = true
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(
@@ -207,8 +210,33 @@ fun TutorClassesScreen(
                     )
                 }
 
-                if (isGroupedByTutor) {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    if (filteredAllClasses.isEmpty() && searchQuery.isNotEmpty()) {
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.FilterListOff,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(64.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = stringResource(id = R.string.no_filtered_classes),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    } else if (isGroupedByTutor) {
                         filteredClassesByUser.forEach { (userEmail, classes) ->
                             val user = users.find { it.email == userEmail }
                             item {
@@ -235,10 +263,11 @@ fun TutorClassesScreen(
                                         IconButton(
                                             onClick = {
                                                 hiddenClassesByUser.value =
-                                                    hiddenClassesByUser.value.toMutableMap().apply {
-                                                        this[userEmail] =
-                                                            !(this[userEmail] ?: false)
-                                                    }
+                                                    hiddenClassesByUser.value.toMutableMap()
+                                                        .apply {
+                                                            this[userEmail] =
+                                                                !(this[userEmail] ?: false)
+                                                        }
                                             }
                                         ) {
                                             Icon(
@@ -254,82 +283,26 @@ fun TutorClassesScreen(
                                 }
                             }
                             if (hiddenClassesByUser.value[userEmail] == false) {
-                                if (classes.isEmpty() && searchQuery.isNotEmpty()) {
-                                    item {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.FilterListOff,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(64.dp)
-                                            )
-                                            Spacer(modifier = Modifier.height(16.dp))
-                                            Text(
-                                                text = stringResource(id = R.string.no_filtered_classes),
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                textAlign = TextAlign.Center,
-                                                fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
+                                items(classes) { (documentId, classData) ->
+                                    ClassCard(
+                                        classItem = classData,
+                                        studentsList = emptyList(),
+                                        onClick = {
+                                            navController.navigate("classDetailScreen/$documentId")
                                         }
-                                    }
-                                } else {
-                                    items(classes) { (documentId, classData) ->
-                                        ClassCard(
-                                            classItem = classData,
-                                            studentsList = emptyList(),
-                                            onClick = {
-                                                navController.navigate("classDetailScreen/$documentId")
-                                            }
-                                        )
-                                    }
+                                    )
                                 }
                             }
                         }
-                    }
-                } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        if (filteredAllClasses.isEmpty() && searchQuery.isNotEmpty()) {
-                            item {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.FilterListOff,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(64.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                    Text(
-                                        text = stringResource(id = R.string.no_filtered_classes),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
+                    } else {
+                        items(filteredAllClasses) { (documentId, classData) ->
+                            ClassCard(
+                                classItem = classData,
+                                studentsList = emptyList(),
+                                onClick = {
+                                    navController.navigate("classDetailScreen/$documentId")
                                 }
-                            }
-                        } else {
-                            items(filteredAllClasses) { (documentId, classData) ->
-                                ClassCard(
-                                    classItem = classData,
-                                    studentsList = emptyList(),
-                                    onClick = {
-                                        navController.navigate("classDetailScreen/$documentId")
-                                    }
-                                )
-                            }
+                            )
                         }
                     }
                 }
