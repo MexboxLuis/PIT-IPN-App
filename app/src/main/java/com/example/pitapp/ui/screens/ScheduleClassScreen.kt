@@ -1,5 +1,6 @@
 package com.example.pitapp.ui.screens
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.widget.Toast
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.ui.components.BackScaffold
@@ -38,10 +40,13 @@ import com.example.pitapp.utils.FireStoreManager
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Locale
 
-
+@SuppressLint("NewApi")
 @Composable
 fun ScheduleClassScreen(
     navController: NavHostController,
@@ -59,20 +64,73 @@ fun ScheduleClassScreen(
     var isFreeTime by rememberSaveable { mutableStateOf(false) }
     var startTime by rememberSaveable { mutableStateOf<Timestamp?>(null) }
     var isErrorDate by rememberSaveable { mutableStateOf(false) }
+    var isInvalidSchedule by rememberSaveable { mutableStateOf(false) } // Nuevo: Para validar días no laborables y períodos
+    var invalidScheduleMessage by rememberSaveable { mutableStateOf("") } // Nuevo: Mensaje para el error de horario
 
     val calendar = Calendar.getInstance()
+
+
+    @SuppressLint("NewApi")
+    suspend fun isValidSchedule(
+        date: LocalDate,
+        fireStoreManager: FireStoreManager
+    ): Pair<Boolean, String> {
+        val year = date.year.toString()
+        try {
+            val nonWorkingDays = fireStoreManager.getNonWorkingDays(year).map {
+                it.date.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+            }
+            val periods =
+                fireStoreManager.getPeriods(year).flatMap { it.toLocalDateList() }
+
+            return when {
+                nonWorkingDays.contains(date) -> Pair(
+                    false,
+                    "Dia Laboral activo"
+                )
+
+                periods.contains(date) -> Pair(
+                    false,
+                    "Periodo Activo"
+                )
+                date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Pair(
+                    false,
+                    "Es fin de semana"
+                )
+
+                else -> Pair(true, "")
+            }
+        } catch (e: Exception) {
+//            Log.e("ScheduleClassScreen", "Error validating schedule: ${e.message}")
+//            return Pair(false, context.getString(R.string.error_validating_schedule))
+            return Pair(false, "Error validando el horario" )
+        }
+    }
+    // TimePickerDialog para la hora, sin cambios
     val timeScheduledPickerDialog = TimePickerDialog(
         context,
         { _, hourOfDay, minute ->
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
             calendar.set(Calendar.MINUTE, minute)
             startTime = Timestamp(calendar.time)
+            // Validación de la fecha
+            coroutineScope.launch {
+                val selectedLocalDate =
+                    startTime?.toDate()?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+                if (selectedLocalDate != null) {
+                    val isValid =
+                        isValidSchedule(selectedLocalDate, fireStoreManager)
+                    isInvalidSchedule = !isValid.first
+                    invalidScheduleMessage = isValid.second
+                }
+            }
         },
         calendar.get(Calendar.HOUR_OF_DAY),
         calendar.get(Calendar.MINUTE),
         true
     )
 
+    // DatePickerDialog con la validación integrada
     val datePickerDialog = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
@@ -86,15 +144,17 @@ fun ScheduleClassScreen(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
+    // Función para validar la fecha (reutilizada de StartClassNowScreen)
 
-    val isButtonEnabled =
-        !isErrorDate && tutoring.isNotEmpty() && topic.isNotEmpty() && classroom.isNotEmpty() &&
-                (isFreeTime || (durationHours > 0 || durationMinutes > 0) && startTime != null)
+
+    // Validar la fecha cuando se selecciona una nueva
+    val isButtonEnabled = !isErrorDate && !isInvalidSchedule && tutoring.isNotEmpty() && topic.isNotEmpty() && classroom.isNotEmpty() &&
+            (isFreeTime || (durationHours > 0 || durationMinutes > 0) && startTime != null)
 
     BackScaffold(
         navController = navController,
         authManager = authManager,
-        topBarTitle = "Schedule Class"
+        topBarTitle = "Agenda una clase"
     ) {
         Column(
             modifier = Modifier
@@ -106,24 +166,23 @@ fun ScheduleClassScreen(
             OutlinedTextField(
                 value = tutoring,
                 onValueChange = { tutoring = it },
-                label = { Text("Tutoring") },
+                label = { Text("Tutoria a dar") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = topic,
                 onValueChange = { topic = it },
-                label = { Text("Topic") },
+                label = { Text("El nombre de tu tema") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = classroom,
                 onValueChange = { classroom = it },
-                label = { Text("Location/Classroom") },
+                label = { Text("Selecciona el salon") },
                 modifier = Modifier.fillMaxWidth()
             )
-
 
             Row(
                 modifier = Modifier
@@ -140,7 +199,7 @@ fun ScheduleClassScreen(
                         ).format(startTime!!.toDate())
                     } else "",
                     onValueChange = {},
-                    label = { Text("Date") },
+                    label = { Text("Selecciona la fecha") },
                     enabled = false,
                     modifier = Modifier
                         .weight(1f)
@@ -154,7 +213,7 @@ fun ScheduleClassScreen(
                         SimpleDateFormat("HH:mm", Locale.getDefault()).format(startTime!!.toDate())
                     } else "",
                     onValueChange = {},
-                    label = { Text("Time") },
+                    label = { Text("Selecciona la hora") },
                     enabled = false,
                     modifier = Modifier
                         .weight(1f)
@@ -166,10 +225,16 @@ fun ScheduleClassScreen(
                 isErrorDate = startTime != null && startTime!!.seconds <= currentTime.seconds
             }
 
-
             if (isErrorDate) {
                 Text(
-                    text = "Please select a future date and time.",
+                    text = "Ha seleccionado una fecha y hora anteriores a la actual",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            if (isInvalidSchedule) {
+                Text(
+                    text = invalidScheduleMessage,
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -211,7 +276,7 @@ fun ScheduleClassScreen(
                         }
                     )
                     Text(
-                        text = "Free Time",
+                        text = "Tiempo libre",
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -222,7 +287,7 @@ fun ScheduleClassScreen(
                     ) {
                         Icon(imageVector = Icons.Default.AccessTime, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Duration: $durationHours h $durationMinutes m")
+                        Text(text = " $durationHours h $durationMinutes m")
                     }
                 }
             }

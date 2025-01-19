@@ -88,7 +88,14 @@
     <string name="permission_requests_title">Solicitudes de tutor</string>
     <string name="tutors_title">Tutores registrados</string>
     <string name="classes_title">Clases impartidas</string>
-
+    <string name="classrooms_title">Salones de clases</string>
+    <string name="classrooms_subtitle">Gestiona tus salones de clases</string>
+    <string name="calendar_title">Calendario</string>
+    <string name="calendar_subtitle">Consulta y organiza tu calendario</string>
+    <string name="careers_title">Carreras</string>
+    <string name="careers_subtitle">Explora las opciones de carrera</string>
+    <string name="search_hint">Buscar secciones</string>
+    <string name="no_filtered_section">Aún no contamos con esa sección.</string>
 
     <!--    Permission Requests Screen -->
     <string name="no_requests">No hay solicitudes de nuevos tutores.</string>
@@ -115,5 +122,29 @@
     <string name="search_classes">Buscar clases</string>
     <string name="no_filtered_classes">No se encontraron clases para los filtros especificados.</string>
     <string name="classes_of_tutor">Clases de %1$s</string>
+
+    <!--    Calendar Screen -->
+    <string name="tab_title_days">Días Inhábiles</string>
+    <string name="tab_title_periods">Periodos</string>
+    <string name="message_non_working_day">¿Quieres agregar esta fecha como inhábil?</string>
+    <string name="select_non_working_day">Selecciona un día inhábil</string>
+    <string name="confirm_range_message">¿Confirmar rango de %1$s a %2$s?</string>
+    <string name="end_date_error">La fecha final debe ser posterior a la inicial</string>
+    <string name="save_to_confirm">Presiona guardar para confirmar</string>
+    <string name="select_date_range">Selecciona un rango de fechas</string>
+    <string name="select_end_range">Selecciona el final del rango</string>
+    <string name="to">a</string>
+    <string name="day_mon">Lunes</string>
+    <string name="day_tue">Martes</string>
+    <string name="day_wed">Miércoles</string>
+    <string name="day_thu">Jueves</string>
+    <string name="day_fri">Viernes</string>
+    <string name="day_sat">Sábado</string>
+    <string name="day_sun">Domingo</string>
+
+
+
+
+
 
 </resources>

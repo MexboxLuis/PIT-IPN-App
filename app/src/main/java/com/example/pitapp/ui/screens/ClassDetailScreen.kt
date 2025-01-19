@@ -313,11 +313,11 @@ fun ClassDetailScreen(
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onBackground
                                     )
-                                    Text(
-                                        text = "Fecha: aqui fecha ",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
+//                                    Text(
+//                                        text = "Fecha: } ",
+//                                        style = MaterialTheme.typography.bodyLarge,
+//                                        color = MaterialTheme.colorScheme.onBackground
+//                                    )
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -400,18 +400,18 @@ fun ClassDetailScreen(
                                     }
                                     Spacer(modifier = Modifier.height(16.dp))
 
-                                    OutlinedButton(
-                                        onClick = {
-                                            Toast.makeText(
-                                                context,
-                                                "Generando Excel...",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        },
-                                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                                    ) {
-                                        Text(text = "Generar Reporte en Excel")
-                                    }
+//                                    OutlinedButton(
+//                                        onClick = {
+//                                            Toast.makeText(
+//                                                context,
+//                                                "Generando Excel...",
+//                                                Toast.LENGTH_SHORT
+//                                            ).show()
+//                                        },
+//                                        modifier = Modifier.align(Alignment.CenterHorizontally)
+//                                    ) {
+//                                        Text(text = "Generar Reporte en Excel")
+//                                    }
                                 }
 
                                 HorizontalDivider(

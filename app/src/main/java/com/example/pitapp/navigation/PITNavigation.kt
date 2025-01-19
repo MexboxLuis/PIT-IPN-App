@@ -12,7 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.pitapp.ui.screens.CalendarScreen
+import com.example.pitapp.ui.screens.CareersScreen
 import com.example.pitapp.ui.screens.ClassDetailScreen
+import com.example.pitapp.ui.screens.ClassroomsScreen
 import com.example.pitapp.ui.screens.ErrorScreen
 import com.example.pitapp.ui.screens.HomeScreen
 import com.example.pitapp.ui.screens.LoginScreen
@@ -190,6 +193,27 @@ fun PITNavigation(
                 navController = navController,
                 authManager = authManager,
                 fireStoreManager = fireStoreManager
+            )
+        }
+        composable(route = "classroomsScreen") {
+            ClassroomsScreen(
+                navController = navController,
+                authManager = authManager
+            )
+        }
+
+        composable(route = "calendarScreen") {
+            CalendarScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
+            )
+        }
+
+        composable(route = "careersScreen") {
+            CareersScreen(
+                navController = navController,
+                authManager = authManager
             )
         }
     }

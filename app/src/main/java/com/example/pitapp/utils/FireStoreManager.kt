@@ -4,14 +4,23 @@ import android.net.Uri
 import com.example.pitapp.data.ClassData
 import com.example.pitapp.data.Student
 import com.example.pitapp.data.UserData
+import com.example.pitapp.ui.screens.NonWorkingDay
+import com.example.pitapp.ui.screens.Period
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Calendar
+import java.util.Locale
 import java.util.UUID
 
 class FireStoreManager(
@@ -372,7 +381,7 @@ class FireStoreManager(
     }
 
     fun getStudents(classDocumentId: String, callback: (Result<List<Student>>) -> Unit) {
-        val studentsCollection = FirebaseFirestore.getInstance().collection("saved_classes")
+        val studentsCollection = firestore.collection("saved_classes")
             .document(classDocumentId)
             .collection("students")
 
@@ -407,6 +416,69 @@ class FireStoreManager(
                     }
             }
     }
+
+
+
+    suspend fun addNonWorkingDay(date: Timestamp) {
+
+
+        val calendar = Calendar.getInstance()
+        calendar.time = date.toDate()
+        val year = calendar.get(Calendar.YEAR).toString()
+
+        val nonWorkingDaysRef = firestore.collection("saved_calendar")
+            .document(year)
+            .collection("nonWorkingDays")
+
+        val newDay = NonWorkingDay(date)
+        nonWorkingDaysRef.add(newDay).await()
+    }
+
+
+
+    suspend fun addPeriod(year: String, startDate: Timestamp, endDate: Timestamp) {
+
+        val periodsRef = firestore.collection("saved_calendar")
+            .document(year)
+            .collection("periods")
+
+        val newPeriod = Period(startDate, endDate)
+        periodsRef.add(newPeriod).await()
+    }
+
+    suspend fun getNonWorkingDays(year: String): List<NonWorkingDay> = withContext(Dispatchers.IO) {
+        val nonWorkingDaysRef = firestore.collection("saved_calendar")
+            .document(year)
+            .collection("nonWorkingDays")
+
+        try {
+            val snapshot = nonWorkingDaysRef.get().await()
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(NonWorkingDay::class.java)
+            }
+        } catch (e: Exception) {
+
+            emptyList()
+        }
+    }
+
+    suspend fun getPeriods(year: String): List<Period> = withContext(Dispatchers.IO) {
+        val periodsRef = firestore.collection("saved_calendar")
+            .document(year)
+            .collection("periods")
+
+        try {
+            val snapshot = periodsRef.get().await()
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Period::class.java)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+
+
 
 
 }

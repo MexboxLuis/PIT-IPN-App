@@ -85,12 +85,20 @@
     <string name="permission_requests_subtitle">Tutor applications pending.</string>
     <string name="tutors_subtitle">All tutors registered.</string>
     <string name="classes_subtitle">All classes taught.</string>
-
     <string name="permission_requests_title">Permission requests</string>
     <string name="tutors_title">Tutors</string>
     <string name="classes_title">Classes</string>
+    <string name="classrooms_title">Classrooms</string>
+    <string name="classrooms_subtitle">Manage your classrooms</string>
+    <string name="calendar_title">Calendar</string>
+    <string name="calendar_subtitle">View and organize your calendar</string>
+    <string name="careers_title">Careers</string>
+    <string name="careers_subtitle">Explore career options</string>
+    <string name="search_hint">Search in sections</string>
+    <string name="no_filtered_section">We do not have that section yet.</string>
 
-<!--    Permission Requests Screen -->
+
+    <!--    Permission Requests Screen -->
     <string name="no_requests">There are no requests for new tutors.</string>
     <string name="no_rejected_users">There are no rejected users.</string>
     <string name="tutor_requests">Tutors requests</string>
@@ -119,11 +127,34 @@
 
 
 
-
-
 <!--   CLass Detail Screen  -->
     <string name="student_regular" translatable="false">Regular</string>
     <string name="student_irregular" translatable="false">Irregular</string>
+
+
+<!--    Calendar Screen -->
+    <string name="tab_title_days">Non-working Days</string>
+    <string name="tab_title_periods">Periods</string>
+    <string name="message_non_working_day">Do you want to add this date as a non-working day?</string>
+    <string name="select_non_working_day">Select a non-working day</string>
+    <string name="confirm_range_message">Confirm range from %1$s to %2$s?</string>
+    <string name="end_date_error">The end date must be later than the start date</string>
+    <string name="save_to_confirm">Press save to confirm</string>
+    <string name="select_date_range">Select a date range</string>
+    <string name="select_end_range">Select the end of the range</string>
+    <string name="to">to</string>
+    <string name="day_mon">Monday</string>
+    <string name="day_tue">Tuesday</string>
+    <string name="day_wed">Wednesday</string>
+    <string name="day_thu">Thursday</string>
+    <string name="day_fri">Friday</string>
+    <string name="day_sat">Saturday</string>
+    <string name="day_sun">Sunday</string>
+
+
+
+
+
 
 
 

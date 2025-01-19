@@ -1,6 +1,8 @@
 package com.example.pitapp.ui.screens
 
+import android.annotation.SuppressLint
 import android.app.TimePickerDialog
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +18,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,11 +45,17 @@ import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.ZoneId
 
 
+@SuppressLint("NewApi")
 @Composable
 fun StartClassNowScreen(
     navController: NavHostController,
@@ -63,7 +74,71 @@ fun StartClassNowScreen(
     val scrollState = rememberScrollState()
     val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
 
-    val isButtonEnabled = (durationHours > 0 || durationMinutes > 0 || isFreeTime) &&
+    val currentDate = LocalDate.now()
+    val year = currentDate.year.toString()
+
+    var isValidDate by rememberSaveable { mutableStateOf(false) }
+    var showToast by remember { mutableStateOf(false) }
+
+    var reason by rememberSaveable { mutableStateOf("") }
+
+
+    LaunchedEffect(Unit) {
+        try {
+            val nonWorkingDays = mutableListOf<LocalDate>()
+            val periods = mutableListOf<LocalDate>() // Cambiado a List<LocalDate>
+
+            // Obtener NonWorkingDays
+            val nonWorkingDaysDeferred = coroutineScope.async {
+                try {
+                    val days = fireStoreManager.getNonWorkingDays(year)
+                    nonWorkingDays.addAll(days.map {
+                        it.date.toDate().toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
+                    })
+                } catch (exception: Exception) {
+                    Log.e("Firestore", "Error fetching non-working days", exception)
+                }
+            }
+
+            // Obtener Periods y convertirlos a List<LocalDate>
+            val periodsDeferred = coroutineScope.async {
+                try {
+                    val fetchedPeriods = fireStoreManager.getPeriods(year)
+                    periods.addAll(fetchedPeriods.flatMap { it.toLocalDateList() })
+                } catch (exception: Exception) {
+                    Log.e("Firestore", "Error fetching periods", exception)
+                }
+            }
+
+            // Esperar a que ambas operaciones se completen
+            nonWorkingDaysDeferred.await()
+            periodsDeferred.await()
+
+            // Verificar condiciones
+            if (nonWorkingDays.contains(currentDate)) {
+                isValidDate = false
+                reason = "Un día no laborable"
+            } else if (periods.contains(currentDate)) { // Usar la lista de LocalDate
+                isValidDate = false
+                reason = "Un período activo"
+            } else if (currentDate.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
+                isValidDate = false
+                reason = "Es fin de semana"
+            } else {
+                isValidDate = true
+                reason = ""
+            }
+
+        } catch (e: Exception) {
+            Log.e("Error", "Exception occurred: $e")
+            isValidDate = false
+            reason = "un error inesperado"
+        }
+    }
+
+    val isButtonEnabled = isValidDate && (durationHours > 0 || durationMinutes > 0 || isFreeTime) &&
             tutoring.isNotEmpty() && topic.isNotEmpty() && classroom.isNotEmpty()
 
     BackScaffold(
@@ -80,34 +155,37 @@ fun StartClassNowScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Tutoring field aca la profe silvia dice que deberia poderse seleccionar una tutotoria (quizas desde admin puedas agregarla)
-            // si lo agregare esto, un admin, quizas si con un tabrow o algun separador para distinguir entre las 5 carreras
+
+            if (!isValidDate) {
+                Text(
+                    text = "No se puede iniciar una clase hoy debido a $reason.",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(8.dp),
+                )
+            }
+
+
             OutlinedTextField(
                 value = tutoring,
                 onValueChange = { tutoring = it },
-                label = { Text("Tutoring") },
+                label = { Text("Tutoria a dar") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Topic field este campo si se quedara asi tal cual debido a que no habra tanta relevancia en ello a mi parecer
             OutlinedTextField(
                 value = topic,
                 onValueChange = { topic = it },
-                label = { Text("Topic") },
+                label = { Text("Tema a dar") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Classroom field en este campo siento que si deberia ser analogo a lo anterior, otro card basciamente donde el admin agregue el salon :)
             OutlinedTextField(
                 value = classroom,
                 onValueChange = { classroom = it },
-                label = { Text("Location/Classroom") },
+                label = { Text("Salon de clases") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-//            FieldValue.serverTimestamp() este no sirve de nada aqui debe estar en firestoremanager
-
-            // Free Time and Duration Selector justo aqui se tiene que corregir el tiempo de duracion, no puede ser mayor a 2 horas
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,15 +208,13 @@ fun StartClassNowScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = isFreeTime,
                         onCheckedChange = { isFreeTime = it }
                     )
                     Text(
-                        text = "Free Time",
+                        text = "Tiempo libre",
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -149,19 +225,16 @@ fun StartClassNowScreen(
                     ) {
                         Icon(imageVector = Icons.Default.AccessTime, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Duration: $durationHours h $durationMinutes m")
+                        Text(text = " $durationHours h $durationMinutes m")
                     }
                 }
             }
 
-
-
-
-
-            // Create Class Button
             OutlinedButton(
                 onClick = {
                     coroutineScope.launch {
+                        Log.d("Firestore", "Attempting to create class with: $tutoring, $topic, $classroom, Duration: $durationHours h $durationMinutes m, Free Time: $isFreeTime")
+
                         val result = fireStoreManager.createClass(
                             tutoring = tutoring,
                             topic = topic,
@@ -172,15 +245,16 @@ fun StartClassNowScreen(
                         )
 
                         if (result.isSuccess) {
+                            Log.d("Firestore", "Class created successfully!")
                             Toast.makeText(
                                 context,
-                                "Class created successfully",
+                                "La clase se creo correctamente",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            delay(500)
                             navController.popBackStack()
                         } else {
-                            Toast.makeText(context, "Error creating class", Toast.LENGTH_SHORT)
+                            Log.e("Firestore", "Error creating class.")
+                            Toast.makeText(context, "Error creando la clase", Toast.LENGTH_SHORT)
                                 .show()
                         }
                     }
@@ -192,5 +266,6 @@ fun StartClassNowScreen(
             }
         }
     }
+
 }
 

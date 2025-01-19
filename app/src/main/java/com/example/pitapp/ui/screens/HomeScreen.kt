@@ -74,8 +74,12 @@ fun HomeScreen(
                 preferencesManager = preferencesManager,
                 onPermissionRequestsClick = { navController.navigate("permissionRequestsScreen") },
                 onTutorsClick = { navController.navigate("tutorsScreen") },
-                onClassesClick = { navController.navigate("tutorClassesScreen") }
+                onClassesClick = { navController.navigate("tutorClassesScreen") },
+                onClassroomsClick = { navController.navigate("classroomsScreen") },
+                onCalendarClick = { navController.navigate("calendarScreen") },
+                onCareersClick = { navController.navigate("careersScreen") }
             )
+
 
             else -> ErrorScreen()
         }
