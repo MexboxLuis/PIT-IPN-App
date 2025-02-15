@@ -103,18 +103,18 @@ fun StartClassNowScreen(
             }
 
             // Obtener Periods y convertirlos a List<LocalDate>
-            val periodsDeferred = coroutineScope.async {
-                try {
-                    val fetchedPeriods = fireStoreManager.getPeriods(year)
-                    periods.addAll(fetchedPeriods.flatMap { it.toLocalDateList() })
-                } catch (exception: Exception) {
-                    Log.e("Firestore", "Error fetching periods", exception)
-                }
-            }
+//            val periodsDeferred = coroutineScope.async {
+//                try {
+//                    val fetchedPeriods = fireStoreManager.getPeriods(year)
+//                    periods.addAll(fetchedPeriods.flatMap { it.toLocalDateList() })
+//                } catch (exception: Exception) {
+//                    Log.e("Firestore", "Error fetching periods", exception)
+//                }
+//            }
 
             // Esperar a que ambas operaciones se completen
-            nonWorkingDaysDeferred.await()
-            periodsDeferred.await()
+//            nonWorkingDaysDeferred.await()
+//            periodsDeferred.await()
 
             // Verificar condiciones
             if (nonWorkingDays.contains(currentDate)) {

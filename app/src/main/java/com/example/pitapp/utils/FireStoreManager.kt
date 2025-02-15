@@ -11,16 +11,12 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Calendar
-import java.util.Locale
 import java.util.UUID
 
 class FireStoreManager(
@@ -420,28 +416,19 @@ class FireStoreManager(
 
 
     suspend fun addNonWorkingDay(date: Timestamp) {
-
-
-        val calendar = Calendar.getInstance()
-        calendar.time = date.toDate()
+        val calendar = Calendar.getInstance().apply { time = date.toDate() }
         val year = calendar.get(Calendar.YEAR).toString()
-
         val nonWorkingDaysRef = firestore.collection("saved_calendar")
             .document(year)
             .collection("nonWorkingDays")
-
         val newDay = NonWorkingDay(date)
         nonWorkingDaysRef.add(newDay).await()
     }
 
-
-
     suspend fun addPeriod(year: String, startDate: Timestamp, endDate: Timestamp) {
-
         val periodsRef = firestore.collection("saved_calendar")
             .document(year)
             .collection("periods")
-
         val newPeriod = Period(startDate, endDate)
         periodsRef.add(newPeriod).await()
     }
@@ -450,14 +437,12 @@ class FireStoreManager(
         val nonWorkingDaysRef = firestore.collection("saved_calendar")
             .document(year)
             .collection("nonWorkingDays")
-
         try {
             val snapshot = nonWorkingDaysRef.get().await()
             snapshot.documents.mapNotNull { doc ->
                 doc.toObject(NonWorkingDay::class.java)
             }
         } catch (e: Exception) {
-
             emptyList()
         }
     }
@@ -466,7 +451,6 @@ class FireStoreManager(
         val periodsRef = firestore.collection("saved_calendar")
             .document(year)
             .collection("periods")
-
         try {
             val snapshot = periodsRef.get().await()
             snapshot.documents.mapNotNull { doc ->
@@ -474,6 +458,45 @@ class FireStoreManager(
             }
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    suspend fun deleteNonWorkingDay(date: Timestamp) = withContext(Dispatchers.IO) {
+        val calendar = Calendar.getInstance().apply { time = date.toDate() }
+        val year = calendar.get(Calendar.YEAR).toString()
+        val nonWorkingDaysRef = firestore.collection("saved_calendar")
+            .document(year)
+            .collection("nonWorkingDays")
+        try {
+            val querySnapshot = nonWorkingDaysRef
+                .whereEqualTo("date", date)
+                .get()
+                .await()
+            for (doc in querySnapshot.documents) {
+                doc.reference.delete().await()
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun deletePeriod(period: Period) = withContext(Dispatchers.IO) {
+        val calendar = Calendar.getInstance().apply { time = period.startDate.toDate() }
+        val year = calendar.get(Calendar.YEAR).toString()
+        val periodsRef = firestore.collection("saved_calendar")
+            .document(year)
+            .collection("periods")
+        try {
+            val querySnapshot = periodsRef
+                .whereEqualTo("startDate", period.startDate)
+                .whereEqualTo("endDate", period.endDate)
+                .get()
+                .await()
+            for (doc in querySnapshot.documents) {
+                doc.reference.delete().await()
+            }
+        } catch (e: Exception) {
+            throw e
         }
     }
 

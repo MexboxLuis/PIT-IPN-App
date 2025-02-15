@@ -80,8 +80,8 @@ fun ScheduleClassScreen(
             val nonWorkingDays = fireStoreManager.getNonWorkingDays(year).map {
                 it.date.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
             }
-            val periods =
-                fireStoreManager.getPeriods(year).flatMap { it.toLocalDateList() }
+//            val periods =
+//                fireStoreManager.getPeriods(year).flatMap { it.toLocalDateList() }
 
             return when {
                 nonWorkingDays.contains(date) -> Pair(
@@ -89,14 +89,14 @@ fun ScheduleClassScreen(
                     "Dia Laboral activo"
                 )
 
-                periods.contains(date) -> Pair(
-                    false,
-                    "Periodo Activo"
-                )
-                date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Pair(
-                    false,
-                    "Es fin de semana"
-                )
+//                periods.contains(date) -> Pair(
+//                    false,
+//                    "Periodo Activo"
+//                )
+//                date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Pair(
+//                    false,
+//                    "Es fin de semana"
+//                )
 
                 else -> Pair(true, "")
             }

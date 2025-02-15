@@ -151,8 +151,15 @@
     <string name="day_sat">Saturday</string>
     <string name="day_sun">Sunday</string>
 
-
-
+    <string name="non_working_day">Non-working day</string>
+    <string name="add_non_working_day">Non-working day to be added -> %s</string>
+    <string name="add_period">Period to be added -> %s</string>
+    <string name="period_details">Period details</string>
+    <string name="date_range_overlaps">The selected end date may not overlap with an active period.</string>
+    <string name="selected_day">Selected day:</string>
+    <string name="weekend">WEEKEND</string>
+    <string name="no_events">NO EVENTS</string>
+    <string name="period_prefix">HOLIDAY PERIOD</string>
 
 
 
