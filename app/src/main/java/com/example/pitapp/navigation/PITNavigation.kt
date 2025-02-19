@@ -15,8 +15,11 @@ import androidx.navigation.navArgument
 import com.example.pitapp.ui.screens.CalendarScreen
 import com.example.pitapp.ui.screens.CareersScreen
 import com.example.pitapp.ui.screens.ClassDetailScreen
+import com.example.pitapp.ui.screens.ClassSchedulesScreen
 import com.example.pitapp.ui.screens.ClassroomsScreen
+import com.example.pitapp.ui.screens.EditScheduleScreen
 import com.example.pitapp.ui.screens.ErrorScreen
+import com.example.pitapp.ui.screens.GenerateScheduleScreen
 import com.example.pitapp.ui.screens.HomeScreen
 import com.example.pitapp.ui.screens.LoginScreen
 import com.example.pitapp.ui.screens.PermissionRequestsScreen
@@ -25,7 +28,6 @@ import com.example.pitapp.ui.screens.RegisterAllDataScreen
 import com.example.pitapp.ui.screens.RegisterDataScreen
 import com.example.pitapp.ui.screens.RequestedPermissionScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
-import com.example.pitapp.ui.screens.ScheduleClassScreen
 import com.example.pitapp.ui.screens.StartClassNowScreen
 import com.example.pitapp.ui.screens.TutorClassesScreen
 import com.example.pitapp.ui.screens.TutorsScreen
@@ -167,8 +169,8 @@ fun PITNavigation(
             )
         }
 
-        composable(route = "scheduleClassScreen") {
-            ScheduleClassScreen(
+        composable(route = "generateScheduleScreen") {
+            GenerateScheduleScreen(
                 navController = navController,
                 authManager = authManager,
                 fireStoreManager = fireStoreManager
@@ -198,7 +200,8 @@ fun PITNavigation(
         composable(route = "classroomsScreen") {
             ClassroomsScreen(
                 navController = navController,
-                authManager = authManager
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
             )
         }
 
@@ -216,5 +219,26 @@ fun PITNavigation(
                 authManager = authManager
             )
         }
+
+        composable(route = "classSchedulesScreen") {
+            ClassSchedulesScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
+            )
+        }
+
+        composable(route = "editSchedule/{scheduleId}") {
+            val scheduleId = it.arguments?.getString("scheduleId")
+            EditScheduleScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager,
+                scheduleId = scheduleId
+            )
+
+        }
+
+
     }
 }

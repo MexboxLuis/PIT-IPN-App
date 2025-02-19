@@ -94,6 +94,8 @@
     <string name="calendar_subtitle">Consulta y organiza tu calendario</string>
     <string name="careers_title">Carreras</string>
     <string name="careers_subtitle">Explora las opciones de carrera</string>
+    <string name="class_schedules_title">Horario de clases</string>
+    <string name="class_schedules_subtitle">Gestión de horarios de clases y aprobaciones</string>
     <string name="search_hint">Buscar secciones</string>
     <string name="no_filtered_section">Aún no contamos con esa sección.</string>
 
@@ -141,7 +143,6 @@
     <string name="day_fri">Viernes</string>
     <string name="day_sat">Sábado</string>
     <string name="day_sun">Domingo</string>
-
     <string name="non_working_day">Día Inhábil</string>
     <string name="add_non_working_day">Día inhábil por agregar -> %s</string>
     <string name="add_period">Período por agregar -> %s</string>
@@ -152,6 +153,19 @@
     <string name="no_events">SIN EVENTOS</string>
     <string name="period_prefix">PERÍODO VACACIONAL</string>
 
+
+    <!-- CareersScreen -->
+    <string name="career_biotech">Ingeniería Biotecnológica</string>
+    <string name="career_ai">Ingeniería en Inteligencia Artificial</string>
+    <string name="career_automotive">Ingeniería en Sistemas Automotrices</string>
+    <string name="career_transport">Ingeniería en Transporte</string>
+    <string name="career_data_science">Licenciatura en Ciencia de Datos</string>
+    <string name="career_industrial">Ingeniería Industrial</string>
+
+
+
+    <!--ClassroomsScreen-->
+    <string name="add_classroom">Añadir Aula</string>
 
 
 </resources>

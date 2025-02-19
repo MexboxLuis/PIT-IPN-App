@@ -1,11 +1,14 @@
 package com.example.pitapp.utils
 
 import android.net.Uri
+import android.util.Log
 import com.example.pitapp.data.ClassData
 import com.example.pitapp.data.Student
 import com.example.pitapp.data.UserData
+import com.example.pitapp.ui.screens.Classroom
 import com.example.pitapp.ui.screens.NonWorkingDay
 import com.example.pitapp.ui.screens.Period
+import com.example.pitapp.ui.screens.Schedule
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
@@ -498,6 +501,220 @@ class FireStoreManager(
         } catch (e: Exception) {
             throw e
         }
+    }
+
+
+    fun addClassroom(classroom: Classroom, callback: (Result<Unit>) -> Unit) {
+        firestore.collection("saved_classrooms")
+            .document(classroom.number.toString())
+            .set(
+                mapOf(
+                    "number" to classroom.number,
+                    "description" to classroom.description
+                )
+            )
+            .addOnSuccessListener { callback(Result.success(Unit)) }
+            .addOnFailureListener { callback(Result.failure(it)) }
+    }
+
+    fun updateClassroom(classroom: Classroom, callback: (Result<Unit>) -> Unit) {
+        firestore.collection("saved_classrooms")
+            .document(classroom.number.toString())
+            .update("description", classroom.description)
+            .addOnSuccessListener { callback(Result.success(Unit)) }
+            .addOnFailureListener { callback(Result.failure(it)) }
+    }
+
+    fun deleteClassroom(number: Int, callback: (Result<Unit>) -> Unit) {
+        firestore.collection("saved_classrooms")
+            .document(number.toString())
+            .delete()
+            .addOnSuccessListener { callback(Result.success(Unit)) }
+            .addOnFailureListener { callback(Result.failure(it)) }
+    }
+
+    fun getClassrooms(callback: (Result<List<Classroom>>) -> Unit) {
+        firestore.collection("saved_classrooms")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    callback(Result.failure(error))
+                    return@addSnapshotListener
+                }
+                val classrooms = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(Classroom::class.java)
+                } ?: emptyList()
+                callback(Result.success(classrooms))
+            }
+    }
+
+    fun createSchedule(
+        schedule: Schedule,
+        callback: (Result<Unit>) -> Unit
+    ) {
+        firestore.collection("saved_schedules")
+            .add(schedule)
+            .addOnSuccessListener { callback(Result.success(Unit)) }
+            .addOnFailureListener { callback(Result.failure(it)) }
+    }
+
+    fun getSchedules(callback: (Result<List<Pair<String, Schedule>>>) -> Unit) {
+        firestore.collection("saved_schedules")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    callback(Result.failure(error))
+                    return@addSnapshotListener
+                }
+                val schedules = snapshot?.documents?.mapNotNull { doc ->
+                    // Extraemos el objeto Schedule y lo asociamos con el ID del documento
+                    doc.toObject(Schedule::class.java)?.let { schedule ->
+                        doc.id to schedule
+                    }
+                } ?: emptyList()
+                callback(Result.success(schedules))
+            }
+    }
+
+    fun approveSchedule(documentId: String, callback: (Result<Unit>) -> Unit) {
+        firestore.collection("saved_schedules")
+            .document(documentId)
+            .update("approved", true)
+            .addOnSuccessListener { callback(Result.success(Unit)) }
+            .addOnFailureListener { callback(Result.failure(it)) }
+    }
+
+    fun updateSchedule(
+        documentId: String,
+        schedule: Schedule,
+        callback: (Result<Unit>) -> Unit
+    ) {
+        firestore.collection("saved_schedules")
+            .document(documentId)
+            .set(schedule) // Usar .set() para reemplazar completamente el documento
+            .addOnSuccessListener { callback(Result.success(Unit)) }
+            .addOnFailureListener { callback(Result.failure(it)) }
+    }
+
+    fun getScheduleById(scheduleId: String, callback: (Result<Schedule>) -> Unit) {
+        firestore.collection("saved_schedules")
+            .document(scheduleId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val schedule = document.toObject(Schedule::class.java)
+                    if (schedule != null) {
+                        callback(Result.success(schedule))
+                    } else {
+                        callback(Result.failure(Exception("No se pudo convertir el documento a Schedule"))) // o un error más específico
+                    }
+                } else {
+                    callback(Result.failure(Exception("El horario no existe"))) // o un error de "No encontrado"
+                }
+            }
+            .addOnFailureListener {
+                callback(Result.failure(it))
+            }
+    }
+    fun getClassroomByNumber(number:String ,callback: (Result<Classroom>) -> Unit){
+        firestore.collection("saved_classrooms")
+            .whereEqualTo("number", number.toInt())
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val classroom = querySnapshot.documents[0].toObject(Classroom::class.java)
+                    classroom?.let{ callback(Result.success(it))}
+                }
+                else{
+                    callback(Result.failure(Exception("Classroom Not found")))
+                }
+
+            }
+            .addOnFailureListener{
+                callback(Result.failure(it))
+            }
+    }
+
+    // Lógica de traslape (optimizado y más claro)
+    //VERIFICA SI AL APROBAR
+    suspend fun checkForOverlap(newSchedule: Schedule): Boolean = withContext(Dispatchers.IO) {
+        val overlappingSchedules = firestore.collection("saved_schedules")
+            .whereEqualTo("salonId", newSchedule.salonId)
+            .whereEqualTo("approved", true) // Solo considerar horarios aprobados
+            .get()
+            .await()
+            .toObjects(Schedule::class.java)
+
+
+        for (existingSchedule in overlappingSchedules) {
+            if (schedulesOverlap(newSchedule, existingSchedule)) {
+                return@withContext true // Traslape encontrado
+            }
+        }
+        return@withContext false // No hay traslapes
+    }
+
+    //VERIFICA SI AL EDITAR
+    suspend fun checkForUpdatedOverlap(updatedSchedule: Schedule, scheduleId: String?): Boolean = withContext(Dispatchers.IO) {
+
+        // Excluir el horario actual de la verificación (para permitir editar sin falsos positivos)
+        val overlappingSchedules = firestore.collection("saved_schedules")
+            .whereEqualTo("salonId", updatedSchedule.salonId)
+            .whereEqualTo("approved", true)
+            .get()
+            .await()
+            .documents
+            .filter { it.id != scheduleId } // Excluir el horario que se está editando
+            .mapNotNull { it.toObject(Schedule::class.java) }
+
+        for (existingSchedule in overlappingSchedules) {
+            if (schedulesOverlap(updatedSchedule, existingSchedule)) {
+                return@withContext true // Traslape encontrado
+            }
+        }
+        return@withContext false // No hay traslape
+    }
+
+    suspend fun checkForEmailOverlap(newSchedule: Schedule): Boolean = withContext(Dispatchers.IO) {
+        val overlappingSchedules = firestore.collection("saved_schedules")
+            .whereEqualTo("tutorEmail", newSchedule.tutorEmail) // Filtrar por email
+            .whereEqualTo("approved", true) // Solo horarios aprobados
+            .get()
+            .await()
+            .toObjects(Schedule::class.java)
+
+        Log.d("EmailOverlap", "Horarios encontrados para ${newSchedule.tutorEmail}: ${overlappingSchedules.size}") // <--- LOG 2
+
+        for (existingSchedule in overlappingSchedules) {
+            Log.d("EmailOverlap", "Comparando con horario existente: $existingSchedule")
+            if (schedulesOverlap(newSchedule, existingSchedule)) {
+                Log.d("EmailOverlap", "¡¡¡TRASLAPE ENCONTRADO!!!")
+                return@withContext true // Traslape encontrado
+            }
+        }
+        Log.d("EmailOverlap", "No se encontraron traslapes por email.")
+        return@withContext false // No hay traslape
+    }
+
+
+    // Función auxiliar para comparar dos horarios y determinar si hay traslape
+    private fun schedulesOverlap(schedule1: Schedule, schedule2: Schedule): Boolean {
+        // 1. Verificar traslape de fechas (años y meses)
+        if (schedule1.startYear > schedule2.endYear || (schedule1.startYear == schedule2.endYear && schedule1.startMonth > schedule2.endMonth)) {
+            return false; // No hay traslape temporal
+        }
+        if (schedule2.startYear > schedule1.endYear || (schedule2.startYear == schedule1.endYear && schedule2.startMonth > schedule1.endMonth)) {
+            return false; // No hay traslape temporal
+        }
+
+        // 2. Si hay traslape temporal, verificar sesiones
+        for (session1 in schedule1.sessions) {
+            for (session2 in schedule2.sessions) {
+                // Verificar si hay traslape de día y hora
+                if (session1.dayOfWeek == session2.dayOfWeek && session1.startTime == session2.startTime) {
+                    return true; // Traslape de sesión encontrado
+                }
+            }
+        }
+        return false; // No hay traslape de sesiones
     }
 
 

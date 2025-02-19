@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.CoPresent
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Room
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.ViewStream
@@ -64,7 +65,8 @@ fun HomeScreen4Admin(
     onClassesClick: () -> Unit,
     onClassroomsClick: () -> Unit,
     onCalendarClick: () -> Unit,
-    onCareersClick: () -> Unit
+    onCareersClick: () -> Unit,
+    onClassSchedulesClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
@@ -91,24 +93,31 @@ fun HomeScreen4Admin(
             icon = Icons.Default.Class,
             onClick = onClassesClick
         ),
-//        AdminCardData(
-//            title = stringResource(id = R.string.classrooms_title),
-//            subtitle = stringResource(id = R.string.classrooms_subtitle),
-//            icon = Icons.Default.Room,
-//            onClick = { onClassroomsClick() }
-//        ),
+        AdminCardData(
+            title = stringResource(id = R.string.classrooms_title),
+            subtitle = stringResource(id = R.string.classrooms_subtitle),
+            icon = Icons.Default.Room,
+            onClick = { onClassroomsClick() }
+        ),
         AdminCardData(
             title = stringResource(id = R.string.calendar_title),
             subtitle = stringResource(id = R.string.calendar_subtitle),
             icon = Icons.Default.CalendarMonth,
             onClick = { onCalendarClick() }
         ),
-//        AdminCardData(
-//            title = stringResource(id = R.string.careers_title),
-//            subtitle = stringResource(id = R.string.careers_subtitle),
-//            icon = Icons.Default.Work,
-//            onClick = { onCareersClick() }
-//        )
+        AdminCardData(
+            title = stringResource(id = R.string.careers_title),
+            subtitle = stringResource(id = R.string.careers_subtitle),
+            icon = Icons.Default.Work,
+            onClick = { onCareersClick() }
+        ),
+        AdminCardData(
+            title = stringResource(id = R.string.class_schedules_title),
+            subtitle = stringResource(id = R.string.class_schedules_subtitle),
+            icon = Icons.Default.Schedule,
+            onClick = { onClassSchedulesClick() }
+        )
+
     )
 
     val filteredItems = items.filter {

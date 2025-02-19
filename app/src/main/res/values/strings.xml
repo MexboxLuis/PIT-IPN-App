@@ -94,6 +94,8 @@
     <string name="calendar_subtitle">View and organize your calendar</string>
     <string name="careers_title">Careers</string>
     <string name="careers_subtitle">Explore career options</string>
+    <string name="class_schedules_title">Class Schedules</string>
+    <string name="class_schedules_subtitle">Management of class schedules and approvals</string>
     <string name="search_hint">Search in sections</string>
     <string name="no_filtered_section">We do not have that section yet.</string>
 
@@ -150,7 +152,6 @@
     <string name="day_fri">Friday</string>
     <string name="day_sat">Saturday</string>
     <string name="day_sun">Sunday</string>
-
     <string name="non_working_day">Non-working day</string>
     <string name="add_non_working_day">Non-working day to be added -> %s</string>
     <string name="add_period">Period to be added -> %s</string>
@@ -162,8 +163,17 @@
     <string name="period_prefix">HOLIDAY PERIOD</string>
 
 
+    <!-- CareersScreen-->
+    <string name="career_biotech">Biotechnology Engineering</string>
+    <string name="career_ai">Artificial Intelligence Engineering</string>
+    <string name="career_automotive">Automotive Systems Engineering</string>
+    <string name="career_transport">Transportation Engineering</string>
+    <string name="career_data_science">Data Science Degree</string>
+    <string name="career_industrial">Industrial Engineering</string>
 
 
+<!--ClassroomsScreen-->
+    <string name="add_classroom">Add Classroom</string>
 
 
 </resources>

@@ -245,7 +245,7 @@ fun HomeScreen4Tutor(
         sheetState = sheetState,
         scope = scope,
         onStartNowClick = { navController.navigate("startClassNowScreen") },
-        onScheduleClick = { navController.navigate("scheduleClassScreen") },
+        onScheduleClick = { navController.navigate("generateScheduleScreen") },
         classes = classes.value
     )
 }
