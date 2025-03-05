@@ -8,6 +8,8 @@ import com.example.pitapp.data.UserData
 import com.example.pitapp.ui.screens.Classroom
 import com.example.pitapp.ui.screens.NonWorkingDay
 import com.example.pitapp.ui.screens.Period
+import com.example.pitapp.ui.screens.SavedClass
+import com.example.pitapp.ui.screens.SavedStudent
 import com.example.pitapp.ui.screens.Schedule
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
@@ -718,6 +720,181 @@ class FireStoreManager(
     }
 
 
+    fun getCurrentSchedule(tutorEmail: String, callback: (Result<Schedule?>) -> Unit) {
+        val now = Calendar.getInstance()
+        val currentDayOfWeek = now.get(Calendar.DAY_OF_WEEK) // Día actual (1-7, Domingo = 1)
+        val currentHour = now.get(Calendar.HOUR_OF_DAY)     // Hora actual (0-23)
+        val currentYear = now.get(Calendar.YEAR)
+        val currentMonth = now.get(Calendar.MONTH) + 1       // Mes actual (1-12)
+        Log.d("GetCurrentSchedule", "currentDayOfWeek: $currentDayOfWeek")
+        Log.d("GetCurrentSchedule", "currentHour: $currentHour")
+        Log.d("GetCurrentSchedule", "currentYear: $currentYear")
+        Log.d("GetCurrentSchedule", "currentMonth: $currentMonth")
+
+        val adaptedDayOfWeek = if (currentDayOfWeek == 1) 7 else currentDayOfWeek - 1
+
+        firestore.collection("saved_schedules")
+            .whereEqualTo("tutorEmail", tutorEmail)
+            .whereEqualTo("approved", true) // Considerar solo horarios aprobados
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+
+                val schedule = querySnapshot.documents.firstNotNullOfOrNull { document ->
+
+                    val scheduleData = document.toObject(Schedule::class.java) ?: return@firstNotNullOfOrNull null
+
+                    // 1. Verificar el rango de fechas (año y mes)
+                    if (currentYear in scheduleData.startYear..scheduleData.endYear) {
+                        val validMonth = if (scheduleData.startYear == scheduleData.endYear) {
+                            // Si es el mismo año, verificar que el mes actual esté en el rango
+                            currentMonth in scheduleData.startMonth..scheduleData.endMonth
+                        } else if (currentYear == scheduleData.startYear) {
+                            // Si es el año de inicio, verificar que el mes sea mayor o igual al mes de inicio
+                            currentMonth >= scheduleData.startMonth
+                        } else if (currentYear == scheduleData.endYear) {
+                            // Si es el año de fin, verificar que el mes sea menor o igual al mes de fin
+                            currentMonth <= scheduleData.endMonth
+                        }
+                        else {
+                            true
+                        }
+                        //Si esta en un mes valido
+                        if(validMonth){
+                            scheduleData.sessions.any { session ->
+                                session.dayOfWeek == adaptedDayOfWeek && session.startTime == currentHour // Usa adaptedDayOfWeek
+                            }.let {
+                                if(it) scheduleData else null
+                            }
+
+                        }else null
+
+                    }else null
+                }
+
+                callback(Result.success(schedule))
+
+
+            }.addOnFailureListener {
+                callback(Result.failure(it))
+            }
+    }
+    // Iniciar una clase instantánea (crear documento en saved_classes)
+    fun startInstantClass(savedClass: SavedClass, callback: (Result<String>) -> Unit) {
+        val classId = UUID.randomUUID().toString() // Genera un ID único
+        val documentId = "${savedClass.tutorEmail}-$classId" // Usa el nuevo formato
+
+        firestore.collection("saved_instant_classes")
+            .document(documentId) // Usa el ID generado
+            .set(savedClass)
+            .addOnSuccessListener {
+                callback(Result.success(documentId)) // Devuelve el ID del documento
+            }
+            .addOnFailureListener {
+                callback(Result.failure(it))
+            }
+    }
+
+    suspend fun addStudent(
+        tutorEmail: String,
+        subject: String,
+        classroom: String,
+        student: SavedStudent,
+        callback: (Result<Unit>) -> Unit // Callback
+    ) { // No es necesario withContext(Dispatchers.IO) aqui
+        val classRef = firestore.collection("saved_instant_classes")
+            .document("$tutorEmail-$subject-$classroom")
+
+        classRef.collection("students").add(student)
+            .addOnSuccessListener {
+                callback(Result.success(Unit)) // Llama al callback con éxito
+            }
+            .addOnFailureListener {
+                callback(Result.failure(it)) // Llama al callback con el error
+            }
+    }
+
+
+
+    fun getCurrentSchedules(tutorEmail: String, callback: (Result<List<Schedule>>) -> Unit) {
+        val now = Calendar.getInstance()
+        val currentYear = now.get(Calendar.YEAR)
+        val currentMonth = now.get(Calendar.MONTH) + 1 // Calendar.MONTH is 0-indexed
+
+        firestore.collection("saved_schedules")
+            .whereEqualTo("tutorEmail", tutorEmail)
+            .whereEqualTo("approved", true)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val schedules = querySnapshot.documents.mapNotNull { document ->
+                    val schedule = document.toObject(Schedule::class.java) ?: return@mapNotNull null
+                    // Check if the current year and month are within the schedule's range.
+                    if (currentYear in schedule.startYear..schedule.endYear &&
+                        isMonthWithinRange(currentYear, currentMonth, schedule)
+                    ) {
+                        schedule
+                    }else{
+                        null
+                    }
+                }
+                callback(Result.success(schedules))
+            }
+            .addOnFailureListener {
+                callback(Result.failure(it))
+            }
+    }
+
+    //Helper function to determine if the current month is within a valid range.
+    fun isMonthWithinRange(currentYear: Int, currentMonth: Int, schedule: Schedule): Boolean {
+        return when {
+            schedule.startYear == schedule.endYear -> currentMonth in schedule.startMonth..schedule.endMonth
+            currentYear == schedule.startYear -> currentMonth >= schedule.startMonth
+            currentYear == schedule.endYear -> currentMonth <= schedule.endMonth
+            else -> true // Current year is between startYear and endYear
+        }
+    }
+
+
+    fun getUpcomingSchedules(
+        tutorEmail: String,
+        callback: (Result<List<Schedule>>) -> Unit
+    ) {
+        firestore.collection("saved_schedules")
+            .whereEqualTo("tutorEmail", tutorEmail)
+            .whereEqualTo("approved", true)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val schedules = querySnapshot.documents.mapNotNull { document ->
+                    document.toObject(Schedule::class.java)
+                }
+                callback(Result.success(schedules))
+            }.addOnFailureListener {
+                callback(Result.failure(it))
+            }
+    }
+
+
+    fun getClassDetalles(classDocumentId: String, callback: (Result<SavedClass>) -> Unit) {
+        firestore.collection("saved_instant_classes")
+            .document(classDocumentId)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                val savedClass = documentSnapshot.toObject(SavedClass::class.java)
+                if (savedClass != null) {
+                    callback(Result.success(savedClass))
+                } else {
+                    callback(Result.failure(Exception("Clase no encontrada")))
+                }
+            }
+            .addOnFailureListener {
+                callback(Result.failure(it))
+            }
+    }
+
+
+
+//getCurrent Schedules quitado
+
+    //Helper function to determine if the current month is within a valid range.
 
 
 

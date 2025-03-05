@@ -369,21 +369,25 @@ fun DaysOfWeekSelection(
 // 1. Data Classes para la estructura del horario
 
 data class Session(
-    val dayOfWeek: Int = 0, // 1 = Lunes, 2 = Martes, ..., 5 = Viernes
-    val startTime: Int = 0  // Hora de inicio en formato 24h (e.g., 7, 13, 19)
+    val dayOfWeek: Int = 0,
+    val startTime: Int = 0  // horario y si requiere el final se le suma 1 (hr) :) 3/7
 )
 
 data class Schedule(
-    val salonId: String = "",          // ID del salón (String, para flexibilidad)
-    val tutorEmail: String = "",       // Email del tutor
-    val subject: String = "",          //  <-- NUEVO:  Materia
-    val approved: Boolean = false,     // Estado de aprobación
-    val startYear: Int = 0,         //  <-- CAMBIO: Año de inicio
-    val startMonth: Int = 0,           // Mes de inicio (1-12)
-    val endYear: Int = 0,            // <-- NUEVO:  Año de fin
-    val endMonth: Int = 0,             // Mes de fin (1-12)
-    val sessions: List<Session> = emptyList()  // Lista de sesiones
+    val salonId: String = "", // lugar de atecion  6/7 (puede que 6 quitando la firma)
+    val tutorEmail: String = "",
+    val subject: String = "", // tutoria entre pares 2/7
+    val approved: Boolean = false,
+    val startYear: Int = 0,
+    val startMonth: Int = 0,
+    val endYear: Int = 0,
+    val endMonth: Int = 0,
+    val sessions: List<Session> = emptyList()
 )
+
+// Al momento de crearse un tema  se debera registrar un usuario
+
+
 
 
 

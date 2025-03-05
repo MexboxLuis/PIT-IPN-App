@@ -3,6 +3,7 @@ package com.example.pitapp.navigation
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,6 +16,7 @@ import androidx.navigation.navArgument
 import com.example.pitapp.ui.screens.CalendarScreen
 import com.example.pitapp.ui.screens.CareersScreen
 import com.example.pitapp.ui.screens.ClassDetailScreen
+import com.example.pitapp.ui.screens.ClassDetallesScreen
 import com.example.pitapp.ui.screens.ClassSchedulesScreen
 import com.example.pitapp.ui.screens.ClassroomsScreen
 import com.example.pitapp.ui.screens.EditScheduleScreen
@@ -29,6 +31,7 @@ import com.example.pitapp.ui.screens.RegisterDataScreen
 import com.example.pitapp.ui.screens.RequestedPermissionScreen
 import com.example.pitapp.ui.screens.ResetPasswordScreen
 import com.example.pitapp.ui.screens.StartClassNowScreen
+import com.example.pitapp.ui.screens.StartInstantClassScreen
 import com.example.pitapp.ui.screens.TutorClassesScreen
 import com.example.pitapp.ui.screens.TutorsScreen
 import com.example.pitapp.utils.AuthManager
@@ -236,7 +239,34 @@ fun PITNavigation(
                 fireStoreManager = fireStoreManager,
                 scheduleId = scheduleId
             )
+        }
 
+
+        // possible temp
+        composable(route = "startInstantClassScreen") {
+            StartInstantClassScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
+            )
+        }
+
+        composable(
+            "classDetalles/{classDocumentId}", // Define la ruta con un parámetro
+            arguments = listOf(navArgument("classDocumentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val classDocumentId = backStackEntry.arguments?.getString("classDocumentId")
+            if (classDocumentId != null) {
+                ClassDetallesScreen(
+                    navController = navController,
+                    authManager = authManager,
+                    fireStoreManager = fireStoreManager,
+                    classDocumentId = classDocumentId
+                ) // Pasa el ID
+            } else {
+                // Manejar el caso en que el ID sea nulo (por ejemplo, mostrar un error)
+                Text("Error: ID de clase no encontrado")
+            }
         }
 
 
