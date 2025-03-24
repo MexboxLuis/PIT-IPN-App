@@ -88,6 +88,8 @@ import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
 import com.example.pitapp.ui.components.EditNonWorkingDayTab
 import com.example.pitapp.ui.components.HeaderCalendar
+import com.example.pitapp.ui.features.scheduling.utils.dayOfWeekToString
+import com.example.pitapp.ui.features.scheduling.utils.monthToString
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import com.google.firebase.Timestamp
@@ -804,7 +806,7 @@ fun Calendar(
                 label = "Calendar Transition"
             ) { month ->
                 Text(
-                    text = "${month.month.name} ${month.year}",
+                    text = "${monthToString(month.month.value)} ${month.year}",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -818,16 +820,8 @@ fun Calendar(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            listOf(
-                R.string.day_mon,
-                R.string.day_tue,
-                R.string.day_wed,
-                R.string.day_thu,
-                R.string.day_fri,
-                R.string.day_sat,
-                R.string.day_sun
-            ).forEach { dayRes ->
-                val dayName = stringResource(id = dayRes)
+            (1..7).forEach { day ->
+                val dayName = dayOfWeekToString(day)
                 Text(
                     text = dayName.take(3),
                     style = MaterialTheme.typography.bodySmall,

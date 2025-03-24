@@ -190,7 +190,7 @@ fun HomeScreen4Admin(
                 if (searchQuery.isNotEmpty() && filteredItems.isEmpty()) {
                     EmptyState(
                         icon = Icons.Default.SearchOff,
-                        message = stringResource(id = R.string.no_filtered_classes)
+                        message = stringResource(id = R.string.no_filtered_section)
                     )
                 } else {
                     if (isGridView!!) {

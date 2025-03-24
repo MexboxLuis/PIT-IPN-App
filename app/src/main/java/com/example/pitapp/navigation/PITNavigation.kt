@@ -3,7 +3,6 @@ package com.example.pitapp.navigation
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -13,16 +12,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.pitapp.ui.features.scheduling.screens.EditScheduleScreen
+import com.example.pitapp.ui.features.scheduling.screens.GenerateScheduleScreen
 import com.example.pitapp.ui.screens.CalendarScreen
+import com.example.pitapp.ui.screens.CareerWebViewScreen
 import com.example.pitapp.ui.screens.CareersScreen
 import com.example.pitapp.ui.screens.ClassDetailScreen
-import com.example.pitapp.ui.screens.ClassDetallesScreen
-import com.example.pitapp.ui.screens.ClassSchedulesScreen
+import com.example.pitapp.ui.features.scheduling.screens.ClassSchedulesScreen
 import com.example.pitapp.ui.screens.ClassroomsScreen
-import com.example.pitapp.ui.screens.EditScheduleScreen
 import com.example.pitapp.ui.screens.ErrorScreen
-import com.example.pitapp.ui.screens.GenerateScheduleScreen
 import com.example.pitapp.ui.screens.HomeScreen
+import com.example.pitapp.ui.screens.InstantClassDetailsScreen
+import com.example.pitapp.ui.screens.InstantClassSummaryScreen
 import com.example.pitapp.ui.screens.LoginScreen
 import com.example.pitapp.ui.screens.PermissionRequestsScreen
 import com.example.pitapp.ui.screens.ProfileScreen
@@ -45,7 +46,6 @@ fun PITNavigation(
     authManager: AuthManager,
     fireStoreManager: FireStoreManager
 ) {
-
 
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
@@ -75,10 +75,10 @@ fun PITNavigation(
         startDestination = startDestination,
         modifier = Modifier.fillMaxSize()
     ) {
+
         composable(route = "errorScreen") {
             ErrorScreen()
         }
-
 
         composable(route = "loginScreen") {
             LoginScreen(
@@ -122,6 +122,7 @@ fun PITNavigation(
                 onPasswordResetSent = { navController.navigate("loginScreen") },
             )
         }
+
         composable(route = "homeScreen") {
             HomeScreen(
                 navController = navController,
@@ -200,6 +201,7 @@ fun PITNavigation(
                 fireStoreManager = fireStoreManager
             )
         }
+
         composable(route = "classroomsScreen") {
             ClassroomsScreen(
                 navController = navController,
@@ -223,6 +225,11 @@ fun PITNavigation(
             )
         }
 
+        composable("careerWebView/{encodedUrl}") { backStackEntry ->
+            val encodedUrl = backStackEntry.arguments?.getString("encodedUrl") ?: ""
+            CareerWebViewScreen(navController = navController, encodedUrl = encodedUrl)
+        }
+
         composable(route = "classSchedulesScreen") {
             ClassSchedulesScreen(
                 navController = navController,
@@ -241,8 +248,6 @@ fun PITNavigation(
             )
         }
 
-
-        // possible temp
         composable(route = "startInstantClassScreen") {
             StartInstantClassScreen(
                 navController = navController,
@@ -252,23 +257,31 @@ fun PITNavigation(
         }
 
         composable(
-            "classDetalles/{classDocumentId}", // Define la ruta con un parámetro
+            "instantClassDetailsScreen/{classDocumentId}",
             arguments = listOf(navArgument("classDocumentId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val classDocumentId = backStackEntry.arguments?.getString("classDocumentId")
-            if (classDocumentId != null) {
-                ClassDetallesScreen(
-                    navController = navController,
-                    authManager = authManager,
-                    fireStoreManager = fireStoreManager,
-                    classDocumentId = classDocumentId
-                ) // Pasa el ID
-            } else {
-                // Manejar el caso en que el ID sea nulo (por ejemplo, mostrar un error)
-                Text("Error: ID de clase no encontrado")
-            }
+            val classDocumentId = backStackEntry.arguments?.getString("classDocumentId") ?: ""
+
+            InstantClassDetailsScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager,
+                classDocumentId = classDocumentId
+            )
+
         }
 
-
+        composable(
+            route = "instantClassSummaryScreen/{classDocumentId}",
+            arguments = listOf(navArgument("classDocumentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val classId = backStackEntry.arguments?.getString("classDocumentId") ?: ""
+            InstantClassSummaryScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager,
+                classId = classId
+            )
+        }
     }
 }
