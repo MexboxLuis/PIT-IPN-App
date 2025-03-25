@@ -1,15 +1,7 @@
 package com.example.pitapp.ui.features.scheduling.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -17,18 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -62,37 +44,47 @@ fun GenerateScheduleScreen(
     fireStoreManager: FireStoreManager
 ) {
     val tutorEmail = authManager.getUserEmail() ?: ""
+    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
 
-    val currentYear = remember { Calendar.getInstance().get(Calendar.YEAR) }
-    val startYearState = remember { mutableStateOf(currentYear.toString()) }
-    val startYearError = remember { mutableStateOf(false) }
+    var startYearState by remember { mutableStateOf(currentYear.toString()) }
+    var startYearError by remember { mutableStateOf(false) }
+    var startYearErrorText by remember { mutableStateOf("") }
 
-    val endYearState = remember { mutableStateOf(currentYear.toString()) }
-    val endYearError = remember { mutableStateOf(false) }
+    var endYearState by remember { mutableStateOf(currentYear.toString()) }
+    var endYearError by remember { mutableStateOf(false) }
+    var endYearErrorText by remember { mutableStateOf("") }
 
-    val startMonthState = remember { mutableStateOf("") }
-    val startMonthError = remember { mutableStateOf(false) }
+    var startMonthState by remember { mutableStateOf("") }
+    var startMonthError by remember { mutableStateOf(false) }
+    var startMonthErrorText by remember { mutableStateOf("") }
 
-    val endMonthState = remember { mutableStateOf("") }
-    val endMonthError = remember { mutableStateOf(false) }
+    var endMonthState by remember { mutableStateOf("") }
+    var endMonthError by remember { mutableStateOf(false) }
+    var endMonthErrorText by remember { mutableStateOf("") }
 
-    val subjectState = remember { mutableStateOf("") }
-    val subjectError = remember { mutableStateOf(false) }
+    var subjectState by remember { mutableStateOf("") }
+    var subjectError by remember { mutableStateOf(false) }
+    var subjectErrorText by remember { mutableStateOf("") }
+
 
     val selectedDays = remember { mutableStateMapOf<Int, Boolean>() }
     (1..5).forEach { selectedDays.getOrPut(it) { false } }
     val sessionsState = remember { mutableStateMapOf<Int, String>() }
     val sessionErrorStates = remember { mutableStateMapOf<Int, Boolean>() }
-
-    val message = remember { mutableStateOf("") }
+    var daysError by remember { mutableStateOf(false) }
+    var daysErrorText by remember { mutableStateOf("") }
 
     val classrooms = remember { mutableStateOf<List<Pair<Int, Classroom>>>(emptyList()) }
     val isLoading = remember { mutableStateOf(true) }
     val errorMessage = remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
-    val selectedClassroom = remember { mutableStateOf<Classroom?>(null) }
-    val classroomError = remember { mutableStateOf(false) } // Add error for classroom
+    var selectedClassroom by remember { mutableStateOf<Classroom?>(null) }
+    var classroomError by remember { mutableStateOf(false) }
+    var classroomErrorText by remember { mutableStateOf("") }
+
     val context = LocalContext.current
+
+    var overlapMessage by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         fireStoreManager.getClassrooms { result ->
@@ -100,12 +92,109 @@ fun GenerateScheduleScreen(
                 classrooms.value = list.map { it.number to it }.sortedBy { it.first }
                 isLoading.value = false
             }.onFailure {
-                errorMessage.value =
-                    it.localizedMessage ?: context.getString(R.string.unknown_error)
+                errorMessage.value = it.localizedMessage ?: context.getString(R.string.unknown_error)
                 isLoading.value = false
             }
         }
     }
+
+    fun validateForm(): Boolean {
+        var isValid = true
+
+        if (selectedClassroom == null) {
+            classroomError = true
+            classroomErrorText = context.getString(R.string.classroom_required)
+            isValid = false
+        } else {
+            classroomError = false
+            classroomErrorText = ""
+        }
+
+        if (subjectState.isBlank()) {
+            subjectError = true
+            subjectErrorText = context.getString(R.string.subject_required)
+            isValid = false
+        } else {
+            subjectError = false
+            subjectErrorText = ""
+        }
+
+        val startMonth = startMonthState.toIntOrNull()
+        if (startMonth == null) {
+            startMonthError = true
+            startMonthErrorText = context.getString(R.string.invalid_months)
+            isValid = false
+        } else {
+            startMonthError = false
+            startMonthErrorText = ""
+        }
+
+        val startYear = startYearState.toIntOrNull()
+        if (startYear == null || startYear < currentYear) {
+            startYearError = true
+            startYearErrorText = context.getString(R.string.invalid_year)
+            isValid = false
+        } else {
+            startYearError = false
+            startYearErrorText = ""
+        }
+
+        val endMonth = endMonthState.toIntOrNull()
+        if (endMonth == null) {
+            endMonthError = true
+            endMonthErrorText = context.getString(R.string.invalid_months)
+            isValid = false
+        } else {
+            endMonthError = false
+            endMonthErrorText = ""
+        }
+
+        val endYear = endYearState.toIntOrNull()
+        if (endYear == null || endYear < currentYear) {
+            endYearError = true
+            endYearErrorText = context.getString(R.string.invalid_year)
+            isValid = false
+        } else {
+            endYearError = false
+            endYearErrorText = ""
+        }
+
+        if (startYear != null && endYear != null && startMonth != null && endMonth != null) {
+            if (endYear < startYear || (endYear == startYear && endMonth < startMonth)) {
+                endMonthError = true
+                endMonthErrorText = context.getString(R.string.start_date_before_end_date)
+                isValid = false
+            }
+        }
+        if (!selectedDays.values.any { it }) {
+            daysError = true
+            daysErrorText = context.getString(R.string.at_least_one_day)
+            isValid = false
+        } else {
+            daysError = false
+            daysErrorText = ""
+        }
+
+
+        for ((day, isSelected) in selectedDays) {
+            if (isSelected) {
+                val hour = sessionsState[day]?.toIntOrNull()
+                if (hour == null || hour !in 7..19) {
+                    isValid = false
+                    sessionErrorStates[day] = true
+                } else {
+                    sessionErrorStates[day] = false
+                }
+            } else {
+                sessionErrorStates[day] = false
+            }
+        }
+
+        return isValid
+    }
+
+    val isFormValid by remember { derivedStateOf { validateForm() } }
+
 
     BackScaffold(
         navController = navController,
@@ -118,163 +207,111 @@ fun GenerateScheduleScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-
             ClassroomDropdown(
                 classrooms = classrooms.value,
-                selectedClassroom = selectedClassroom.value,
+                selectedClassroom = selectedClassroom,
                 isLoading = isLoading.value,
                 errorMessage = errorMessage.value,
                 onClassroomSelected = {
-                    selectedClassroom.value = it
-                    classroomError.value = false // Reset error on selection
+                    selectedClassroom = it
+                    validateForm()
                 },
                 expanded = expanded,
                 onExpandedChange = { expanded = it }
             )
-            if (classroomError.value) {
-                Text(
-                    text = stringResource(R.string.classroom_required),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+            if (classroomError) {
+                Text(classroomErrorText, color = MaterialTheme.colorScheme.error)
             }
 
             Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = subjectState.value,
+                value = subjectState,
                 onValueChange = {
-                    subjectState.value = it
-                    subjectError.value = it.isBlank() // Update error state reactively
+                    subjectState = it
+                    validateForm()
                 },
-                label = { Text(text = stringResource(R.string.subject)) },
+                label = { Text(stringResource(R.string.subject)) },
                 leadingIcon = { Icon(Icons.Filled.Book, contentDescription = null) },
+                isError = subjectError,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                isError = subjectError.value
-
+                singleLine = true
             )
-            if (subjectError.value) {
-                Text(
-                    text = stringResource(R.string.subject_required),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+            if (subjectError) {
+                Text(subjectErrorText, color = MaterialTheme.colorScheme.error)
             }
+
             Spacer(Modifier.height(8.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 MonthDropdown(
                     label = stringResource(R.string.start_month),
-                    selectedMonth = startMonthState.value,
+                    selectedMonth = startMonthState,
                     onMonthSelected = {
-                        startMonthState.value = it
-                        val month = it.toIntOrNull()
-                        startMonthError.value = !(month != null && month in 1..12)
-                    }
+                        startMonthState = it
+                        validateForm()
+                    },
                 )
                 OutlinedTextField(
-                    value = startYearState.value,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 4 && newValue.all { it.isDigit() }) {
-                            startYearState.value = newValue
-                            val year = newValue.toIntOrNull()
-                            startYearError.value = !(year != null && year >= currentYear)
+                    value = startYearState,
+                    onValueChange = {
+                        if (it.length <= 4 && it.all { char -> char.isDigit() }) {
+                            startYearState = it
+                            validateForm()
                         }
                     },
                     label = { Text(stringResource(R.string.start_year)) },
                     leadingIcon = { Icon(Icons.Filled.CalendarToday, contentDescription = null) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    isError = startYearError.value
+                    isError = startYearError,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                    modifier = Modifier.weight(1f)
                 )
             }
-
-            if (startMonthError.value) {
-                Text(
-                    text = stringResource(R.string.invalid_months),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+            if (startMonthError) {
+                Text(startMonthErrorText, color = MaterialTheme.colorScheme.error)
             }
-
-            if (startYearError.value) {
-                Text(
-                    text = stringResource(R.string.invalid_year),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+            if (startYearError) {
+                Text(startYearErrorText, color = MaterialTheme.colorScheme.error)
             }
 
             Spacer(Modifier.height(8.dp))
 
-
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 MonthDropdown(
                     label = stringResource(R.string.end_month),
-                    selectedMonth = endMonthState.value,
+                    selectedMonth = endMonthState,
                     onMonthSelected = {
-                        endMonthState.value = it
-                        val month = it.toIntOrNull()
-                        val startMonth = startMonthState.value.toIntOrNull()
-
-                        endMonthError.value =
-                            !(month != null && month in 1..12 && (startMonth == null || month >= startMonth))
+                        endMonthState = it
+                        validateForm()
                     }
                 )
                 OutlinedTextField(
-                    value = endYearState.value,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 4 && newValue.all { it.isDigit() }) {
-                            endYearState.value = newValue
-                            val startYear = startYearState.value.toIntOrNull()
-                            val endYear = newValue.toIntOrNull()
-                            endYearError.value =
-                                !(endYear != null && endYear >= currentYear && (startYear == null || endYear >= startYear))
+                    value = endYearState,
+                    onValueChange = {
+                        if (it.length <= 4 && it.all { char -> char.isDigit() }) {
+                            endYearState = it
+                            validateForm()
                         }
                     },
                     label = { Text(stringResource(R.string.end_year)) },
                     leadingIcon = { Icon(Icons.Filled.CalendarToday, contentDescription = null) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    isError = endYearError.value
+                    isError = endYearError,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                    modifier = Modifier.weight(1f)
                 )
             }
-            if (endMonthError.value) {
-                Text(
-                    text = stringResource(R.string.invalid_end_month),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+            if (endMonthError) {
+                Text(endMonthErrorText, color = MaterialTheme.colorScheme.error)
             }
-            if (endYearError.value) {
-                Text(
-                    text = stringResource(R.string.invalid_end_year),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+            if (endYearError) {
+                Text(endYearErrorText, color = MaterialTheme.colorScheme.error)
             }
+
             Spacer(Modifier.height(16.dp))
 
             Text(
@@ -282,9 +319,7 @@ fun GenerateScheduleScreen(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier = Modifier.fillMaxWidth()
             )
 
             DaysOfWeekSelection(
@@ -292,109 +327,70 @@ fun GenerateScheduleScreen(
                 sessionsState = sessionsState,
                 sessionErrorStates = sessionErrorStates
             )
+            if (daysError) {
+                Text(daysErrorText, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth())
+            }
+
+
             Spacer(Modifier.height(16.dp))
 
             OutlinedButton(
                 onClick = {
-                    var isValid = true
+                    if (isFormValid) {
+                        val schedule = Schedule(
+                            salonId = selectedClassroom!!.number.toString(),
+                            tutorEmail = tutorEmail,
+                            subject = subjectState,
+                            approved = false,
+                            startYear = startYearState.toInt(),
+                            startMonth = startMonthState.toInt(),
+                            endYear = endYearState.toInt(),
+                            endMonth = endMonthState.toInt(),
+                            sessions = createSessions(selectedDays, sessionsState)
+                        )
 
-                    if (selectedClassroom.value == null) {
-                        message.value = context.getString(R.string.classroom_required)
-                        isValid = false
-                    } else if (subjectState.value.isBlank()) {
-                        message.value = context.getString(R.string.subject_required)
-                        isValid = false
-                    } else if (!selectedDays.values.any { it }) {
-                        message.value = context.getString(R.string.at_least_one_day)
-                        isValid = false
-                    }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val isOverlapping = fireStoreManager.checkForEmailOverlap(schedule)
+                            if (isOverlapping) {
+                                overlapMessage = context.getString(R.string.schedule_overlap_error)
+                            } else {
+                                overlapMessage = ""
+                                fireStoreManager.createSchedule(schedule) { result ->
+                                    result.onSuccess {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.schedule_created_successfully),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        navController.popBackStack()
 
-                    for ((day, isSelected) in selectedDays) {
-                        if (isSelected) {
-                            val hour = sessionsState[day]?.toIntOrNull()
-                            if (hour == null || hour !in 7..19) {
-                                message.value = context.getString(R.string.invalid_hour_range)
-                                isValid = false
-                                break
-                            }
-                        }
-                    }
-                    if (!isValid) {
-                        return@OutlinedButton
-                    }
-
-                    val schedule = Schedule(
-                        salonId = selectedClassroom.value!!.number.toString(),
-                        tutorEmail = tutorEmail,
-                        subject = subjectState.value,
-                        approved = false,
-                        startYear = startYearState.value.toInt(),
-                        startMonth = startMonthState.value.toInt(),
-                        endYear = endYearState.value.toInt(),
-                        endMonth = endMonthState.value.toInt(),
-                        sessions = createSessions(selectedDays, sessionsState)
-                    )
-
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val isOverlapping = fireStoreManager.checkForEmailOverlap(schedule)
-                        if (isOverlapping) {
-                            message.value = context.getString(R.string.schedule_overlap_error)
-
-                        } else {
-                            fireStoreManager.createSchedule(schedule) { result ->
-                                result.onSuccess {
-                                    message.value =
-                                        context.getString(R.string.schedule_created_successfully)
-
-                                    subjectState.value = ""
-                                    startYearState.value = currentYear.toString()
-                                    endYearState.value = currentYear.toString()
-                                    startMonthState.value = ""
-                                    endMonthState.value = ""
-                                    selectedClassroom.value = null
-                                    selectedDays.keys.forEach { selectedDays[it] = false }
-                                    sessionsState.clear()
-                                    sessionErrorStates.clear()
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.schedule_created_successfully),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    navController.popBackStack()
-
-                                }.onFailure {
-                                    message.value = context.getString(
-                                        R.string.scheduling_error,
-                                        it.localizedMessage
-                                    )
+                                    }.onFailure {
+                                        overlapMessage = context.getString(
+                                            R.string.scheduling_error,
+                                            it.localizedMessage
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 },
+                enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = stringResource(R.string.schedule_button))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = null
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.schedule_button))
+                    Spacer(Modifier.width(16.dp))
+                    Icon(Icons.Default.Schedule, contentDescription = null)
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
-            if (message.value.isNotEmpty()) {
+            if (overlapMessage.isNotEmpty()) {
                 Text(
-                    text = message.value,
+                    text = overlapMessage,
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

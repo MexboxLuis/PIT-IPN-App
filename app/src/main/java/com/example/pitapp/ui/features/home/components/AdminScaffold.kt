@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.components
+package com.example.pitapp.ui.features.home.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -6,6 +6,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.example.pitapp.ui.components.MainTopAppBar
 import com.example.pitapp.utils.FireStoreManager
 
 

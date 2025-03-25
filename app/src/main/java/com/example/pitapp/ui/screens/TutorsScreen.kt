@@ -112,7 +112,7 @@ fun TutorsScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.PendingActions,
-                        contentDescription = stringResource(id = R.string.go_to_permission_requests),
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
                     )

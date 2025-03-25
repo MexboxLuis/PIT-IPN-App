@@ -1,19 +1,14 @@
 package com.example.pitapp.utils
 
 import android.net.Uri
-import com.example.pitapp.data.ClassData
-import com.example.pitapp.data.Student
 import com.example.pitapp.data.UserData
+import com.example.pitapp.ui.features.classes.model.SavedClass
+import com.example.pitapp.ui.features.classes.model.SavedStudent
 import com.example.pitapp.ui.features.scheduling.model.Schedule
 import com.example.pitapp.ui.screens.Classroom
 import com.example.pitapp.ui.screens.NonWorkingDay
 import com.example.pitapp.ui.screens.Period
-import com.example.pitapp.ui.screens.SavedClass
-import com.example.pitapp.ui.screens.SavedStudent
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
@@ -153,6 +148,7 @@ class FireStoreManager(
                     newImageRef.putFile(newImageUri).await()
                     newImageRef.downloadUrl.await().toString()
                 }
+
                 else -> null
             }
 
@@ -210,212 +206,6 @@ class FireStoreManager(
         }
     }
 
-    suspend fun createClass(
-        tutoring: String,
-        topic: String,
-        classroom: String,
-        durationHours: Int,
-        durationMinutes: Int,
-        isFreeTime: Boolean,
-        startTime: Timestamp? = null
-    ): Result<Boolean> {
-        return try {
-            val expectedDuration = if (isFreeTime) null else (durationHours * 60 + durationMinutes)
-
-            val classData = hashMapOf(
-                "email" to (authManager.getUserEmail() ?: ""),
-                "tutoring" to tutoring,
-                "topic" to topic,
-                "classroom" to classroom,
-                "startTime" to (startTime ?: FieldValue.serverTimestamp()),
-                "expectedDuration" to expectedDuration,
-                "realDuration" to null,
-            )
-
-            firestore.collection("saved_classes")
-                .add(classData)
-                .await()
-
-            Result.success(true)
-        } catch (e: Exception) {
-            Result.failure(Exception("Failed to create class: ${e.localizedMessage}"))
-        }
-    }
-
-    fun getClasses(onResult: (Result<List<Pair<String, ClassData>>>) -> Unit) {
-        val email = authManager.getUserEmail()
-        if (email.isNullOrEmpty()) {
-            onResult(Result.failure(Exception("User email is required.")))
-            return
-        }
-
-        firestore.collection("saved_classes")
-            .whereEqualTo("email", email)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    onResult(Result.failure(Exception("Error fetching class data: ${error.localizedMessage}")))
-                    return@addSnapshotListener
-                }
-
-                val classList = snapshot?.documents?.mapNotNull { document ->
-                    val tutoring = document.getString("tutoring") ?: ""
-                    val topic = document.getString("topic") ?: ""
-                    val classroom = document.getString("classroom") ?: ""
-                    val startTime = document.getTimestamp("startTime") ?: Timestamp.now()
-                    val expectedDuration = document.getLong("expectedDuration")
-                    val realDuration = document.getLong("realDuration")
-
-                    document.id to ClassData(
-                        email = email,
-                        tutoring = tutoring,
-                        topic = topic,
-                        classroom = classroom,
-                        startTime = startTime,
-                        expectedDuration = expectedDuration,
-                        realDuration = realDuration,
-
-                        )
-                } ?: emptyList()
-
-                onResult(Result.success(classList))
-            }
-    }
-
-    fun getClassesByEmail(email: String, onResult: (Result<List<Pair<String, ClassData>>>) -> Unit) {
-        if (email.isEmpty()) {
-            onResult(Result.failure(Exception("User email is required.")))
-            return
-        }
-
-        firestore.collection("saved_classes")
-            .whereEqualTo("email", email)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    onResult(Result.failure(Exception("Error fetching class data: ${error.localizedMessage}")))
-                    return@addSnapshotListener
-                }
-
-                val classList = snapshot?.documents?.mapNotNull { document ->
-                    val tutoring = document.getString("tutoring") ?: ""
-                    val topic = document.getString("topic") ?: ""
-                    val classroom = document.getString("classroom") ?: ""
-                    val startTime = document.getTimestamp("startTime") ?: Timestamp.now()
-                    val expectedDuration = document.getLong("expectedDuration")
-                    val realDuration = document.getLong("realDuration")
-
-                    document.id to ClassData(
-                        email = email,
-                        tutoring = tutoring,
-                        topic = topic,
-                        classroom = classroom,
-                        startTime = startTime,
-                        expectedDuration = expectedDuration,
-                        realDuration = realDuration,
-                    )
-                } ?: emptyList()
-
-                onResult(Result.success(classList))
-            }
-    }
-
-
-    fun getClassDetails(documentId: String, onResult: (Result<ClassData?>) -> Unit) {
-        firestore.collection("saved_classes")
-            .document(documentId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    onResult(Result.failure(Exception("Error fetching class details: ${error.localizedMessage}")))
-                    return@addSnapshotListener
-                }
-
-                val classData = snapshot?.toObject(ClassData::class.java)
-                onResult(Result.success(classData))
-            }
-    }
-
-
-    fun finishClass(documentId: String, startTime: Timestamp, onResult: (Result<Unit>) -> Unit) {
-        val now = Timestamp.now()
-        val realDuration = (now.seconds - startTime.seconds) / 60
-
-        firestore.collection("saved_classes")
-            .document(documentId)
-            .update("realDuration", realDuration)
-            .addOnSuccessListener {
-                onResult(Result.success(Unit))
-            }
-            .addOnFailureListener { e ->
-                onResult(Result.failure(Exception("Error at the end of the class: ${e.localizedMessage}")))
-            }
-    }
-
-    fun addStudentToClass(
-        classDocumentId: String,
-        student: Student,
-        callback: (Result<Unit>) -> Unit
-    ) {
-        val studentsCollection = FirebaseFirestore.getInstance().collection("saved_classes")
-            .document(classDocumentId)
-            .collection("students")
-
-        val savedStudentsCollection = FirebaseFirestore.getInstance().collection("saved_students")
-
-        savedStudentsCollection.document(student.studentId)
-            .set(student)
-            .addOnSuccessListener {
-                studentsCollection.document(student.studentId)
-                    .set(mapOf("studentId" to student.studentId))
-                    .addOnSuccessListener {
-                        callback(Result.success(Unit))
-                    }
-                    .addOnFailureListener { exception ->
-                        callback(Result.failure(exception))
-                    }
-            }
-            .addOnFailureListener { exception ->
-                callback(Result.failure(exception))
-            }
-    }
-
-    fun getStudents(classDocumentId: String, callback: (Result<List<Student>>) -> Unit) {
-        val studentsCollection = firestore.collection("saved_classes")
-            .document(classDocumentId)
-            .collection("students")
-
-        studentsCollection.get()
-            .addOnSuccessListener { querySnapshot ->
-                val studentIds = querySnapshot.documents.mapNotNull { it.getString("studentId") }
-                if (studentIds.isEmpty()) {
-                    callback(Result.success(emptyList()))
-                    return@addOnSuccessListener
-                }
-
-                val savedStudentsCollection =
-                    FirebaseFirestore.getInstance().collection("saved_students")
-                val studentDetailsTasks = studentIds.map { studentId ->
-                    savedStudentsCollection.document(studentId).get()
-                }
-
-                Tasks.whenAllComplete(studentDetailsTasks)
-                    .addOnSuccessListener { tasks ->
-                        val students = tasks.mapNotNull { task ->
-                            val result = (task.result as? DocumentSnapshot)
-                            result?.toObject(Student::class.java)
-                        }
-                        callback(Result.success(students))
-                    }
-                    .addOnFailureListener { exception ->
-                        callback(Result.failure(exception))
-                    }
-
-                    .addOnFailureListener { exception ->
-                        callback(Result.failure(exception))
-                    }
-            }
-    }
-
-
-
     suspend fun addNonWorkingDay(date: Timestamp) {
         val calendar = Calendar.getInstance().apply { time = date.toDate() }
         val year = calendar.get(Calendar.YEAR).toString()
@@ -443,7 +233,7 @@ class FireStoreManager(
             snapshot.documents.mapNotNull { doc ->
                 doc.toObject(NonWorkingDay::class.java)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -457,7 +247,7 @@ class FireStoreManager(
             snapshot.documents.mapNotNull { doc ->
                 doc.toObject(Period::class.java)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -601,10 +391,10 @@ class FireStoreManager(
                     if (schedule != null) {
                         callback(Result.success(schedule))
                     } else {
-                        callback(Result.failure(Exception("No se pudo convertir el documento a Schedule"))) // o un error más específico
+                        callback(Result.failure(Exception("Could not convert document to Schedule")))
                     }
                 } else {
-                    callback(Result.failure(Exception("El horario no existe"))) // o un error de "No encontrado"
+                    callback(Result.failure(Exception("Schedule does not exist")))
                 }
             }
             .addOnFailureListener {
@@ -629,21 +419,20 @@ class FireStoreManager(
     }
 
 
-    fun getClassroomByNumber(number:String ,callback: (Result<Classroom>) -> Unit){
+    fun getClassroomByNumber(number: String, callback: (Result<Classroom>) -> Unit) {
         firestore.collection("saved_classrooms")
             .whereEqualTo("number", number.toInt())
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
                     val classroom = querySnapshot.documents[0].toObject(Classroom::class.java)
-                    classroom?.let{ callback(Result.success(it))}
-                }
-                else{
+                    classroom?.let { callback(Result.success(it)) }
+                } else {
                     callback(Result.failure(Exception("Classroom Not found")))
                 }
 
             }
-            .addOnFailureListener{
+            .addOnFailureListener {
                 callback(Result.failure(it))
             }
     }
@@ -664,44 +453,46 @@ class FireStoreManager(
         return@withContext false
     }
 
-    suspend fun checkForUpdatedOverlap(updatedSchedule: Schedule, scheduleId: String?): Boolean = withContext(Dispatchers.IO) {
+    suspend fun checkForUpdatedOverlap(updatedSchedule: Schedule, scheduleId: String?): Boolean =
+        withContext(Dispatchers.IO) {
 
-        val overlappingSchedules = firestore.collection("saved_schedules")
-            .whereEqualTo("salonId", updatedSchedule.salonId)
-            .whereEqualTo("approved", true)
-            .get()
-            .await()
-            .documents
-            .filter { it.id != scheduleId }
-            .mapNotNull { it.toObject(Schedule::class.java) }
+            val overlappingSchedules = firestore.collection("saved_schedules")
+                .whereEqualTo("salonId", updatedSchedule.salonId)
+                .whereEqualTo("approved", true)
+                .get()
+                .await()
+                .documents
+                .filter { it.id != scheduleId }
+                .mapNotNull { it.toObject(Schedule::class.java) }
 
-        for (existingSchedule in overlappingSchedules) {
-            if (schedulesOverlap(updatedSchedule, existingSchedule)) {
-                return@withContext true
+            for (existingSchedule in overlappingSchedules) {
+                if (schedulesOverlap(updatedSchedule, existingSchedule)) {
+                    return@withContext true
+                }
             }
+            return@withContext false
         }
-        return@withContext false
-    }
 
-    suspend fun checkForEmailOverlap(newSchedule: Schedule, scheduleId: String? = null): Boolean = withContext(Dispatchers.IO) {
+    suspend fun checkForEmailOverlap(newSchedule: Schedule, scheduleId: String? = null): Boolean =
+        withContext(Dispatchers.IO) {
 
-        val querySnapshot = firestore.collection("saved_schedules")
-            .whereEqualTo("tutorEmail", newSchedule.tutorEmail)
-            .whereEqualTo("approved", true)
-            .get()
-            .await()
+            val querySnapshot = firestore.collection("saved_schedules")
+                .whereEqualTo("tutorEmail", newSchedule.tutorEmail)
+                .whereEqualTo("approved", true)
+                .get()
+                .await()
 
-        val overlappingSchedules = querySnapshot.documents
-            .filter { it.id != scheduleId }
-            .mapNotNull { it.toObject(Schedule::class.java) }
+            val overlappingSchedules = querySnapshot.documents
+                .filter { it.id != scheduleId }
+                .mapNotNull { it.toObject(Schedule::class.java) }
 
-        for (existingSchedule in overlappingSchedules) {
-            if (schedulesOverlap(newSchedule, existingSchedule)) {
-                return@withContext true
+            for (existingSchedule in overlappingSchedules) {
+                if (schedulesOverlap(newSchedule, existingSchedule)) {
+                    return@withContext true
+                }
             }
+            return@withContext false
         }
-        return@withContext false
-    }
 
     private fun schedulesOverlap(schedule1: Schedule, schedule2: Schedule): Boolean {
         if (schedule1.startYear > schedule2.endYear || (schedule1.startYear == schedule2.endYear && schedule1.startMonth > schedule2.endMonth)) {
@@ -752,8 +543,6 @@ class FireStoreManager(
                 callback(Result.failure(it))
             }
     }
-
-
 
 
     fun getCurrentSchedules(tutorEmail: String, callback: (Result<List<Schedule>>) -> Unit) {
@@ -814,7 +603,6 @@ class FireStoreManager(
     }
 
 
-
     fun getInstantClassDetails(classDocumentId: String, callback: (Result<SavedClass>) -> Unit) {
         firestore.collection("saved_instant_classes")
             .document(classDocumentId)
@@ -828,10 +616,10 @@ class FireStoreManager(
                     if (savedClass != null) {
                         callback(Result.success(savedClass))
                     } else {
-                        callback(Result.failure(Exception("Clase no encontrada")))
+                        callback(Result.failure(Exception("Class not found")))
                     }
                 } else {
-                    callback(Result.failure(Exception("Documento nulo o no existe")))
+                    callback(Result.failure(Exception("Document is null or does not exist")))
                 }
             }
     }
@@ -856,9 +644,10 @@ class FireStoreManager(
     }
 
     fun getInstantClasses(
+        email: String,
         callback: (Result<List<Pair<String, SavedClass>>>) -> Unit
     ) {
-        val email = authManager.getUserEmail()
+
         firestore.collection("saved_instant_classes")
             .whereEqualTo("tutorEmail", email)
             .addSnapshotListener { querySnapshot, error ->

@@ -27,10 +27,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun PITApp() {
-
     val navController = rememberNavController()
     val authManager = AuthManager(FirebaseAuth.getInstance())
     val fireStoreManager = remember {
@@ -46,6 +44,5 @@ fun PITApp() {
         authManager = authManager,
         fireStoreManager = fireStoreManager
     )
-
 }
 

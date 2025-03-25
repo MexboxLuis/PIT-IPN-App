@@ -1,5 +1,7 @@
-package com.example.pitapp.ui.screens
+package com.example.pitapp.ui.features.home.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -8,10 +10,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.example.pitapp.data.UserData
+import com.example.pitapp.ui.screens.ErrorScreen
+import com.example.pitapp.ui.screens.LoadingScreen
+import com.example.pitapp.ui.screens.RejectedPermissionScreen
+import com.example.pitapp.ui.screens.RequestedPermissionScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import com.example.pitapp.utils.PreferencesManager
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -65,6 +72,7 @@ fun HomeScreen(
 
             1 -> HomeScreen4Tutor(
                 navController = navController,
+                authManager = authManager,
                 fireStoreManager = fireStoreManager
             )
 

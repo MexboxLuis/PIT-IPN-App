@@ -57,12 +57,12 @@ fun PeriodInfo(startYear: String, startMonth: String, endYear: String, endMonth:
 
     val startDate = try {
         LocalDate.of(startYearInt, startMonthInt, 1)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         now
     }
     val endDate = try {
         YearMonth.of(endYearInt, endMonthInt).atEndOfMonth()
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         now
     }
 

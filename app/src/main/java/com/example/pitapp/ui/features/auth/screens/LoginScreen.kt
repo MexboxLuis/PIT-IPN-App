@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.screens
+package com.example.pitapp.ui.features.auth.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
+import com.example.pitapp.ui.screens.LoadingScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.isValidEmail
 import com.example.pitapp.utils.isValidPassword

@@ -1,6 +1,8 @@
 package com.example.pitapp.ui.screens
 
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,13 +10,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -27,10 +37,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.ui.components.BackScaffold
+import com.example.pitapp.ui.features.classes.model.SavedClass
+import com.example.pitapp.ui.features.classes.model.SavedStudent
 import com.example.pitapp.ui.features.scheduling.model.Schedule
 import com.example.pitapp.ui.features.scheduling.model.Session
 import com.example.pitapp.utils.AuthManager
@@ -41,25 +55,7 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-
-
-data class SavedStudent(
-    val name: String = "",
-    val studentId: String = "",
-    val academicProgram: String = "",
-    val email: String = "",
-    val isRegular: Boolean = true,
-    val signature: String = ""
-)
-
-data class SavedClass(
-    val tutorEmail: String = "",
-    val subject: String = "",
-    val classroom: String = "",
-    val topic: String = "",
-    val date: Timestamp = Timestamp.now(),
-)
-
+import com.example.pitapp.R
 
 
 @Composable
@@ -69,7 +65,7 @@ fun StartInstantClassScreen(
     fireStoreManager: FireStoreManager
 ) {
     val tutorEmail = authManager.getUserEmail() ?: ""
-
+    val context = LocalContext.current
     val currentSchedules = remember { mutableStateOf<List<Schedule>>(emptyList()) }
     val isSchedulesLoading = remember { mutableStateOf(false) }
     val schedulesError = remember { mutableStateOf<String?>(null) }
@@ -90,9 +86,10 @@ fun StartInstantClassScreen(
                 isSchedulesLoading.value = false
                 schedulesError.value = null
             }.onFailure {
-                schedulesError.value = it.localizedMessage ?: "Error desconocido"
+                schedulesError.value = it.localizedMessage ?: context.getString(R.string.unknown_error)
                 isSchedulesLoading.value = false
             }
+            Log.d("Schedules", "A ver: ${result.getOrNull()}")
         }
     }
 
@@ -125,13 +122,10 @@ fun StartInstantClassScreen(
                         set(Calendar.SECOND, 0)
                         set(Calendar.MILLISECOND, 0)
                     }
-                    // Ventana de 60 minutos para iniciar la clase
                     val sessionEndTime = (sessionStartTime.clone() as Calendar).apply {
                         add(Calendar.MINUTE, 60)
                     }
-                    // Sólo consideramos sesiones cuya ventana aún no expiró
                     if (now.timeInMillis < sessionEndTime.timeInMillis) {
-                        // Si la sesión aún no inició, delta es la diferencia; si ya inició, se toma 0
                         val delta = if (now.timeInMillis < sessionStartTime.timeInMillis)
                             sessionStartTime.timeInMillis - now.timeInMillis
                         else
@@ -149,16 +143,13 @@ fun StartInstantClassScreen(
         }
 
         if (targetSessionStartTime == null || targetSchedule == null) {
-            // No hay sesión disponible hoy; deshabilitamos iniciar clase
             canStartClass.value = false
             return@LaunchedEffect
         }
 
-        // Asignamos los datos de la sesión a la UI
         currentSubject.value = targetSchedule.subject
         currentSalonId.value = targetSchedule.salonId
 
-        // Countdown previo a la hora de inicio
         if (now.timeInMillis < targetSessionStartTime.timeInMillis) {
             while (true) {
                 val currentTime = Calendar.getInstance()
@@ -214,7 +205,6 @@ fun StartInstantClassScreen(
                 Spacer(Modifier.height(16.dp))
                 UpcomingSchedules(fireStoreManager, tutorEmail)
             } else {
-                // Mostrar información de la clase (asunto y salón)
                 if (currentSubject.value.isNotEmpty()) {
                     Text(
                         "Clase de ${currentSubject.value}",
@@ -226,7 +216,6 @@ fun StartInstantClassScreen(
                     Spacer(Modifier.height(16.dp))
                 }
 
-                // Mostrar el countdown: si aún no es hora de iniciar o si está en la ventana de 60 minutos
                 if (remainingTime.value.isNotEmpty()) {
                     if (!canStartClass.value) {
                         Text(
@@ -305,6 +294,7 @@ fun InstantClassDetailsScreen(
     fireStoreManager: FireStoreManager,
     classDocumentId: String
 ) {
+    val context = LocalContext.current
     val classDetails = remember { mutableStateOf<SavedClass?>(null) }
     val isLoading = remember { mutableStateOf(true) }
     val error = remember { mutableStateOf<String?>(null) }
@@ -321,7 +311,6 @@ fun InstantClassDetailsScreen(
     val studentIsRegular = remember { mutableStateOf(true) }
     val studentMessage = remember { mutableStateOf("") }
 
-    // Estado para la lista de estudiantes (se actualiza en tiempo real)
     val studentList = remember { mutableStateListOf<SavedStudent>() }
 
     LaunchedEffect(classDocumentId) {
@@ -337,7 +326,7 @@ fun InstantClassDetailsScreen(
                         }
                     }
             }.onFailure {
-                error.value = it.localizedMessage ?: "Error desconocido"
+                error.value = it.localizedMessage ?: context.getString(R.string.unknown_error)
                 isLoading.value = false
             }
 
@@ -352,14 +341,12 @@ fun InstantClassDetailsScreen(
         val classStartTime = classDetails.value!!.date.toDate()
         val classStartCal = Calendar.getInstance().apply { time = classStartTime }
 
-        // Hora de finalización de la clase (próxima hora en punto)
         val classEndCal = (classStartCal.clone() as Calendar).apply {
             add(Calendar.HOUR_OF_DAY, 1)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
         }
 
-        // Fecha límite para agregar estudiantes: 14 minutos antes de la finalización de la clase
         val addStudentEndCal = (classEndCal.clone() as Calendar).apply {
             add(Calendar.MINUTE, -15)
         }
@@ -459,7 +446,7 @@ fun InstantClassDetailsScreen(
                             coroutineScope.launch {
                                 try {
                                     fireStoreManager.addStudent(
-                                        classDocumentId,  // Usa el ID correcto de la clase
+                                        classDocumentId,
                                         newStudent
                                     ) { result ->
                                         if (result.isSuccess) {
@@ -482,7 +469,7 @@ fun InstantClassDetailsScreen(
                         }
                     )
                 } else {
-                    if (timeLeftToAddStudents.value.isNotEmpty()) { // Mostrar solo si no ha empezado el tiempo
+                    if (timeLeftToAddStudents.value.isNotEmpty()) {
                         Text(
                             timeLeftToAddStudents.value,
                             style = MaterialTheme.typography.bodyLarge
@@ -490,7 +477,6 @@ fun InstantClassDetailsScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                // Mostrar la lista de estudiantes agregados en tiempo real
                 if (studentList.isNotEmpty()) {
                     Text("Estudiantes agregados:", style = MaterialTheme.typography.titleMedium)
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -533,7 +519,6 @@ fun UpcomingSchedules(
                             Pair(schedule, formatSessionTime(nextSession, sessionTime))
                         }
                     }
-
                 upcomingSchedules.value = schedulesWithFormattedTime
                 isLoading.value = false
                 error.value = null
@@ -544,19 +529,90 @@ fun UpcomingSchedules(
         }
     }
 
-    if (isLoading.value) {
-        CircularProgressIndicator()
-    } else if (error.value != null) {
-        Text(error.value!!, color = MaterialTheme.colorScheme.error)
-    } else if (upcomingSchedules.value.isNotEmpty()) {
-        Text("Próximas clases:", style = MaterialTheme.typography.titleMedium)
-        upcomingSchedules.value.forEach { (schedule, formattedTime) ->
-            Text("${schedule.subject} (${schedule.salonId}): $formattedTime")
+    when {
+        isLoading.value -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
-    } else {
-        Text("No hay próximas clases programadas.")
+        error.value != null -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = error.value!!, color = MaterialTheme.colorScheme.error)
+                }
+            }
+        }
+        upcomingSchedules.value.isNotEmpty() -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Próximas clases:", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                LazyColumn {
+                    items(upcomingSchedules.value) { (schedule, formattedTime) ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Schedule,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(40.dp)
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column {
+                                    Text(
+                                        text = "${schedule.subject} (${schedule.salonId})",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = formattedTime,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No hay próximas clases programadas.")
+            }
+        }
     }
 }
+
 
 
 private fun nextSessionTime(schedule: Schedule, now: Calendar): Pair<Session, Calendar>? {

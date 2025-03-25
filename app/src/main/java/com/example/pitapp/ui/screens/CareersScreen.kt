@@ -107,7 +107,7 @@ fun CareerWebViewScreen(navController: NavHostController, encodedUrl: String) {
                 title = { Text("Career Information") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
                 }
             )

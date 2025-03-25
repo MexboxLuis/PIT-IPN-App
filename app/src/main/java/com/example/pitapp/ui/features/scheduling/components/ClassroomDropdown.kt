@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 import com.example.pitapp.ui.screens.Classroom
@@ -59,9 +60,17 @@ fun ClassroomDropdown(
             }
                 ?: stringResource(R.string.no_classroom_selected),
             onValueChange = {},
-            label = { Text(stringResource(R.string.select_classroom)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.select_classroom),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             leadingIcon = { Icon(Icons.Filled.MeetingRoom, contentDescription = null) },
+            singleLine = true,
+            maxLines = 1,
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor()
@@ -102,7 +111,7 @@ fun ClassroomDropdown(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.MeetingRoom,
-                                        contentDescription = "Salón",
+                                        contentDescription = null,
                                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = Modifier.fillMaxSize()
                                     )
@@ -111,7 +120,7 @@ fun ClassroomDropdown(
                                         style = MaterialTheme.typography.labelMedium,
                                         color = Color.White,
                                         fontFamily = FontFamily.SansSerif,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
 
@@ -123,7 +132,9 @@ fun ClassroomDropdown(
                                         R.string.classroom_number_description,
                                         classroom.number,
                                         classroom.description
-                                    )
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         },

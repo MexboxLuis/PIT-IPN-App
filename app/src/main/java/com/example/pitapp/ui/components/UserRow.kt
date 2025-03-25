@@ -25,9 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,11 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.example.pitapp.R
 import com.example.pitapp.data.UserData
 import com.example.pitapp.utils.FireStoreManager
 import kotlinx.coroutines.launch
@@ -49,17 +45,6 @@ import kotlinx.coroutines.launch
 fun UserRow(user: UserData, fireStoreManager: FireStoreManager) {
     LocalContext.current
     val scope = rememberCoroutineScope()
-    var classCount by remember { mutableIntStateOf(0) }
-
-    if (user.permission == 1) {
-        LaunchedEffect(Unit) {
-            fireStoreManager.getClassesByEmail(user.email) { result ->
-                if (result.isSuccess) {
-                    classCount = result.getOrNull()?.size ?: 0
-                }
-            }
-        }
-    }
 
     Row(
         modifier = Modifier
@@ -98,12 +83,6 @@ fun UserRow(user: UserData, fireStoreManager: FireStoreManager) {
                 fontFamily = FontFamily.Serif
             )
             Text(text = user.email, style = MaterialTheme.typography.bodySmall)
-            if (user.permission == 1) {
-                Text(
-                    text = stringResource(id = R.string.class_count, classCount),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
         }
 
         var isLoading by remember { mutableStateOf(false) }

@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.screens
+package com.example.pitapp.ui.features.home.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
 import com.example.pitapp.data.AdminCardData
-import com.example.pitapp.ui.components.AdminCard
-import com.example.pitapp.ui.components.AdminCardGrid
-import com.example.pitapp.ui.components.AdminScaffold
+import com.example.pitapp.ui.features.home.components.AdminCard
+import com.example.pitapp.ui.features.home.components.AdminCardGrid
+import com.example.pitapp.ui.features.home.components.AdminScaffold
 import com.example.pitapp.ui.components.EmptyState
 import com.example.pitapp.utils.FireStoreManager
 import com.example.pitapp.utils.PreferencesManager

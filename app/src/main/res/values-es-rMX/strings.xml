@@ -1,84 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--        Shared strings      -->
     <string name="app_name">Programa Institucional de Tutorias</string>
-
     <string name="loading">Cargando…</string>
     <string name="unknown_error">Error desconocido</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save_changes">Guardar cambios</string>
+    <string name="error_saving">Error al guardar los cambios.</string>
+    <string name="day_mon">Lunes</string>
+    <string name="day_tue">Martes</string>
+    <string name="day_wed">Miércoles</string>
+    <string name="day_thu">Jueves</string>
+    <string name="day_fri">Viernes</string>
+    <string name="day_sat">Sábado</string>
+    <string name="day_sun">Domingo</string>
+    <string name="january">Enero</string>
+    <string name="february">Febrero</string>
+    <string name="march">Marzo</string>
+    <string name="april">Abril</string>
+    <string name="may">Mayo</string>
+    <string name="june">Junio</string>
+    <string name="july">Julio</string>
+    <string name="august">Agosto</string>
+    <string name="september">Septiembre</string>
+    <string name="october">Octubre</string>
+    <string name="november">Noviembre</string>
+    <string name="december">Diciembre</string>
 
+    <!--        Screens     -->
+    <string name="error_screen_message">Verifica tu conexión a internet o contacta al administrador.</string>
+
+    <!--        Auth        -->
     <string name="email">Correo electrónico</string>
     <string name="password">Contraseña</string>
     <string name="confirm_password">Confirmar contraseña</string>
-
-    <!--    Mensajes de la pantalla de restablecimiento de contraseña -->
     <string name="toast_reset_password_sent">Si estás registrado, recibirás un enlace para restablecer tu contraseña en breve.</string>
     <string name="toast_reset_password_failed">No se pudo enviar el correo de restablecimiento de contraseña.</string>
     <string name="send_password_reset">Enviar restablecimiento de contraseña</string>
-
-    <!--    Mensajes de la pantalla de inicio de sesión -->
     <string name="login_failed">Credenciales inválidas, por favor intenta nuevamente.</string>
     <string name="login">Iniciar sesión</string>
     <string name="register_here">¿No tienes una cuenta? Regístrate aquí</string>
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
-
-    <!--    Mensajes de la pantalla de registro -->
     <string name="next">Siguiente</string>
     <string name="register">Registrarse</string>
     <string name="email_already_registered">Este correo ya está registrado. Intenta iniciar sesión.</string>
     <string name="names">Nombre(s)</string>
     <string name="surnames">Apellido(s)</string>
-    <string name="upload_image">Subir imagen</string>
     <string name="your_email_is">Tu correo es %s</string>
     <string name="error_uploading_data">Error al subir los datos.</string>
-
-    <!--      Mensajes de REGEX              -->
     <string name="regex_email">Formato de correo inválido, debes usar un correo institucional.</string>
     <string name="regex_password">La contraseña debe tener al menos 6 caracteres.</string>
     <string name="regex_confirm_password">Las contraseñas no coinciden.</string>
-
-    <!--    Mensajes de dialogo para cerrar de sesion -->
     <string name="log_out_message">¿Estás seguro que quieres cerrar sesión?</string>
     <string name="yes_log_out">Sí, quiero</string>
 
-    <!--    Scaffold -->
-
-    <string name="home">Inicio</string>
-    <string name="requests">Solicitudes</string>
-
-    <!--    Profile Screen-->
+    <!--        Profile     -->
     <string name="profile">Perfil</string>
     <string name="edit_data">Editar información del perfil</string>
-    <string name="delete">Eliminar</string>
     <string name="add_pic">Añade una foto</string>
     <string name="change_pic">Cambiar foto</string>
-    <string name="cancel">Cancel</string>
-    <string name="save_changes">Guardar cambios</string>
-    <string name="error_saving">Error al guardar los cambios.</string>
 
-    <!--    Modal bottom sheet-->
+    <!--        Home        -->
     <string name="headline_sheet">Haz una clase para tus alumnos.</string>
     <string name="create_class">Iniciar clase</string>
-    <string name="schedule_class">Agendar clase</string>
+    <string name="schedule_class">Crea un horario</string>
     <string name="class_in_progress">No se puede crear una nueva clase mientras haya una en progreso.</string>
-
-    <!--    Error screen-->
-    <string name="error_screen_message">Verifica tu conexión a internet o contacta al administrador.</string>
-
-
-    <!-- Rejected Permission Screen-->
-    <string name="permission_rejected">Tu solicitud ha sido rechazada.</string>
-    <string name="permission_rejected_message">Si crees que esto es un error, por favor contacta directamente con la escuela.</string>
-
-    <!--    Requested Permission Screen  -->
-    <string name="approval_pending">Tu solicitud está pendiente de aprobación.</string>
-    <string name="approval_message">Por favor, espera a que un administrador acepte tu solicitud.</string>
-    <string name="change_account_button">Iniciar con otra cuenta</string>
-    <string name="change_account_description">Cambiar cuenta</string>
-
-
-    <!--    Home screen 4 tutor-->
-
-
-    <!--    Home screen 4 admin-->
     <string name="permission_requests_subtitle">Solicitudes pendientes de tutor.</string>
     <string name="tutors_subtitle">Todos los tutores registrados.</string>
     <string name="classes_subtitle">Todas las clases impartidas.</string>
@@ -96,48 +83,40 @@
     <string name="search_hint">Buscar secciones</string>
     <string name="no_filtered_section">Aún no contamos con esa sección.</string>
 
-    <!--    Permission Requests Screen -->
+
+    <!--      Permissions       -->
+    <string name="permission_rejected">Tu solicitud ha sido rechazada.</string>
+    <string name="permission_rejected_message">Si crees que esto es un error, por favor contacta directamente con la escuela.</string>
+    <string name="approval_pending">Tu solicitud está pendiente de aprobación.</string>
+    <string name="approval_message">Por favor, espera a que un administrador acepte tu solicitud.</string>
+    <string name="change_account_button">Iniciar con otra cuenta</string>
     <string name="no_requests">No hay solicitudes de nuevos tutores.</string>
     <string name="no_rejected_users">No hay usuarios rechazados.</string>
     <string name="tutor_requests">Solicitudes de tutores</string>
     <string name="rejected_users">Usuarios rechazados</string>
-    <string name="class_count">Cantidad de clases: %1$d</string>
-
-
-    <!--    Tutors  Screen-->
-    <string name="no_tutors_message">No tutors available, you can add one in the permission request section.</string>
-    <string name="go_to_permission_requests">Go to permission requests</string>
-    <string name="search_by_email">Search by email</string>
-    <string name="error_loading_tutors">Error loading tutors: %1$s</string>
+    <string name="no_tutors_message">No hay tutores disponibles, puedes agregar uno en la sección de solicitudes de permiso.</string>
+    <string name="go_to_permission_requests">Ir a solicitudes de permiso</string>
+    <string name="search_by_email">Buscar por correo electrónico</string>
+    <string name="error_loading_tutors">Error al cargar tutores: %1$s</string>
     <string name="no_tutors_found">No se encontraron tutores.</string>
 
-
-    <!--   Classes  -->
+    <!--        Classes     -->
     <string name="tutor_classes_title">Clases de tutores</string>
-    <string name="loading_classes_error">Error al cargar clases para %1$s</string>
     <string name="no_filtered_classes">No se encontraron clases para los filtros especificados.</string>
     <string name="search_my_classes">Buscar en mis clases</string>
     <string name="no_classes_found">No se encontraron clases, crea una ahora.</string>
     <string name="past_instant_classes">Clases impartidas</string>
+    <string name="student_regular">Regular</string>
+    <string name="student_irregular">Irregular</string>
 
-    <!--    Calendar Screen -->
+    <!--        Calendar Screen     -->
     <string name="tab_title_days">Días Inhábiles</string>
     <string name="tab_title_periods">Periodos</string>
-    <string name="message_non_working_day">¿Quieres agregar esta fecha como inhábil?</string>
     <string name="select_non_working_day">Selecciona un día inhábil</string>
-    <string name="confirm_range_message">¿Confirmar rango de %1$s a %2$s?</string>
-    <string name="end_date_error">La fecha final debe ser posterior a la inicial</string>
     <string name="save_to_confirm">Presiona guardar para confirmar</string>
     <string name="select_date_range">Selecciona un rango de fechas</string>
     <string name="select_end_range">Selecciona el final del rango</string>
     <string name="to">a</string>
-    <string name="day_mon">Lunes</string>
-    <string name="day_tue">Martes</string>
-    <string name="day_wed">Miércoles</string>
-    <string name="day_thu">Jueves</string>
-    <string name="day_fri">Viernes</string>
-    <string name="day_sat">Sábado</string>
-    <string name="day_sun">Domingo</string>
     <string name="non_working_day">Día Inhábil</string>
     <string name="add_non_working_day">Día inhábil por agregar -> %s</string>
     <string name="add_period">Período por agregar -> %s</string>
@@ -148,8 +127,7 @@
     <string name="no_events">SIN EVENTOS</string>
     <string name="period_prefix">PERÍODO VACACIONAL</string>
 
-
-    <!-- CareersScreen -->
+    <!--        CareersScreen       -->
     <string name="career_biotech">Ingeniería Biotecnológica</string>
     <string name="career_ai">Ingeniería en Inteligencia Artificial</string>
     <string name="career_automotive">Ingeniería en Sistemas Automotrices</string>
@@ -158,9 +136,44 @@
     <string name="career_industrial">Ingeniería Industrial</string>
 
 
-    <!--ClassroomsScreen-->
-    <string name="add_classroom">Añadir Aula</string>
-
+    <!--    Scheduling      -->
+    <string name="error_message">Error: %s</string>
+    <string name="load_error">Error al cargar: %s</string>
+    <string name="select">Seleccionar</string>
+    <string name="create_schedule">Crear Horario</string>
+    <string name="select_classroom">Seleccione un Salón</string>
+    <string name="classroom_number_description">Salón %d - %s</string>
+    <string name="no_classroom_selected">Ningún salón seleccionado</string>
+    <string name="classroom_required">Debes seleccionar un salón.</string>
+    <string name="subject">Materia</string>
+    <string name="subject_required">Debes ingresar una materia</string>
+    <string name="start_month">Mes de Inicio</string>
+    <string name="end_month">Mes de Fin</string>
+    <string name="invalid_months">Meses inválidos (deben estar entre 1 y 12).</string>
+    <string name="start_year">Año de Inicio</string>
+    <string name="end_year">Año de Fin</string>
+    <string name="invalid_year">El año de inicio debe ser mayor o igual al actual</string>
+    <string name="start_date_before_end_date">El año/mes de inicio no puede ser posterior al año/mes de fin.</string>
+    <string name="select_days_and_time">Selecciona los días y la hora (7–19):</string>
+    <string name="hour">Hora</string>
+    <string name="invalid_hour_range">\t\t\t\t\t\t\tHora inválida \n(debe estar entre 07 y 19 hrs).</string>
+    <string name="at_least_one_day">Debes seleccionar al menos un día.</string>
+    <string name="schedule_button">Agendar Horario</string>
+    <string name="schedule_overlap_error">Ya tienes un horario aprobado que coincide con este.  Por favor, revisa tus horarios.</string>
+    <string name="tutor_schedule_overlap_error">El tutor ya tiene un horario aprobado que coincide con este.</string>
+    <string name="schedule_created_successfully">Horario agendado exitosamente.</string>
+    <string name="scheduling_error">Error al agendar: %s</string>
+    <string name="edit_schedule">Editar Horario</string>
+    <string name="original_classroom_error">El salón original no existe o hubo un error.</string>
+    <string name="invalid_schedule_id">ID de horario inválido.</string>
+    <string name="update_schedule">Actualizar Horario</string>
+    <string name="update_error">Error al actualizar: %s</string>
+    <string name="delete_schedule_message">¿Estás seguro de que deseas eliminar este horario?</string>
+    <string name="yes_delete_schedule">Sí, eliminar</string>
+    <string name="deletion_success">El horario ha sido eliminado correctamente.</string>
+    <string name="disapprove_schedule_message">¿Estás seguro de que deseas desaprobar este horario? Esto podría afectar la creación de clases para los tutores.</string>
+    <string name="yes_disapprove_schedule">Sí, desaprobar</string>
+    <string name="disapproval_success">El horario ha sido desaprobado exitosamente.</string>
     <string name="defined_schedules">Horarios Aprobados</string>
     <string name="pending_schedules">Horarios por Aprobar</string>
     <string name="no_approved_schedules">No hay horarios aprobados.</string>
@@ -179,65 +192,5 @@
     <string name="ends_in_days">Termina en %d días</string>
     <string name="ends_in_months">Termina en %d meses</string>
     <string name="sessions">Sesiones:</string>
-
-    <string name="january">Enero</string>
-    <string name="february">Febrero</string>
-    <string name="march">Marzo</string>
-    <string name="april">Abril</string>
-    <string name="may">Mayo</string>
-    <string name="june">Junio</string>
-    <string name="july">Julio</string>
-    <string name="august">Agosto</string>
-    <string name="september">Septiembre</string>
-    <string name="october">Octubre</string>
-    <string name="november">Noviembre</string>
-    <string name="december">Diciembre</string>
-
-    <string name="delete_schedule_message">¿Estás seguro de que deseas eliminar este horario?</string>
-    <string name="yes_delete_schedule">Sí, eliminar</string>
-    <string name="disapproval_success">El horario ha sido desaprobado exitosamente.</string>
-    <string name="deletion_success">El horario ha sido eliminado correctamente.</string>
-    <string name="disapprove_schedule_message">¿Estás seguro de que deseas desaprobar este horario? Esto podría afectar la creación de clases para los tutores.</string>
-    <string name="yes_disapprove_schedule">Sí, desaprobar</string>
-
-    <string name="create_schedule">Crear Horario</string>
-    <string name="subject">Materia</string>
-    <string name="subject_required">Debes ingresar una materia</string>
-    <string name="start_year">Año de Inicio</string>
-    <string name="end_year">Año de Fin</string>
-    <string name="start_month">Mes de Inicio</string>
-    <string name="end_month">Mes de Fin</string>
-    <string name="select_days_and_time">Selecciona los días y la hora (7–19):</string>
-    <string name="schedule_button">Agendar Horario</string>
-    <string name="classroom_required">Debes seleccionar un salón.</string>
-    <string name="year_month_numbers">Año y mes deben ser números.</string>
-    <string name="start_date_before_end_date">El año/mes de inicio no puede ser posterior al año/mes de fin.</string>
-    <string name="invalid_months">Meses inválidos (deben estar entre 1 y 12).</string>
-    <string name="invalid_year_before">No se pueden seleccionar años anteriores al año actual (%d).</string>
-    <string name="invalid_end_year">Año de fin invalido.</string>
-    <string name="at_least_one_day">Debes seleccionar al menos un día.</string>
-    <string name="invalid_hour_for_day">Hora inválida para el día %d (debe estar entre 7hr y 19hr).</string>
-    <string name="schedule_overlap_error">Ya tienes un horario aprobado que coincide con este.  Por favor, revisa tus horarios.</string>
-    <string name="schedule_created_successfully">Horario agendado exitosamente.</string>
-    <string name="scheduling_error">Error al agendar: %s</string>
-    <string name="classroom_number_description">Salón %d - %s</string>
-    <string name="no_classroom_selected">Ningún salón seleccionado</string>
-    <string name="select_classroom">Seleccione un Salón</string>
-    <string name="error_message">Error: %s</string>
-    <string name="select">Seleccionar</string>
-    <string name="hour">Hora</string>
-    <string name="invalid_hour_range">\t\t\t\t\t\t\tHora inválida \n(debe estar entre 07 y 19 hrs).</string>
-    <string name="invalid_year">El año de inicio debe ser mayor o igual al actual</string>
-
-    <string name="edit_schedule">Editar Horario</string>
-    <string name="original_classroom_error">El salón original no existe o hubo un error.</string>
-    <string name="load_error">Error al cargar: %s</string>
-    <string name="invalid_schedule_id">ID de horario inválido.</string>
-    <string name="update_schedule">Actualizar Horario</string>
-    <string name="schedule_updated">Horario actualizado.</string>
-    <string name="update_error">Error al actualizar: %s</string>
-    <string name="tutor_schedule_overlap_error">El tutor ya tiene un horario aprobado que coincide con este.</string>
-    <string name="invalid_end_month">Mes final invalido.</string>
-
 
 </resources>

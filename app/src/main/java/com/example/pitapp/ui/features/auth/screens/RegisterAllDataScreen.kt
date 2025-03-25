@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.screens
+package com.example.pitapp.ui.features.auth.screens
 
 import android.net.Uri
 import android.widget.Toast
@@ -53,6 +53,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
+import com.example.pitapp.ui.screens.LoadingScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.FireStoreManager
 import kotlinx.coroutines.delay

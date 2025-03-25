@@ -52,7 +52,7 @@ fun MonthDropdown(label: String, selectedMonth: String, onMonthSelected: (String
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             leadingIcon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
             modifier = Modifier
-                .fillMaxWidth(0.7f)
+                .fillMaxWidth(0.6f)
                 .menuAnchor()
         )
         ExposedDropdownMenu(

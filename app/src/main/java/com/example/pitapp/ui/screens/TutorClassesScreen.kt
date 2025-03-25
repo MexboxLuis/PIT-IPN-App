@@ -72,34 +72,6 @@ fun TutorClassesScreen(
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        fireStoreManager.getAllUsersSnapshot { result ->
-            if (result.isSuccess) {
-                users = result.getOrNull()?.filter { it.permission == 1 } ?: emptyList()
-                users.forEach { user ->
-                    fireStoreManager.getClassesByEmail(user.email) { classResult ->
-                        if (classResult.isSuccess) {
-                            classesByUser.value = classesByUser.value.toMutableMap().apply {
-                                this[user.email] = classResult.getOrDefault(emptyList())
-                            }
-                            hiddenClassesByUser.value =
-                                hiddenClassesByUser.value.toMutableMap().apply {
-                                    this[user.email] = true
-                                }
-                            allClasses = classesByUser.value.values.flatten()
-                        } else {
-                            errorMessage =
-                                context.getString(R.string.loading_classes_error, user.email)
-
-                        }
-                    }
-                }
-            } else {
-                errorMessage = result.exceptionOrNull()?.message
-            }
-            isLoading = false
-        }
-    }
 
     BackScaffold(
         navController = navController,

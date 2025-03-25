@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.screens
+package com.example.pitapp.ui.features.home.screens
 
 import android.app.Activity
 import android.content.Context
@@ -100,14 +100,18 @@ import java.util.Date
 import java.util.Locale
 import java.util.Calendar
 import java.util.jar.Manifest
+import com.example.pitapp.ui.features.classes.model.SavedClass
+import com.example.pitapp.ui.features.classes.model.SavedStudent
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen4Tutor(
     navController: NavHostController,
+    authManager: AuthManager,
     fireStoreManager: FireStoreManager
 ) {
+    val email = authManager.getUserEmail() ?: ""
     val instantClasses = remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
     val savedInstantClasses = remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
     val filteredSavedInstantClasses = remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
@@ -130,11 +134,11 @@ fun HomeScreen4Tutor(
     )
 
     LaunchedEffect(Unit) {
-        fireStoreManager.getInstantClasses { result ->
+        fireStoreManager.getInstantClasses(email = email) { result ->
             instantClasses.value = result.getOrDefault(emptyList())
         }
 
-        fireStoreManager.getInstantClasses { result ->
+        fireStoreManager.getInstantClasses(email = email) { result ->
             result.onSuccess { list ->
                 list.forEach { (classId, savedClass) ->
                     fireStoreManager.getStudentsNow(classId) { studentResult ->
@@ -590,7 +594,7 @@ fun InstantClassSummaryScreen(
                         val csvFile = generateStudentsCsv(savedClass, students.value, context)
                         shareFile(context, csvFile)
                     }) {
-                        Icon(Icons.Filled.Download, contentDescription = "Descargar CSV")
+                        Icon(Icons.Filled.Download, contentDescription = null)
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                         Text("Descargar CSV de Alumnos")
                     }
@@ -719,3 +723,4 @@ fun StudentItem(student: SavedStudent) {
         }
     }
 }
+

@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.screens
+package com.example.pitapp.ui.features.auth.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
 import com.example.pitapp.ui.components.BackScaffold
+import com.example.pitapp.ui.screens.LoadingScreen
 import com.example.pitapp.utils.AuthManager
 import com.example.pitapp.utils.isValidEmail
 import com.example.pitapp.utils.isValidPassword

@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.components
+package com.example.pitapp.ui.features.home.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

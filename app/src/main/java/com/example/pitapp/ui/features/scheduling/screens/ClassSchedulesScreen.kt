@@ -66,10 +66,16 @@ fun ClassSchedulesScreen(
     val isLoading = remember { mutableStateOf(true) }
     val errorMessage = remember { mutableStateOf<String?>(null) }
 
+
     LaunchedEffect(Unit) {
         fireStoreManager.getSchedules { result ->
             result.onSuccess { list ->
-                schedules.value = list
+                schedules.value = list.sortedWith(
+                    compareBy<Pair<String, Schedule>> { it.second.startYear }
+                        .thenBy { it.second.startMonth }
+                        .thenBy { it.second.endYear }
+                        .thenBy { it.second.endMonth }
+                )
                 isLoading.value = false
             }.onFailure {
                 errorMessage.value =
@@ -78,6 +84,7 @@ fun ClassSchedulesScreen(
             }
         }
     }
+
 
     BackScaffold(
         navController = navController,

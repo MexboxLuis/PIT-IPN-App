@@ -1,4 +1,4 @@
-package com.example.pitapp.ui.screens
+package com.example.pitapp.ui.features.auth.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.Image

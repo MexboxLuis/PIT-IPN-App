@@ -17,21 +17,19 @@ import com.example.pitapp.ui.features.scheduling.screens.GenerateScheduleScreen
 import com.example.pitapp.ui.screens.CalendarScreen
 import com.example.pitapp.ui.screens.CareerWebViewScreen
 import com.example.pitapp.ui.screens.CareersScreen
-import com.example.pitapp.ui.screens.ClassDetailScreen
 import com.example.pitapp.ui.features.scheduling.screens.ClassSchedulesScreen
 import com.example.pitapp.ui.screens.ClassroomsScreen
 import com.example.pitapp.ui.screens.ErrorScreen
-import com.example.pitapp.ui.screens.HomeScreen
+import com.example.pitapp.ui.features.home.screens.HomeScreen
 import com.example.pitapp.ui.screens.InstantClassDetailsScreen
-import com.example.pitapp.ui.screens.InstantClassSummaryScreen
-import com.example.pitapp.ui.screens.LoginScreen
+import com.example.pitapp.ui.features.auth.screens.LoginScreen
 import com.example.pitapp.ui.screens.PermissionRequestsScreen
 import com.example.pitapp.ui.screens.ProfileScreen
-import com.example.pitapp.ui.screens.RegisterAllDataScreen
-import com.example.pitapp.ui.screens.RegisterDataScreen
+import com.example.pitapp.ui.features.auth.screens.RegisterAllDataScreen
+import com.example.pitapp.ui.features.auth.screens.RegisterDataScreen
 import com.example.pitapp.ui.screens.RequestedPermissionScreen
-import com.example.pitapp.ui.screens.ResetPasswordScreen
-import com.example.pitapp.ui.screens.StartClassNowScreen
+import com.example.pitapp.ui.features.auth.screens.ResetPasswordScreen
+import com.example.pitapp.ui.features.home.screens.InstantClassSummaryScreen
 import com.example.pitapp.ui.screens.StartInstantClassScreen
 import com.example.pitapp.ui.screens.TutorClassesScreen
 import com.example.pitapp.ui.screens.TutorsScreen
@@ -165,32 +163,11 @@ fun PITNavigation(
             )
         }
 
-        composable(route = "startClassNowScreen") {
-            StartClassNowScreen(
-                navController = navController,
-                authManager = authManager,
-                fireStoreManager = fireStoreManager
-            )
-        }
-
         composable(route = "generateScheduleScreen") {
             GenerateScheduleScreen(
                 navController = navController,
                 authManager = authManager,
                 fireStoreManager = fireStoreManager
-            )
-        }
-
-        composable(
-            route = "classDetailScreen/{documentId}",
-            arguments = listOf(navArgument("documentId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val documentId = backStackEntry.arguments?.getString("documentId") ?: ""
-            ClassDetailScreen(
-                navController = navController,
-                authManager = authManager,
-                fireStoreManager = fireStoreManager,
-                classDocumentId = documentId
             )
         }
 
