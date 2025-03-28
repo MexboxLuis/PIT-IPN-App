@@ -17,8 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.pitapp.ui.features.scheduling.model.Session
-import com.example.pitapp.ui.features.scheduling.utils.dayOfWeekToString
+import com.example.pitapp.model.Session
+import com.example.pitapp.ui.shared.formatting.dayOfWeekToString
 
 @Composable
 fun SessionItem(session: Session) {

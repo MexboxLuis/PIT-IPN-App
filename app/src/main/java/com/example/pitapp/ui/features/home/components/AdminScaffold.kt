@@ -6,8 +6,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.example.pitapp.ui.components.MainTopAppBar
-import com.example.pitapp.utils.FireStoreManager
+import com.example.pitapp.datasource.FireStoreManager
 
 
 @Composable

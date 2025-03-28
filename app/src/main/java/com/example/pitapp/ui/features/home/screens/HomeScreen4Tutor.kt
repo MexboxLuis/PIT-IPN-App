@@ -1,14 +1,10 @@
 package com.example.pitapp.ui.features.home.screens
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.util.Log
 //import manifest permission
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -32,13 +28,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
@@ -76,32 +70,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.data.ClassData
-import com.example.pitapp.data.Student
-import com.example.pitapp.ui.components.BackScaffold
-import com.example.pitapp.ui.components.CreateClassSheet
-import com.example.pitapp.ui.components.EmptyState
-import com.example.pitapp.ui.components.TutorScaffold
-import com.example.pitapp.ui.model.SortOrder
-import com.example.pitapp.utils.AuthManager
-import com.example.pitapp.utils.FireStoreManager
+import com.example.pitapp.ui.shared.components.BackScaffold
+import com.example.pitapp.ui.features.home.components.CreateClassSheet
+import com.example.pitapp.ui.shared.components.EmptyState
+import com.example.pitapp.ui.features.home.components.TutorScaffold
+import com.example.pitapp.ui.features.classes.components.SortOrder
+import com.example.pitapp.datasource.AuthManager
+import com.example.pitapp.datasource.FireStoreManager
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import java.util.Calendar
-import java.util.jar.Manifest
-import com.example.pitapp.ui.features.classes.model.SavedClass
-import com.example.pitapp.ui.features.classes.model.SavedStudent
+import com.example.pitapp.model.SavedClass
+import com.example.pitapp.model.SavedStudent
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)

@@ -45,13 +45,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.data.AdminCardData
+import com.example.pitapp.ui.features.home.components.AdminCardData
 import com.example.pitapp.ui.features.home.components.AdminCard
 import com.example.pitapp.ui.features.home.components.AdminCardGrid
 import com.example.pitapp.ui.features.home.components.AdminScaffold
-import com.example.pitapp.ui.components.EmptyState
-import com.example.pitapp.utils.FireStoreManager
-import com.example.pitapp.utils.PreferencesManager
+import com.example.pitapp.ui.shared.components.EmptyState
+import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.datasource.PreferencesManager
 import kotlinx.coroutines.launch
 
 

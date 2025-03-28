@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
-import com.example.pitapp.ui.features.scheduling.utils.monthToString
+import com.example.pitapp.ui.shared.formatting.monthToString
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit

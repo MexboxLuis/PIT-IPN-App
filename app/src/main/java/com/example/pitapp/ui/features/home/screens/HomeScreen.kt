@@ -9,14 +9,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
-import com.example.pitapp.data.UserData
-import com.example.pitapp.ui.screens.ErrorScreen
-import com.example.pitapp.ui.screens.LoadingScreen
-import com.example.pitapp.ui.screens.RejectedPermissionScreen
-import com.example.pitapp.ui.screens.RequestedPermissionScreen
-import com.example.pitapp.utils.AuthManager
-import com.example.pitapp.utils.FireStoreManager
-import com.example.pitapp.utils.PreferencesManager
+import com.example.pitapp.model.UserData
+import com.example.pitapp.ui.shared.screens.ErrorScreen
+import com.example.pitapp.ui.shared.screens.LoadingScreen
+import com.example.pitapp.datasource.AuthManager
+import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.datasource.PreferencesManager
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

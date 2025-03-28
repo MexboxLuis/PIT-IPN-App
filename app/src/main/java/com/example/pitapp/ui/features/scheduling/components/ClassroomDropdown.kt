@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
-import com.example.pitapp.ui.screens.Classroom
+import com.example.pitapp.ui.features.classrooms.screens.Classroom
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

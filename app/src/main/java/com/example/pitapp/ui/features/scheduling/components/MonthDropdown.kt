@@ -31,7 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
-import com.example.pitapp.ui.features.scheduling.utils.monthToString
+import com.example.pitapp.ui.shared.formatting.monthToString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

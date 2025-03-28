@@ -31,7 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
-import com.example.pitapp.ui.features.scheduling.utils.dayOfWeekToString
+import com.example.pitapp.ui.shared.formatting.dayOfWeekToString
 
 @Composable
 fun DaysOfWeekSelection(

@@ -40,7 +40,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
-import com.example.pitapp.ui.features.scheduling.model.Schedule
+import com.example.pitapp.model.Schedule
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

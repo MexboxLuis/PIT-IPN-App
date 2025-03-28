@@ -41,9 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.ui.components.BackScaffold
-import com.example.pitapp.utils.AuthManager
-import com.example.pitapp.utils.isValidEmail
+import com.example.pitapp.ui.shared.components.BackScaffold
+import com.example.pitapp.datasource.AuthManager
+import com.example.pitapp.ui.features.auth.helpers.isValidEmail
 import kotlinx.coroutines.launch
 
 @Composable
