@@ -125,7 +125,7 @@ fun TutorsScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    label = { Text(stringResource(id = R.string.search_by_email)) },
+                    label = { Text(text = stringResource(id = R.string.search_by_email)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     trailingIcon = {

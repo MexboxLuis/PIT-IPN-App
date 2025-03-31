@@ -79,7 +79,7 @@
     <string name="careers_subtitle">Explore career options</string>
     <string name="class_schedules_title">Class Schedules</string>
     <string name="class_schedules_subtitle">Management of class schedules and approvals</string>
-    <string name="search_hint">Search in sections</string>
+    <string name="search_seaction">Search in sections</string>
     <string name="no_filtered_section">We do not have that section yet.</string>
 
 
@@ -135,7 +135,7 @@
     <string name="career_industrial">Industrial Engineering</string>
 
     <!--        Scheduling      -->
-    <string name="error_message">Error: %s</string>
+
     <string name="load_error">Error loading: %s</string>
     <string name="select">Select</string>
     <string name="create_schedule">Create Schedule</string>
@@ -191,6 +191,31 @@
     <string name="ends_in_months">Ends in %d months</string>
     <string name="sessions">Sessions:</string>
 
+
+    <!--        Classrooms      -->
+    <string name="search_classrooms">Search classrooms…</string>
+    <string name="sort_number_asc">Number (Asc)</string>
+    <string name="sort_number_desc">Number (Desc)</string>
+    <string name="sort_description_asc">Description (A-Z)</string>
+    <string name="sort_description_desc">Description (Z-A)</string>
+    <string name="no_classrooms_found">No classrooms found</string>
+    <string name="no_classrooms_yet">No classrooms yet</string>
+    <string name="add_classroom">Add a classroom</string>
+    <string name="classroom_no_match">No classrooms match the filter</string>
+    <string name="classroom_card_title_prefix">Classroom %d</string>
+    <string name="classroom_card_no_description">No description</string>
+    <string name="edit_classroom_dialog_title_prefix">Edit Classroom</string>
+    <string name="add_classroom_dialog_title">Add New Classroom</string>
+    <string name="error_cannot_change_number_edit">Cannot change classroom number in edit mode.</string>
+    <string name="error_update_failed_prefix">Update error: </string>
+    <string name="error_add_failed_prefix">Add error: </string>
+    <string name="error_classroom_exists">Classroom %1$d already exists.</string>
+    <string name="validation_must_be_integer">Must be an integer</string>
+    <string name="validation_number_required">Number is required</string>
+    <string name="label_number">Number</string>
+    <string name="label_description">Description</string>
+    <string name="delete_dialog_confirmation_question">Are you sure you want to delete Classroom %1$d?</string>
+    <string name="delete_dialog_info_text">This action will remove the classroom from the available list and affect scheduling functionality. It will not impact historical records, but remember to reassign classrooms to avoid scheduling issues.</string>
 
 
 </resources>

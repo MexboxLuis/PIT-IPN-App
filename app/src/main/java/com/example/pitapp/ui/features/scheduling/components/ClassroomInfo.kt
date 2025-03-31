@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 
 @Composable
-fun ClassroomInfo(salonId: String) {
+fun ClassroomInfo(classroomId: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 4.dp)
@@ -31,7 +31,7 @@ fun ClassroomInfo(salonId: String) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = stringResource(R.string.classroom, salonId),
+            text = stringResource(R.string.classroom, classroomId),
             style = MaterialTheme.typography.bodyMedium
         )
     }

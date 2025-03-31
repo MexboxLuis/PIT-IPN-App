@@ -160,6 +160,14 @@ fun ClassSchedulesScreen(
                                                     onEdit = { navController.navigate("editSchedule/$scheduleId") },
                                                     onApprove = {
                                                         CoroutineScope(Dispatchers.Main).launch {
+                                                            if (schedule.classroomId.isEmpty()) {
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    context.getString(R.string.original_classroom_error),
+                                                                    Toast.LENGTH_LONG
+                                                                ).show()
+                                                                return@launch
+                                                            }
                                                             val isClassroomOverlapping =
                                                                 fireStoreManager.checkForOverlap(
                                                                     schedule

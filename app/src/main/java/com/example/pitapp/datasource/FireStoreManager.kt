@@ -1,14 +1,13 @@
 package com.example.pitapp.datasource
 
 import android.net.Uri
-import com.example.pitapp.model.UserData
+import com.example.pitapp.model.Classroom
 import com.example.pitapp.model.NonWorkingDay
 import com.example.pitapp.model.Period
 import com.example.pitapp.model.SavedClass
 import com.example.pitapp.model.SavedStudent
 import com.example.pitapp.model.Schedule
-import com.example.pitapp.ui.features.classrooms.screens.Classroom
-
+import com.example.pitapp.model.UserData
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -315,12 +314,39 @@ class FireStoreManager(
     }
 
     fun deleteClassroom(number: Int, callback: (Result<Unit>) -> Unit) {
-        firestore.collection("saved_classrooms")
-            .document(number.toString())
-            .delete()
-            .addOnSuccessListener { callback(Result.success(Unit)) }
-            .addOnFailureListener { callback(Result.failure(it)) }
+        val classroomNumberStr = number.toString()
+        val classroomDocRef = firestore.collection("saved_classrooms")
+            .document(classroomNumberStr)
+
+        firestore.collection("saved_schedules")
+            .whereEqualTo("classroomId", classroomNumberStr)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                firestore.runTransaction { transaction ->
+                    querySnapshot.documents.forEach { scheduleDoc ->
+                        transaction.update(
+                            scheduleDoc.reference,
+                            mapOf(
+                                "approved" to false,
+                                "classroomId" to ""
+                            )
+                        )
+                    }
+                    transaction.delete(classroomDocRef)
+                    null
+                }
+                    .addOnSuccessListener {
+                        callback(Result.success(Unit))
+                    }
+                    .addOnFailureListener { e ->
+                        callback(Result.failure(e))
+                    }
+            }
+            .addOnFailureListener { e ->
+                callback(Result.failure(e))
+            }
     }
+
 
     fun getClassrooms(callback: (Result<List<Classroom>>) -> Unit) {
         firestore.collection("saved_classrooms")
@@ -333,6 +359,32 @@ class FireStoreManager(
                     doc.toObject(Classroom::class.java)
                 } ?: emptyList()
                 callback(Result.success(classrooms))
+            }
+    }
+
+    fun getClassroomByNumber(number: String, callback: (Result<Classroom>) -> Unit) {
+        if (number.isEmpty()) {
+            callback(Result.failure(IllegalArgumentException("Classroom ID/number cannot be empty.")))
+            return
+        }
+
+        firestore.collection("saved_classrooms")
+            .document(number)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val classroom = documentSnapshot.toObject(Classroom::class.java)
+                    if (classroom != null) {
+                        callback(Result.success(classroom))
+                    } else {
+                        callback(Result.failure(Exception("Failed to convert document to Classroom")))
+                    }
+                } else {
+                    callback(Result.failure(Exception("Classroom not found with ID: $number")))
+                }
+            }
+            .addOnFailureListener {
+                callback(Result.failure(it))
             }
     }
 
@@ -419,28 +471,9 @@ class FireStoreManager(
             .addOnFailureListener { callback(Result.failure(it)) }
     }
 
-
-    fun getClassroomByNumber(number: String, callback: (Result<Classroom>) -> Unit) {
-        firestore.collection("saved_classrooms")
-            .whereEqualTo("number", number.toInt())
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                if (!querySnapshot.isEmpty) {
-                    val classroom = querySnapshot.documents[0].toObject(Classroom::class.java)
-                    classroom?.let { callback(Result.success(it)) }
-                } else {
-                    callback(Result.failure(Exception("Classroom Not found")))
-                }
-
-            }
-            .addOnFailureListener {
-                callback(Result.failure(it))
-            }
-    }
-
     suspend fun checkForOverlap(newSchedule: Schedule): Boolean = withContext(Dispatchers.IO) {
         val overlappingSchedules = firestore.collection("saved_schedules")
-            .whereEqualTo("salonId", newSchedule.salonId)
+            .whereEqualTo("classroomId", newSchedule.classroomId)
             .whereEqualTo("approved", true)
             .get()
             .await()
@@ -458,7 +491,7 @@ class FireStoreManager(
         withContext(Dispatchers.IO) {
 
             val overlappingSchedules = firestore.collection("saved_schedules")
-                .whereEqualTo("salonId", updatedSchedule.salonId)
+                .whereEqualTo("classroomId", updatedSchedule.classroomId)
                 .whereEqualTo("approved", true)
                 .get()
                 .await()

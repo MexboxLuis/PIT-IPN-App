@@ -58,7 +58,7 @@ fun DaysOfWeekSelection(
                     .fillMaxWidth()
             ) {
                 Checkbox(
-                    checked = selectedDays[day] ?: false,
+                    checked = selectedDays[day] == true,
                     onCheckedChange = { selectedDays[day] = it },
                     modifier = Modifier.padding(end = 8.dp)
                 )
@@ -81,8 +81,8 @@ fun DaysOfWeekSelection(
                                 val hour = newValue.toIntOrNull()
                                 sessionErrorStates[day] = !(hour != null && hour in 7..19)
                             },
-                            isError = sessionErrorStates[day] ?: false,
-                            label = { Text(stringResource(R.string.hour)) },
+                            isError = sessionErrorStates[day] == true,
+                            label = { Text(text = stringResource(R.string.hour)) },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done

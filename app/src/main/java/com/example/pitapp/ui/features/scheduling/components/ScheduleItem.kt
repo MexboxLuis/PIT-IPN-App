@@ -98,7 +98,7 @@ fun ScheduleItem(
                 ) {
                     HorizontalDivider()
                     Spacer(modifier = Modifier.height(16.dp))
-                    ClassroomInfo(schedule.salonId)
+                    ClassroomInfo(schedule.classroomId)
                     PeriodInfo(
                         schedule.startYear.toString(),
                         schedule.startMonth.toString(),

@@ -41,15 +41,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.ui.shared.components.BackScaffold
+import com.example.pitapp.datasource.AuthManager
+import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.model.Classroom
+import com.example.pitapp.model.Schedule
 import com.example.pitapp.ui.features.scheduling.components.ClassroomDropdown
 import com.example.pitapp.ui.features.scheduling.components.DaysOfWeekSelection
 import com.example.pitapp.ui.features.scheduling.components.MonthDropdown
-import com.example.pitapp.model.Schedule
 import com.example.pitapp.ui.features.scheduling.helpers.createSessions
-import com.example.pitapp.ui.features.classrooms.screens.Classroom
-import com.example.pitapp.datasource.AuthManager
-import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.ui.shared.components.BackScaffold
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -128,7 +128,7 @@ fun EditScheduleScreen(
                     }
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        fireStoreManager.getClassroomByNumber(schedule.salonId) { classroomResult ->
+                        fireStoreManager.getClassroomByNumber(schedule.classroomId) { classroomResult ->
                             classroomResult.onSuccess {
                                 selectedClassroom = it
                             }
@@ -303,7 +303,7 @@ fun EditScheduleScreen(
                         subjectState = it
                         validateForm()
                     },
-                    label = { Text(stringResource(R.string.subject)) },
+                    label = { Text(text = stringResource(R.string.subject)) },
                     leadingIcon = { Icon(Icons.Filled.Book, contentDescription = null) },
                     isError = subjectError,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -334,7 +334,7 @@ fun EditScheduleScreen(
                                 validateForm()
                             }
                         },
-                        label = { Text(stringResource(R.string.start_year)) },
+                        label = { Text(text = stringResource(R.string.start_year)) },
                         leadingIcon = { Icon(Icons.Filled.CalendarToday, contentDescription = null) },
                         isError = startYearError,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
@@ -369,7 +369,7 @@ fun EditScheduleScreen(
                                 validateForm()
                             }
                         },
-                        label = { Text(stringResource(R.string.end_year)) },
+                        label = { Text(text = stringResource(R.string.end_year)) },
                         leadingIcon = { Icon(Icons.Filled.CalendarToday, contentDescription = null) },
                         isError = endYearError,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
@@ -410,7 +410,7 @@ fun EditScheduleScreen(
                         if (isFormValid) {
 
                             val updatedSchedule = Schedule(
-                                salonId = selectedClassroom!!.number.toString(),
+                                classroomId = selectedClassroom!!.number.toString(),
                                 tutorEmail = tutorEmailState,
                                 subject = subjectState,
                                 approved = true,
@@ -450,7 +450,7 @@ fun EditScheduleScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.update_schedule))
+                        Text(text = stringResource(R.string.update_schedule))
                         Spacer(Modifier.width(16.dp))
                         Icon(Icons.Default.AlarmOn, contentDescription = null)
                     }

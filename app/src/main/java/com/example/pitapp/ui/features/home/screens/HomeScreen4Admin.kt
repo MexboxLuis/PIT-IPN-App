@@ -20,7 +20,7 @@ import androidx.compose.material.icons.filled.Class
 import androidx.compose.material.icons.filled.CoPresent
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.Room
+import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
@@ -45,13 +45,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.ui.features.home.components.AdminCardData
+import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.datasource.PreferencesManager
 import com.example.pitapp.ui.features.home.components.AdminCard
+import com.example.pitapp.ui.features.home.components.AdminCardData
 import com.example.pitapp.ui.features.home.components.AdminCardGrid
 import com.example.pitapp.ui.features.home.components.AdminScaffold
 import com.example.pitapp.ui.shared.components.EmptyState
-import com.example.pitapp.datasource.FireStoreManager
-import com.example.pitapp.datasource.PreferencesManager
 import kotlinx.coroutines.launch
 
 
@@ -96,7 +96,7 @@ fun HomeScreen4Admin(
         AdminCardData(
             title = stringResource(id = R.string.classrooms_title),
             subtitle = stringResource(id = R.string.classrooms_subtitle),
-            icon = Icons.Default.Room,
+            icon = Icons.Default.MeetingRoom,
             onClick = { onClassroomsClick() }
         ),
         AdminCardData(
@@ -157,7 +157,7 @@ fun HomeScreen4Admin(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        label = { Text(text = stringResource(id = R.string.search_hint)) },
+                        label = { Text(text = stringResource(id = R.string.search_seaction)) },
                         modifier = Modifier
                             .padding(bottom = 16.dp),
                         trailingIcon = {

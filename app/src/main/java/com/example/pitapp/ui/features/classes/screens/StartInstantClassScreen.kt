@@ -74,7 +74,7 @@ fun StartInstantClassScreen(
     val classMessage = remember { mutableStateOf("") }
     val canStartClass = remember { mutableStateOf(false) }
     val currentSubject = remember { mutableStateOf("") }
-    val currentSalonId = remember { mutableStateOf("") }
+    val currentClassroomId = remember { mutableStateOf("") }
     val classCreated = remember { mutableStateOf(false) }
     val remainingTime = remember { mutableStateOf("") }
 
@@ -148,7 +148,7 @@ fun StartInstantClassScreen(
         }
 
         currentSubject.value = targetSchedule.subject
-        currentSalonId.value = targetSchedule.salonId
+        currentClassroomId.value = targetSchedule.classroomId
 
         if (now.timeInMillis < targetSessionStartTime.timeInMillis) {
             while (true) {
@@ -211,8 +211,8 @@ fun StartInstantClassScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
-                if (currentSalonId.value.isNotEmpty()) {
-                    Text("Salón: ${currentSalonId.value}")
+                if (currentClassroomId.value.isNotEmpty()) {
+                    Text("Salón: ${currentClassroomId.value}")
                     Spacer(Modifier.height(16.dp))
                 }
 
@@ -251,7 +251,7 @@ fun StartInstantClassScreen(
                             val savedClass = SavedClass(
                                 tutorEmail = tutorEmail,
                                 subject = currentSubject.value,
-                                classroom = currentSalonId.value,
+                                classroom = currentClassroomId.value,
                                 topic = topic.value,
                                 date = Timestamp.now()
                             )
@@ -585,7 +585,7 @@ fun UpcomingSchedules(
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(
-                                        text = "${schedule.subject} (${schedule.salonId})",
+                                        text = "${schedule.subject} (${schedule.classroomId})",
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.Bold
                                     )

@@ -217,7 +217,7 @@ fun HomeScreen4Tutor(
                         OutlinedTextField(
                             value = searchText,
                             onValueChange = { searchText = it },
-                            label = { Text(stringResource(id = R.string.search_my_classes)) },
+                            label = { Text(text = stringResource(id = R.string.search_my_classes)) },
                             trailingIcon = {
                                 if (searchText.isNotEmpty()) {
                                     IconButton(onClick = { searchText = "" }) {

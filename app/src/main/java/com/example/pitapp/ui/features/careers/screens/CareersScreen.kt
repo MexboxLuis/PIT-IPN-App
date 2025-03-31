@@ -74,7 +74,7 @@ fun CareersScreen(navController: NavHostController, authManager: AuthManager) {
                             if (careerItem.url.isNotEmpty()) {
                                 // URL encoding corrected (encode entire URL)
                                 val encodedUrl = URLEncoder.encode(careerItem.url, "UTF-8")
-                                navController.navigate("career_webview/$encodedUrl")
+                                navController.navigate("careerWebView/$encodedUrl")
                             }
                         }
                 ) {

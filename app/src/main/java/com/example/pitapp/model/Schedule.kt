@@ -1,7 +1,7 @@
 package com.example.pitapp.model
 
 data class Schedule(
-    val salonId: String = "",
+    val classroomId: String = "",
     val tutorEmail: String = "",
     val subject: String = "",
     val approved: Boolean = false,

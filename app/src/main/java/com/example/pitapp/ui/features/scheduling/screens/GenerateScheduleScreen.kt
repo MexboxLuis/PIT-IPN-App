@@ -1,7 +1,15 @@
 package com.example.pitapp.ui.features.scheduling.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -9,8 +17,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,15 +41,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.ui.shared.components.BackScaffold
+import com.example.pitapp.datasource.AuthManager
+import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.model.Classroom
+import com.example.pitapp.model.Schedule
 import com.example.pitapp.ui.features.scheduling.components.ClassroomDropdown
 import com.example.pitapp.ui.features.scheduling.components.DaysOfWeekSelection
 import com.example.pitapp.ui.features.scheduling.components.MonthDropdown
-import com.example.pitapp.model.Schedule
 import com.example.pitapp.ui.features.scheduling.helpers.createSessions
-import com.example.pitapp.ui.features.classrooms.screens.Classroom
-import com.example.pitapp.datasource.AuthManager
-import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.ui.shared.components.BackScaffold
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -231,7 +250,7 @@ fun GenerateScheduleScreen(
                     subjectState = it
                     validateForm()
                 },
-                label = { Text(stringResource(R.string.subject)) },
+                label = { Text(text = stringResource(R.string.subject)) },
                 leadingIcon = { Icon(Icons.Filled.Book, contentDescription = null) },
                 isError = subjectError,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -263,7 +282,7 @@ fun GenerateScheduleScreen(
                             validateForm()
                         }
                     },
-                    label = { Text(stringResource(R.string.start_year)) },
+                    label = { Text(text = stringResource(R.string.start_year)) },
                     leadingIcon = { Icon(Icons.Filled.CalendarToday, contentDescription = null) },
                     isError = startYearError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
@@ -298,7 +317,7 @@ fun GenerateScheduleScreen(
                             validateForm()
                         }
                     },
-                    label = { Text(stringResource(R.string.end_year)) },
+                    label = { Text(text = stringResource(R.string.end_year)) },
                     leadingIcon = { Icon(Icons.Filled.CalendarToday, contentDescription = null) },
                     isError = endYearError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
@@ -338,7 +357,7 @@ fun GenerateScheduleScreen(
                 onClick = {
                     if (isFormValid) {
                         val schedule = Schedule(
-                            salonId = selectedClassroom!!.number.toString(),
+                            classroomId = selectedClassroom!!.number.toString(),
                             tutorEmail = tutorEmail,
                             subject = subjectState,
                             approved = false,
@@ -379,7 +398,7 @@ fun GenerateScheduleScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.schedule_button))
+                    Text(text = stringResource(R.string.schedule_button))
                     Spacer(Modifier.width(16.dp))
                     Icon(Icons.Default.Schedule, contentDescription = null)
                 }

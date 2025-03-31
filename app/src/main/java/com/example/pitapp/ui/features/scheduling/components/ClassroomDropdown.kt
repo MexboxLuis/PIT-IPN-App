@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
-import com.example.pitapp.ui.features.classrooms.screens.Classroom
+import com.example.pitapp.model.Classroom
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,15 +81,20 @@ fun ClassroomDropdown(
         ) {
             if (isLoading) {
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.loading)) },
-                    onClick = {}
-                )
-            } else if (errorMessage != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.error_message, errorMessage)) },
+                    text = { Text(text = stringResource(R.string.loading)) },
                     onClick = {}
                 )
             } else {
+                if (errorMessage != null) {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = errorMessage
+                            )
+                        },
+                        onClick = {}
+                    )
+                }
                 classrooms.forEach { (id, classroom) ->
                     DropdownMenuItem(
                         text = {

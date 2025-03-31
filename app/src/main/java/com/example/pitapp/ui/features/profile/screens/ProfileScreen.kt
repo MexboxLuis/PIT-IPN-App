@@ -154,7 +154,7 @@ fun ProfileScreen(
                         } else {
                             R.string.change_pic
                         }
-                        Text(stringResource(id = textId))
+                        Text(text = stringResource(id = textId))
                         Spacer(modifier = Modifier.width(16.dp))
                         Icon(
                             imageVector = Icons.Default.AddPhotoAlternate,
@@ -299,7 +299,7 @@ fun ProfileScreen(
                         onClick = { isEditing = true },
                         modifier = Modifier.fillMaxWidth(0.9f),
                     ) {
-                        Text(stringResource(id = R.string.edit_data))
+                        Text(text = stringResource(id = R.string.edit_data))
                         Spacer(modifier = Modifier.width(16.dp))
                         Icon(
                             imageVector = Icons.Default.Edit,

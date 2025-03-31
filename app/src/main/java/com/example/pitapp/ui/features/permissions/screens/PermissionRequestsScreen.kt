@@ -90,7 +90,7 @@ fun PermissionRequestsScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Text(stringResource(id = R.string.tutor_requests))
+                                    Text(text = stringResource(id = R.string.tutor_requests))
                                     Icon(
                                         imageVector = Icons.Default.HowToVote,
                                         contentDescription = null,
@@ -107,7 +107,7 @@ fun PermissionRequestsScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Text(stringResource(id = R.string.rejected_users))
+                                    Text(text = stringResource(id = R.string.rejected_users))
                                     Icon(
                                         imageVector = Icons.Default.Cancel,
                                         contentDescription = null,

@@ -80,7 +80,7 @@
     <string name="careers_subtitle">Explora las opciones de carrera</string>
     <string name="class_schedules_title">Horarios de clases</string>
     <string name="class_schedules_subtitle">Gestión de horarios de clases y aprobaciones</string>
-    <string name="search_hint">Buscar secciones</string>
+    <string name="search_seaction">Buscar secciones</string>
     <string name="no_filtered_section">Aún no contamos con esa sección.</string>
 
 
@@ -137,7 +137,6 @@
 
 
     <!--    Scheduling      -->
-    <string name="error_message">Error: %s</string>
     <string name="load_error">Error al cargar: %s</string>
     <string name="select">Seleccionar</string>
     <string name="create_schedule">Crear Horario</string>
@@ -192,5 +191,31 @@
     <string name="ends_in_days">Termina en %d días</string>
     <string name="ends_in_months">Termina en %d meses</string>
     <string name="sessions">Sesiones:</string>
+
+    <!--        Classrooms      -->
+    <string name="search_classrooms">Buscar salones…</string>
+    <string name="sort_number_asc">Número (Asc)</string>
+    <string name="sort_number_desc">Número (Desc)</string>
+    <string name="sort_description_asc">Descripción (A-Z)</string>
+    <string name="sort_description_desc">Descripción (Z-A)</string>
+    <string name="no_classrooms_found">No se encontraron salones</string>
+    <string name="no_classrooms_yet">Aún no hay salones</string>
+    <string name="add_classroom">Añadir un salón</string>
+    <string name="classroom_no_match">No hay salones que coincidan con el filtro</string>
+    <string name="classroom_card_title_prefix">Salón</string>
+    <string name="classroom_card_no_description">Sin descripción</string>
+    <string name="edit_classroom_dialog_title_prefix">Editar Salón</string>
+    <string name="add_classroom_dialog_title">Añadir Nuevo Salón</string>
+    <string name="error_cannot_change_number_edit">No se puede cambiar el número del salón en modo edición.</string>
+    <string name="error_update_failed_prefix">Error al actualizar: </string>
+    <string name="error_add_failed_prefix">Error al añadir: </string>
+    <string name="error_classroom_exists">El salón %1$d ya existe.</string>
+    <string name="validation_must_be_integer">Debe ser un número entero</string>
+    <string name="validation_number_required">El número es requerido</string>
+    <string name="label_number">Número</string>
+    <string name="label_description">Descripción</string>
+    <string name="delete_dialog_confirmation_question">¿Seguro que quieres eliminar el Salón %1$d?</string>
+    <string name="delete_dialog_info_text">Esta acción eliminará el salón de la lista de disponibles y afectará la funcionalidad de los horarios. No impactará los registros históricos, pero recuerda reasignar los salones para evitar problemas en los horarios.</string>
+
 
 </resources>
