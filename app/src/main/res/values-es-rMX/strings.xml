@@ -80,7 +80,7 @@
     <string name="careers_subtitle">Explora las opciones de carrera</string>
     <string name="class_schedules_title">Horarios de clases</string>
     <string name="class_schedules_subtitle">Gestión de horarios de clases y aprobaciones</string>
-    <string name="search_seaction">Buscar secciones</string>
+    <string name="search_section">Buscar secciones</string>
     <string name="no_filtered_section">Aún no contamos con esa sección.</string>
 
 
@@ -134,9 +134,15 @@
     <string name="career_transport">Ingeniería en Transporte</string>
     <string name="career_data_science">Licenciatura en Ciencia de Datos</string>
     <string name="career_industrial">Ingeniería Industrial</string>
+    <string name="career_web_view_title">Vista Web de Carrera</string>
+    <string name="ssl_title">Advertencia de seguridad</string>
+    <string name="ssl_certificate_message">El certificado de seguridad del sitio no es de confianza. ¿Deseas continuar de todas formas?</string>
+    <string name="continue_unsafe">Continuar</string>
+    <string name="error_loading_page_title">Error al Cargar la Página</string>
+    <string name="error_loading_page_message">Se produjo un error: %1$s</string>
+    <string name="ok">Aceptar</string>
 
-
-    <!--    Scheduling      -->
+    <!--        Scheduling      -->
     <string name="load_error">Error al cargar: %s</string>
     <string name="select">Seleccionar</string>
     <string name="create_schedule">Crear Horario</string>
@@ -202,7 +208,7 @@
     <string name="no_classrooms_yet">Aún no hay salones</string>
     <string name="add_classroom">Añadir un salón</string>
     <string name="classroom_no_match">No hay salones que coincidan con el filtro</string>
-    <string name="classroom_card_title_prefix">Salón</string>
+    <string name="classroom_card_title_prefix">Salón %d</string>
     <string name="classroom_card_no_description">Sin descripción</string>
     <string name="edit_classroom_dialog_title_prefix">Editar Salón</string>
     <string name="add_classroom_dialog_title">Añadir Nuevo Salón</string>

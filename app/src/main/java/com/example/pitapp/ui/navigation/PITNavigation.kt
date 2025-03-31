@@ -204,7 +204,11 @@ fun PITNavigation(
 
         composable("careerWebView/{encodedUrl}") { backStackEntry ->
             val encodedUrl = backStackEntry.arguments?.getString("encodedUrl") ?: ""
-            CareerWebViewScreen(navController = navController, encodedUrl = encodedUrl)
+            CareerWebViewScreen(
+                navController = navController,
+                authManager = authManager,
+                encodedUrl = encodedUrl
+            )
         }
 
         composable(route = "classSchedulesScreen") {

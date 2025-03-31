@@ -157,9 +157,9 @@ fun HomeScreen4Admin(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        label = { Text(text = stringResource(id = R.string.search_seaction)) },
+                        label = { Text(text = stringResource(id = R.string.search_section)) },
                         modifier = Modifier
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = 16.dp).fillMaxWidth(0.85f),
                         trailingIcon = {
                             IconButton(
                                 onClick = { if (searchQuery.isNotEmpty()) searchQuery = "" }) {
@@ -177,7 +177,7 @@ fun HomeScreen4Admin(
                                 preferencesManager.setIsGridView(!isGridView!!)
                             }
                         },
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
                     ) {
                         Icon(
                             imageVector = if (!isGridView!!) Icons.Default.GridView else Icons.Default.ViewStream,

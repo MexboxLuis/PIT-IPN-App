@@ -79,7 +79,7 @@
     <string name="careers_subtitle">Explore career options</string>
     <string name="class_schedules_title">Class Schedules</string>
     <string name="class_schedules_subtitle">Management of class schedules and approvals</string>
-    <string name="search_seaction">Search in sections</string>
+    <string name="search_section">Search in sections</string>
     <string name="no_filtered_section">We do not have that section yet.</string>
 
 
@@ -133,9 +133,15 @@
     <string name="career_transport">Transportation Engineering</string>
     <string name="career_data_science">Data Science Degree</string>
     <string name="career_industrial">Industrial Engineering</string>
+    <string name="career_web_view_title">Career Web View</string>
+    <string name="ssl_title">Security Warning</string>
+    <string name="ssl_certificate_message">The website\'s security certificate is not trusted. Do you want to continue anyway? </string>
+    <string name="continue_unsafe">Continue (Unsafe)</string>
+    <string name="error_loading_page_title">Error Loading Page</string>
+    <string name="error_loading_page_message">An error occurred: %1$s</string>
+    <string name="ok">OK</string>
 
     <!--        Scheduling      -->
-
     <string name="load_error">Error loading: %s</string>
     <string name="select">Select</string>
     <string name="create_schedule">Create Schedule</string>
