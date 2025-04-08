@@ -54,7 +54,7 @@ fun CareerGridItem(
                     .crossfade(true)
                     .placeholder(R.drawable.pit_logo)
                     .build(),
-                contentDescription = stringResource(id = career.nameResId),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1.5f)

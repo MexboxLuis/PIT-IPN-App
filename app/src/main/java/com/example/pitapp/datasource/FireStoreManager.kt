@@ -546,39 +546,6 @@ class FireStoreManager(
         return false
     }
 
-    fun startInstantClass(savedClass: SavedClass, callback: (Result<String>) -> Unit) {
-        val classId = UUID.randomUUID().toString()
-        val documentId = "${savedClass.tutorEmail}-$classId"
-
-        firestore.collection("saved_instant_classes")
-            .document(documentId)
-            .set(savedClass)
-            .addOnSuccessListener {
-                callback(Result.success(documentId))
-            }
-            .addOnFailureListener {
-                callback(Result.failure(it))
-            }
-    }
-
-    fun addStudent(
-        classDocumentId: String,
-        student: SavedStudent,
-        callback: (Result<Unit>) -> Unit
-    ) {
-        val classRef = firestore.collection("saved_instant_classes")
-            .document(classDocumentId)
-
-        classRef.collection("students").add(student)
-            .addOnSuccessListener {
-                callback(Result.success(Unit))
-            }
-            .addOnFailureListener {
-                callback(Result.failure(it))
-            }
-    }
-
-
     fun getCurrentSchedules(tutorEmail: String, callback: (Result<List<Schedule>>) -> Unit) {
         val now = Calendar.getInstance()
         val currentYear = now.get(Calendar.YEAR)
@@ -636,6 +603,20 @@ class FireStoreManager(
             }
     }
 
+    fun startInstantClass(savedClass: SavedClass, callback: (Result<String>) -> Unit) {
+        val classId = UUID.randomUUID().toString()
+        val documentId = "${savedClass.tutorEmail}-$classId"
+
+        firestore.collection("saved_instant_classes")
+            .document(documentId)
+            .set(savedClass)
+            .addOnSuccessListener {
+                callback(Result.success(documentId))
+            }
+            .addOnFailureListener {
+                callback(Result.failure(it))
+            }
+    }
 
     fun getInstantClassDetails(classDocumentId: String, callback: (Result<SavedClass>) -> Unit) {
         firestore.collection("saved_instant_classes")
@@ -655,25 +636,6 @@ class FireStoreManager(
                 } else {
                     callback(Result.failure(Exception("Document is null or does not exist")))
                 }
-            }
-    }
-
-    fun getStudentsNow(
-        classDocumentId: String,
-        callback: (Result<List<SavedStudent>>) -> Unit
-    ) {
-        firestore.collection("saved_instant_classes")
-            .document(classDocumentId)
-            .collection("students")
-            .addSnapshotListener { querySnapshot, error ->
-                if (error != null) {
-                    callback(Result.failure(error))
-                    return@addSnapshotListener
-                }
-                val students = querySnapshot?.documents?.mapNotNull { document ->
-                    document.toObject(SavedStudent::class.java)
-                } ?: emptyList()
-                callback(Result.success(students))
             }
     }
 
@@ -700,6 +662,116 @@ class FireStoreManager(
                 } ?: emptyList()
 
                 callback(Result.success(classes))
+            }
+    }
+
+    fun addStudent(
+        classDocumentId: String,
+        student: SavedStudent,
+        callback: (Result<Unit>) -> Unit
+    ) {
+        val classStudentsRef = firestore.collection("saved_instant_classes")
+            .document(classDocumentId)
+            .collection("students")
+
+        classStudentsRef
+            .whereEqualTo("studentId", student.studentId)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (querySnapshot.isEmpty) {
+                    classStudentsRef.add(student)
+                        .addOnSuccessListener {
+                            createOrUpdateSavedStudent(student, callback)
+                        }
+                        .addOnFailureListener { e ->
+                            callback(Result.failure(e))
+                        }
+                } else {
+                    createOrUpdateSavedStudent(student, callback)
+                }
+            }
+            .addOnFailureListener { e ->
+                callback(Result.failure(e))
+            }
+    }
+
+    fun getStudentsNow(
+        classDocumentId: String,
+        callback: (Result<List<SavedStudent>>) -> Unit
+    ) {
+        firestore.collection("saved_instant_classes")
+            .document(classDocumentId)
+            .collection("students")
+            .addSnapshotListener { querySnapshot, error ->
+                if (error != null) {
+                    callback(Result.failure(error))
+                    return@addSnapshotListener
+                }
+                val students = querySnapshot?.documents?.mapNotNull { document ->
+                    document.toObject(SavedStudent::class.java)
+                } ?: emptyList()
+                callback(Result.success(students))
+            }
+    }
+
+    fun getSavedStudent(studentId: String, callback: (Result<SavedStudent?>) -> Unit) {
+        firestore.collection("saved_students") .document(studentId).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val student = documentSnapshot.toObject(SavedStudent::class.java)
+                    callback(Result.success(student))
+                } else {
+                    callback(Result.success(null))
+                }
+            }
+            .addOnFailureListener { e ->
+                callback(Result.failure(e))
+            }
+    }
+
+    private fun createOrUpdateSavedStudent(
+        student: SavedStudent,
+        callback: (Result<Unit>) -> Unit
+    ) {
+        val savedStudentDocRef = firestore.collection("saved_students").document(student.studentId)
+
+        savedStudentDocRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val existingStudentData = documentSnapshot.toObject(SavedStudent::class.java)
+
+                    if (existingStudentData != null) {
+                        if (existingStudentData.email != student.email || existingStudentData.regular != student.regular) {
+                            val updates = mapOf(
+                                "email" to student.email,
+                                "regular" to student.regular
+                            )
+                            savedStudentDocRef.update(updates)
+                                .addOnSuccessListener {
+                                    callback(Result.success(Unit))
+                                }
+                                .addOnFailureListener { e ->
+                                    callback(Result.failure(e))
+                                }
+                        } else {
+                            callback(Result.success(Unit))
+                        }
+                    } else {
+                        callback(Result.failure(Exception("Could not convert existing student data.")))
+                    }
+                } else {
+                    savedStudentDocRef.set(student)
+                        .addOnSuccessListener {
+                            callback(Result.success(Unit))
+                        }
+                        .addOnFailureListener { e ->
+                            callback(Result.failure(e))
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                callback(Result.failure(e))
             }
     }
 

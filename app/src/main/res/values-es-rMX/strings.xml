@@ -27,12 +27,18 @@
     <string name="october">Octubre</string>
     <string name="november">Noviembre</string>
     <string name="december">Diciembre</string>
+    <string name="hour">Hora</string>
+    <string name="student_regular">Regular</string>
+    <string name="student_irregular">Irregular</string>
+    <string name="subject">Materia</string>
+    <string name="classroom">Salón</string>
+    <string name="classroom_card_title_prefix">Salón %d</string>
+    <string name="email">Correo electrónico</string>
 
     <!--        Screens     -->
     <string name="error_screen_message">Verifica tu conexión a internet o contacta al administrador.</string>
 
     <!--        Auth        -->
-    <string name="email">Correo electrónico</string>
     <string name="password">Contraseña</string>
     <string name="confirm_password">Confirmar contraseña</string>
     <string name="toast_reset_password_sent">Si estás registrado, recibirás un enlace para restablecer tu contraseña en breve.</string>
@@ -106,8 +112,58 @@
     <string name="search_my_classes">Buscar en mis clases</string>
     <string name="no_classes_found">No se encontraron clases, crea una ahora.</string>
     <string name="past_instant_classes">Clases impartidas</string>
-    <string name="student_regular">Regular</string>
-    <string name="student_irregular">Irregular</string>
+    <string name="time_format_absolute">%1$s a las %2$s</string>
+    <string name="coming_soon">Próximamente</string>
+    <string name="relative_days">Faltan %1$d días</string>
+    <string name="relative_day">Falta 1 día</string>
+    <string name="relative_day_hours">Falta 1 día con %1$d %2$s</string>
+    <string name="relative_hours">Comienza en %1$d horas</string>
+    <string name="hours">Horas</string>
+    <string name="schedule_message">Todavía no tienes un horario de clases.\n Crea uno o solicita su aprobación a un administrador.</string>
+    <string name="create_new_schedule">¡Crea un nuevo horario ahora!</string>
+    <string name="class_of_subject">Clase de %1$s</string>
+    <string name="next_class_in">Próxima clase en: %1$s</string>
+    <string name="ends_in">Tienes %1$s para empezar</string>
+    <string name="class_topic_label">Tema de la clase</string>
+    <string name="class_starting">Iniciando clase…</string>
+    <string name="class_started_success">Clase iniciada con éxito.</string>
+    <string name="upcoming_classes_title">Tus próximas clases</string>
+<!--    qr-->
+    <string name="qr_prompt">Escanea el QR de la credencial de acceso</string>
+    <string name="qr_cancelled">Escaneo cancelado</string>
+    <string name="qr_extraction_error">No se pudieron extraer todos los datos del QR. Verifica la página o intenta de nuevo.</string>
+    <string name="qr_processing_error">Error al procesar QR/HTML</string>
+    <string name="qr_unexpected_code">Código inesperado %1$s</string>
+    <string name="qr_empty_body">Respuesta vacía</string>
+    <string name="network_error">Error de red. Intenta de nuevo.</string>
+
+<!--    add student form-->
+    <string name="full_name">Nombre completo</string>
+    <string name="student_id">Boleta</string>
+    <string name="academic_program">Programa académico</string>
+    <string name="add_student">Agregar estudiante</string>
+    <string name="student_id_prefix">Boleta: %1$s</string>
+    <!--    class instant private components-->
+    <string name="class_details_title">Detalles de la Clase</string>
+    <string name="time_left_class_title">Tiempo restante</string>
+    <string name="add_students">Registra estudiantes en…</string>
+    <string name="searching_data">Buscando datos…</string>
+    <string name="scan_qr">Escanear QR</string>
+    <string name="refresh">Actualizar</string>
+    <string name="invalid_email">Correo electrónico inválido</string>
+    <string name="complete_remaining_data">Completa los datos restantes</string>
+    <string name="duplicate_student_id">El estudiante con este número de boleta ya existe.</string>
+    <string name="student_added_success">Estudiante %1$s agregado.</string>
+    <string name="error_adding_student">Error al agregar estudiante: %1$s</string>
+    <string name="welcome_back">¡Bienvenido de nuevo, %1$s!</string>
+    <string name="welcome_new_student">Bienvenido, ingresa tu correo electrónico y tu estado actual</string>
+    <string name="error_fetching_student">Error al buscar datos guardados: %1$s</string>
+
+    <string name="added_students_title">Estudiantes añadidos</string>
+    <string name="no_students_added_message">Aún no se han añadido estudiantes.</string>
+    <string name="waiting_to_add_students_message">Esperando a que inicie el tiempo para añadir estudiantes%s</string>
+    <string name="class_details_not_found">No se encontraron detalles de la clase.</string>
+
 
     <!--        Calendar Screen     -->
     <string name="tab_title_days">Días Inhábiles</string>
@@ -150,7 +206,6 @@
     <string name="classroom_number_description">Salón %d - %s</string>
     <string name="no_classroom_selected">Ningún salón seleccionado</string>
     <string name="classroom_required">Debes seleccionar un salón.</string>
-    <string name="subject">Materia</string>
     <string name="subject_required">Debes ingresar una materia</string>
     <string name="start_month">Mes de Inicio</string>
     <string name="end_month">Mes de Fin</string>
@@ -160,7 +215,6 @@
     <string name="invalid_year">El año de inicio debe ser mayor o igual al actual</string>
     <string name="start_date_before_end_date">El año/mes de inicio no puede ser posterior al año/mes de fin.</string>
     <string name="select_days_and_time">Selecciona los días y la hora (7–19):</string>
-    <string name="hour">Hora</string>
     <string name="invalid_hour_range">\t\t\t\t\t\t\tHora inválida \n(debe estar entre 07 y 19 hrs).</string>
     <string name="at_least_one_day">Debes seleccionar al menos un día.</string>
     <string name="schedule_button">Agendar Horario</string>
@@ -188,7 +242,6 @@
     <string name="approval_error">Error al aprobar.</string>
     <string name="approved">Aprobado</string>
     <string name="pending">Pendiente</string>
-    <string name="classroom">Salón: %s</string>
     <string name="period_same_year">Periodo: del %1$s al %2$s %3$d</string>
     <string name="period_different_year">Periodo: del %1$s %2$d al %3$s %4$d</string>
     <string name="starts_in_days">Empieza en %d días</string>
@@ -208,7 +261,6 @@
     <string name="no_classrooms_yet">Aún no hay salones</string>
     <string name="add_classroom">Añadir un salón</string>
     <string name="classroom_no_match">No hay salones que coincidan con el filtro</string>
-    <string name="classroom_card_title_prefix">Salón %d</string>
     <string name="classroom_card_no_description">Sin descripción</string>
     <string name="edit_classroom_dialog_title_prefix">Editar Salón</string>
     <string name="add_classroom_dialog_title">Añadir Nuevo Salón</string>

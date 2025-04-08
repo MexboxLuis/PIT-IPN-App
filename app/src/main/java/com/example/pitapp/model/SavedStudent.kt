@@ -5,6 +5,6 @@ data class SavedStudent(
     val studentId: String = "",
     val academicProgram: String = "",
     val email: String = "",
-    val isRegular: Boolean = true,
+    val regular: Boolean = true,
     val signature: String = ""
 )

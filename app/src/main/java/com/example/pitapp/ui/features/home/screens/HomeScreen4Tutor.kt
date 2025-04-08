@@ -356,7 +356,10 @@ fun HomeScreen4Tutor(
     CreateClassSheet(
         sheetState = sheetState,
         scope = scope,
-        onStartNowClick = { navController.navigate("startInstantClassScreen") },
+        onStartNewClassClick = { navController.navigate("startInstantClassScreen") },
+        onGoToExistingClassClick = { classId ->
+            navController.navigate("instantClassDetailsScreen/$classId")
+        },
         onScheduleClick = { navController.navigate("generateScheduleScreen") },
         instantClasses = instantClasses.value
     )
@@ -669,7 +672,7 @@ fun generateStudentsCsv(savedClass: SavedClass, students: List<SavedStudent>, co
                     savedClass.topic,
                     student.academicProgram,
                     student.email,
-                    if (student.isRegular) "Regular" else "Irregular"
+                    if (student.regular) "Regular" else "Irregular"
                 )
             )
         }

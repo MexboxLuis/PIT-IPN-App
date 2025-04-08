@@ -26,12 +26,18 @@
     <string name="october">October</string>
     <string name="november">November</string>
     <string name="december">December</string>
+    <string name="hour">Hour</string>
+    <string name="student_regular">Regular</string>
+    <string name="student_irregular">Irregular</string>
+    <string name="subject">Subject</string>
+    <string name="classroom">Classroom</string>
+    <string name="classroom_card_title_prefix">Classroom %d</string>
+    <string name="email">Email</string>
 
     <!--        Screens     -->
     <string name="error_screen_message">Check your internet connection or contact the administrator.</string>
 
     <!--        Auth        -->
-    <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm password</string>
     <string name="toast_reset_password_sent">If you\'re registered, you\'ll receive a password reset link shortly.</string>
@@ -105,8 +111,57 @@
     <string name="search_my_classes">Search in my classes</string>
     <string name="no_classes_found">No classes found, start creating your first class!</string>
     <string name="past_instant_classes">Classes taught</string>
-    <string name="student_regular">Regular</string>
-    <string name="student_irregular">Irregular</string>
+    <string name="time_format_absolute">%1$s at %2$s</string>
+    <string name="coming_soon">Coming Soon</string>
+    <string name="relative_days">In %1$d days</string>
+    <string name="relative_day">In 1 day</string>
+    <string name="relative_day_hours">In 1 day and %1$d %2$s</string>
+    <string name="relative_hours">Starts in %1$d hours</string>
+    <string name="hours">Hours</string>
+    <string name="schedule_message">You don’t have a class schedule yet.\n Create one or ask an administrator to approve it.</string>
+    <string name="create_new_schedule">Create your new schedule now!</string>
+    <string name="class_of_subject">Class of %1$s</string>
+    <string name="next_class_in">Next class in: %1$s</string>
+    <string name="ends_in">You have %1$s to get started</string>
+    <string name="class_topic_label">Class Topic</string>
+    <string name="class_starting">Starting class…</string>
+    <string name="class_started_success">Class started successfully.</string>
+    <string name="upcoming_classes_title">Your upcoming classes</string>
+
+<!--    qr -->
+    <string name="qr_prompt">Scan the QR of the access badge</string>
+    <string name="qr_cancelled">Scan cancelled</string>
+    <string name="qr_extraction_error">Not all QR data could be extracted. Please check the page or try again.</string>
+    <string name="qr_processing_error">Error processing QR/HTML</string>
+    <string name="qr_unexpected_code">Unexpected code %1$s</string>
+    <string name="qr_empty_body">Empty response</string>
+    <string name="network_error">Network error. Please try again.</string>
+<!--    add student form-->
+    <string name="full_name">Full Name</string>
+    <string name="student_id">Student ID</string>
+    <string name="academic_program">Academic Program</string>
+    <string name="add_student">Add Student</string>
+    <string name="student_id_prefix">ID: %1$s</string>
+    <!--    class instant private components-->
+    <string name="class_details_title">Class Details</string>
+    <string name="time_left_class_title">Time remaining</string>
+    <string name="add_students">Register students in…</string>
+    <string name="searching_data">Searching data…</string>
+    <string name="scan_qr">Scan QR</string>
+    <string name="refresh">Refresh</string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="complete_remaining_data">Complete the remaining data</string>
+    <string name="duplicate_student_id">Student with this ID already exists.</string>
+    <string name="student_added_success">Student %1$s added.</string>
+    <string name="error_adding_student">Error adding student: %1$s</string>
+    <string name="welcome_back">Welcome back, %1$s!</string>
+    <string name="welcome_new_student">Welcome, please enter your email and current status</string>
+    <string name="error_fetching_student">Error fetching stored data: %1$s</string>
+
+    <string name="added_students_title">Added Students</string>
+    <string name="no_students_added_message">No students have been added yet.</string>
+    <string name="waiting_to_add_students_message">Waiting for the time to add students%s</string>
+    <string name="class_details_not_found">No class details found.</string>
 
     <!--        Calendar Screen     -->
     <string name="tab_title_days">Non-working Days</string>
@@ -149,7 +204,6 @@
     <string name="classroom_number_description">Classroom %d - %s</string>
     <string name="no_classroom_selected">No classroom selected</string>
     <string name="classroom_required">You must select a classroom.</string>
-    <string name="subject">Subject</string>
     <string name="subject_required">Subject is required</string>
     <string name="start_month">Start Month</string>
     <string name="end_month">End Month</string>
@@ -159,7 +213,6 @@
     <string name="invalid_year">Start Year must be greater or equal than the current</string>
     <string name="start_date_before_end_date">The start year/month cannot be after the end year/month.</string>
     <string name="select_days_and_time">Select the days and time (07hr–19hr)</string>
-    <string name="hour">Hour</string>
     <string name="invalid_hour_range">\t\t\t\t\t\t\tInvalid hour \n(must be between 07 and 19 hrs).</string>
     <string name="at_least_one_day">You must select at least one day.</string>
     <string name="schedule_button">Schedule</string>
@@ -187,7 +240,6 @@
     <string name="approval_error">Error approving schedule.</string>
     <string name="approved">Approved</string>
     <string name="pending">Pending</string>
-    <string name="classroom">Classroom: %s</string>
     <string name="period_same_year">Period: from %1$s to %2$s %3$d</string>
     <string name="period_different_year">Period: from %1$s %2$d to %3$s %4$d</string>
     <string name="starts_in_days">Starts in %d days</string>
@@ -208,7 +260,6 @@
     <string name="no_classrooms_yet">No classrooms yet</string>
     <string name="add_classroom">Add a classroom</string>
     <string name="classroom_no_match">No classrooms match the filter</string>
-    <string name="classroom_card_title_prefix">Classroom %d</string>
     <string name="classroom_card_no_description">No description</string>
     <string name="edit_classroom_dialog_title_prefix">Edit Classroom</string>
     <string name="add_classroom_dialog_title">Add New Classroom</string>

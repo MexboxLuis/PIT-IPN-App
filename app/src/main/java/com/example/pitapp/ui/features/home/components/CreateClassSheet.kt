@@ -24,7 +24,8 @@ import com.example.pitapp.model.SavedClass
 fun CreateClassSheet(
     sheetState: SheetState,
     scope: CoroutineScope,
-    onStartNowClick: (String?) -> Unit,
+    onStartNewClassClick: () -> Unit,
+    onGoToExistingClassClick: (classId: String) -> Unit,
     onScheduleClick: () -> Unit,
     instantClasses: List<Pair<String, SavedClass>>,
 ) {
@@ -69,16 +70,14 @@ fun CreateClassSheet(
                 scope.launch {
                     sheetState.hide()
                 }
-            },
+            }
         ) {
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.3f)
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -100,16 +99,16 @@ fun CreateClassSheet(
                             onClick = {
                                 scope.launch {
                                     val (inProgress, classId) = hasClassInProgress(instantClasses)
+                                    sheetState.hide()
                                     if (inProgress && classId != null) {
+                                        onGoToExistingClassClick(classId)
                                         Toast.makeText(
                                             context,
                                             context.getString(R.string.class_in_progress),
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        sheetState.hide()
                                     } else {
-                                        sheetState.hide()
-                                        onStartNowClick(classId)
+                                        onStartNewClassClick()
                                     }
                                 }
                             }

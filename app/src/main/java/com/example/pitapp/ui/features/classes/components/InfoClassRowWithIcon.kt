@@ -1,38 +1,38 @@
-package com.example.pitapp.ui.features.scheduling.components
+package com.example.pitapp.ui.features.classes.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.example.pitapp.R
 
 @Composable
-fun ClassroomInfo(classroomId: String) {
+fun InfoClassRowWithIcon(
+    icon: ImageVector,
+    text: String,
+    style: TextStyle = MaterialTheme.typography.bodyLarge,
+    iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.fillMaxWidth()
     ) {
         Icon(
-            imageVector = Icons.Default.MeetingRoom,
+            imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = iconTint,
             modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(R.string.classroom_card_title_prefix, classroomId.toInt()),
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Text(text = text, style = style, color = MaterialTheme.colorScheme.onSurface)
     }
 }
