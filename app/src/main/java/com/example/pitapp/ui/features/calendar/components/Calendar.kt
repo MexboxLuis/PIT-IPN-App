@@ -40,8 +40,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.model.NonWorkingDay
 import com.example.pitapp.model.Period
-import com.example.pitapp.ui.features.calendar.helpers.getPeriodForDate
-import com.example.pitapp.ui.features.calendar.helpers.isDateNonWorking
+import com.example.pitapp.model.getPeriodForDate
+import com.example.pitapp.model.isDateNonWorking
 import com.example.pitapp.ui.shared.formatting.dayOfWeekToString
 import com.example.pitapp.ui.shared.formatting.monthToString
 import java.time.DayOfWeek

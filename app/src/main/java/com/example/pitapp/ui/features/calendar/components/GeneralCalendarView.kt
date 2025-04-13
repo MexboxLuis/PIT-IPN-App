@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 import com.example.pitapp.model.NonWorkingDay
 import com.example.pitapp.model.Period
-import com.example.pitapp.ui.features.calendar.helpers.getEndLocalDate
-import com.example.pitapp.ui.features.calendar.helpers.getLocalDate
-import com.example.pitapp.ui.features.calendar.helpers.getStartLocalDate
+import com.example.pitapp.model.getEndLocalDate
+import com.example.pitapp.model.getLocalDate
+import com.example.pitapp.model.getStartLocalDate
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

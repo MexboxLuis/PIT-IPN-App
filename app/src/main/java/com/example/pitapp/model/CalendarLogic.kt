@@ -1,9 +1,7 @@
-package com.example.pitapp.ui.features.calendar.helpers
+package com.example.pitapp.model
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.pitapp.model.NonWorkingDay
-import com.example.pitapp.model.Period
 import java.time.LocalDate
 
 
@@ -13,6 +11,14 @@ fun isDateNonWorking(date: LocalDate, nonWorkingDays: List<NonWorkingDay>): Bool
 @RequiresApi(Build.VERSION_CODES.O)
 fun getPeriodForDate(date: LocalDate, periods: List<Period>): Period? =
     periods.find { period ->
+        val start = period.getStartLocalDate()
+        val end = period.getEndLocalDate()
+        !date.isBefore(start) && !date.isAfter(end)
+    }
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun isDateInPeriod(date: LocalDate, periods: List<Period>): Boolean =
+    periods.any { period ->
         val start = period.getStartLocalDate()
         val end = period.getEndLocalDate()
         !date.isBefore(start) && !date.isAfter(end)

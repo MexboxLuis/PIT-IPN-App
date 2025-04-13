@@ -119,11 +119,17 @@
     <string name="relative_hours">Starts in %1$d hours</string>
     <string name="hours">Hours</string>
     <string name="schedule_message">You don’t have a class schedule yet.\n Create one or ask an administrator to approve it.</string>
+    <string name="today_non_working">Today is a non-working day, enjoy your break!</string>
+    <string name="today_in_period">Today falls within a vacation period, enjoy your vacation!</string>
+    <string name="last_class_indicator">Last class, awesome!</string>
+    <string name="info_non_working_day">Non-working day</string>
+    <string name="info_period">Upcoming vacation period</string>
     <string name="create_new_schedule">Create your new schedule now!</string>
     <string name="class_of_subject">Class of %1$s</string>
     <string name="next_class_in">Next class in: %1$s</string>
     <string name="ends_in">You have %1$s to get started</string>
     <string name="class_topic_label">Class Topic</string>
+    <string name="topic">Topic</string>
     <string name="class_starting">Starting class…</string>
     <string name="class_started_success">Class started successfully.</string>
     <string name="upcoming_classes_title">Your upcoming classes</string>

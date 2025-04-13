@@ -583,26 +583,6 @@ class FireStoreManager(
         }
     }
 
-
-    fun getUpcomingSchedules(
-        tutorEmail: String,
-        callback: (Result<List<Schedule>>) -> Unit
-    ) {
-        firestore.collection("saved_schedules")
-            .whereEqualTo("tutorEmail", tutorEmail)
-            .whereEqualTo("approved", true)
-            .addSnapshotListener { querySnapshot, error ->
-                if (error != null) {
-                    callback(Result.failure(error))
-                    return@addSnapshotListener
-                }
-                val schedules = querySnapshot?.documents?.mapNotNull { document ->
-                    document.toObject(Schedule::class.java)
-                } ?: emptyList()
-                callback(Result.success(schedules))
-            }
-    }
-
     fun startInstantClass(savedClass: SavedClass, callback: (Result<String>) -> Unit) {
         val classId = UUID.randomUUID().toString()
         val documentId = "${savedClass.tutorEmail}-$classId"

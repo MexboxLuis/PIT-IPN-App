@@ -2,18 +2,22 @@ package com.example.pitapp.ui.features.home.screens
 
 import android.content.Context
 import android.content.Intent
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
-//import manifest permission
+import android.os.Environment
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,20 +32,49 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Biotech
+import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.HistoryEdu
+import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.MeetingRoom
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.NoBackpack
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.outlined.AutoStories
+import androidx.compose.material.icons.outlined.BorderColor
+import androidx.compose.material.icons.outlined.InsertChart
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.rounded.Build
+import androidx.compose.material.icons.rounded.Pool
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -64,7 +97,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,6 +124,11 @@ import java.util.Locale
 import java.util.Calendar
 import com.example.pitapp.model.SavedClass
 import com.example.pitapp.model.SavedStudent
+import com.example.pitapp.model.UserData
+import com.example.pitapp.ui.features.classes.components.InstantClassCard
+import com.example.pitapp.ui.features.classes.components.StudentRow
+import com.example.pitapp.ui.features.classes.helpers.getSubjectIcon
+import java.text.Normalizer
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,8 +140,10 @@ fun HomeScreen4Tutor(
 ) {
     val email = authManager.getUserEmail() ?: ""
     val instantClasses = remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
-    val savedInstantClasses = remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
-    val filteredSavedInstantClasses = remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
+    val savedInstantClasses =
+        remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
+    val filteredSavedInstantClasses =
+        remember { mutableStateOf<List<Pair<String, SavedClass>>>(emptyList()) }
     val studentsCountMap = remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var searchText by remember { mutableStateOf("") }
     var sortOrder by remember { mutableStateOf(SortOrder.NEWEST) }
@@ -109,6 +151,7 @@ fun HomeScreen4Tutor(
     val scope = rememberCoroutineScope()
     val infiniteTransition = rememberInfiniteTransition(label = "blinkingTransition")
     val currentTimeMillis = remember { mutableLongStateOf(System.currentTimeMillis()) }
+
 
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.75f,
@@ -147,12 +190,20 @@ fun HomeScreen4Tutor(
         }
     }
 
-    LaunchedEffect(searchText, sortOrder, savedInstantClasses.value, instantClasses.value, currentTimeMillis.longValue) {
+    LaunchedEffect(
+        searchText,
+        sortOrder,
+        savedInstantClasses.value,
+        instantClasses.value,
+        currentTimeMillis.longValue
+    ) {
         val visibleIds = instantClasses.value.filter { (_, savedClass) ->
             val classCalendar = Calendar.getInstance().apply { time = savedClass.date.toDate() }
-            val currentCalendar = Calendar.getInstance().apply { timeInMillis = currentTimeMillis.longValue }
-            val isSameDay = classCalendar.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR) &&
-                    classCalendar.get(Calendar.DAY_OF_YEAR) == currentCalendar.get(Calendar.DAY_OF_YEAR)
+            val currentCalendar =
+                Calendar.getInstance().apply { timeInMillis = currentTimeMillis.longValue }
+            val isSameDay =
+                classCalendar.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR) &&
+                        classCalendar.get(Calendar.DAY_OF_YEAR) == currentCalendar.get(Calendar.DAY_OF_YEAR)
             val classHourStartMillis = classCalendar.apply {
                 set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
@@ -184,7 +235,8 @@ fun HomeScreen4Tutor(
 
     val visibleInstantClasses = instantClasses.value.filter { (_, savedClass) ->
         val classCalendar = Calendar.getInstance().apply { time = savedClass.date.toDate() }
-        val currentCalendar = Calendar.getInstance().apply { timeInMillis = currentTimeMillis.longValue }
+        val currentCalendar =
+            Calendar.getInstance().apply { timeInMillis = currentTimeMillis.longValue }
         val isSameDay = classCalendar.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR) &&
                 classCalendar.get(Calendar.DAY_OF_YEAR) == currentCalendar.get(Calendar.DAY_OF_YEAR)
         val classHourStartMillis = classCalendar.apply {
@@ -209,7 +261,9 @@ fun HomeScreen4Tutor(
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -240,7 +294,10 @@ fun HomeScreen4Tutor(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
-                            onClick = { sortOrder = if (sortOrder == SortOrder.NEWEST) SortOrder.OLDEST else SortOrder.NEWEST },
+                            onClick = {
+                                sortOrder =
+                                    if (sortOrder == SortOrder.NEWEST) SortOrder.OLDEST else SortOrder.NEWEST
+                            },
                             modifier = Modifier.size(48.dp)
                         ) {
                             Icon(
@@ -299,7 +356,9 @@ fun HomeScreen4Tutor(
                                     .clickable { dropdownExpanded = !dropdownExpanded }
                             ) {
                                 Row(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -365,157 +424,9 @@ fun HomeScreen4Tutor(
     )
 }
 
-@Composable
-fun InstantClassCard(
-    savedClass: SavedClass,
-    studentsCount: Int,
-    onClick: () -> Unit
-) {
-    // Formateo de la hora y la fecha
-    val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-    val formattedTime = timeFormat.format(savedClass.date.toDate())
-    val dateFormat = SimpleDateFormat("dd/MMM/yyyy", Locale.getDefault())
-    val formattedDate = dateFormat.format(savedClass.date.toDate())
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(160.dp)  // Dimensión fija para mantener consistencia
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Encabezado con el subject (título) resaltado en un fondo primario
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
-                    .height(48.dp)
-                    .padding(horizontal = 12.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = savedClass.subject,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (studentsCount > 0) {
-                            Icon(
-                                imageVector = Icons.Default.People,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "$studentsCount",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                }
 
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        modifier = Modifier.weight(1f), // ✅ Permite que el otro Row tenga espacio
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = savedClass.topic,
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Place,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = savedClass.classroom,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-
-                // Fila 3: Hora y Fecha (separadas)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Hora
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.AccessTime,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formattedTime,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    // Fecha
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formattedDate,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 
 
@@ -526,13 +437,11 @@ fun InstantClassSummaryScreen(
     navController: NavHostController,
     fireStoreManager: FireStoreManager
 ) {
-    // Estados para almacenar la clase y la lista de alumnos
     val savedClass = remember { mutableStateOf<SavedClass?>(null) }
     val students = remember { mutableStateOf<List<SavedStudent>>(emptyList()) }
     val isLoading = remember { mutableStateOf(true) }
-    val context = LocalContext.current  // Necesario para crear archivos y compartir
+    val context = LocalContext.current
 
-    // Efecto para cargar los datos de la clase y sus alumnos
     LaunchedEffect(classId) {
         fireStoreManager.getInstantClassDetails(classId) { result ->
             result.onSuccess { retrievedClass ->
@@ -563,13 +472,25 @@ fun InstantClassSummaryScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    Text(text = "Materia: ${savedClass.subject}", style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = "Materia: ${savedClass.subject}",
+                        style = MaterialTheme.typography.titleLarge
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Tutor: ${savedClass.tutorEmail}", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "Tutor: ${savedClass.tutorEmail}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Salón: ${savedClass.classroom}", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "Salón: ${savedClass.classroom}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Tópico: ${savedClass.topic}", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "Tópico: ${savedClass.topic}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Fecha: ${savedClass.date.toDate()}",
@@ -579,10 +500,10 @@ fun InstantClassSummaryScreen(
                     Text(text = "Alumnos Inscritos:", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Botón para generar y compartir el CSV de estudiantes
                     Button(onClick = {
                         val csvFile = generateStudentsCsv(savedClass, students.value, context)
                         shareFile(context, csvFile)
+                        copyFileToDownloads(context, csvFile)
                     }) {
                         Icon(Icons.Filled.Download, contentDescription = null)
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
@@ -591,11 +512,14 @@ fun InstantClassSummaryScreen(
 
 
                     if (students.value.isEmpty()) {
-                        Text(text = "No hay alumnos inscritos.", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            text = "No hay alumnos inscritos.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     } else {
                         LazyColumn {
                             items(students.value) { student ->
-                                StudentItem(student)
+                                StudentRow(student = student)
                             }
                         }
                     }
@@ -618,12 +542,23 @@ fun InstantClassSummaryScreen(
 }
 
 
+fun generateStudentsCsv(
+    savedClass: SavedClass,
+    students: List<SavedStudent>,
+    context: Context
+): File {
 
-// Función para generar el CSV de estudiantes
-fun generateStudentsCsv(savedClass: SavedClass, students: List<SavedStudent>, context: Context): File {
-    val file = File(context.filesDir, "asistencia_alumnos_${savedClass}.csv")
+    val dateFormat = SimpleDateFormat("dd_MMM_yyyy", Locale.getDefault())
+    val formattedDate = dateFormat.format(savedClass.date.toDate())
 
-    csvWriter().open(file, append = false) {
+    val fileName = "asistenca_${savedClass.tutorEmail.substringBefore("@")}_${
+        savedClass.subject.substringBefore(" ")
+    }_${savedClass.topic.substringBefore(" ")}_$formattedDate.csv"
+
+    val file = File(context.filesDir, fileName)
+
+    csvWriter { charset = "UTF-8" }.open(file, append = false) {
+
         writeRow(
             listOf(
                 "Fecha",
@@ -632,7 +567,7 @@ fun generateStudentsCsv(savedClass: SavedClass, students: List<SavedStudent>, co
                 "Horario",
                 "Tema Visto",
                 "Programa Educativo",
-                "Correo Electronico",
+                "Correo Electrónico",
                 "Regular o irregular"
             )
         )
@@ -643,21 +578,20 @@ fun generateStudentsCsv(savedClass: SavedClass, students: List<SavedStudent>, co
 
 
         for (student in students) {
-            // Extract start hour and calculate end hour.  Handle potential parsing errors.
             val startTime = try {
                 timeFormat.format(savedClass.date.toDate())  // Use HH:mm format
-            } catch (e: Exception) {
-                "Error" // Or some other default value
+            } catch (_: Exception) {
+                context.getString(R.string.unknown_error)
             }
 
             val endTime = try {
                 val calendar = Calendar.getInstance().apply {
                     time = savedClass.date.toDate()
-                    add(Calendar.HOUR_OF_DAY, 1) // Add one hour
+                    add(Calendar.HOUR_OF_DAY, 1)
                 }
-                timeFormat.format(calendar.time)  //Use HH:mm
-            } catch(e: Exception){
-                "Error"
+                timeFormat.format(calendar.time)
+            } catch (_: Exception) {
+                context.getString(R.string.unknown_error)
             }
 
 
@@ -681,11 +615,10 @@ fun generateStudentsCsv(savedClass: SavedClass, students: List<SavedStudent>, co
 }
 
 
-//funcion para compartir
 fun shareFile(context: Context, file: File) {
     val uri: Uri = FileProvider.getUriForFile(
         context,
-        "${context.packageName}.provider",  // Usar el provider correcto.
+        "${context.packageName}.provider",
         file
     )
 
@@ -697,20 +630,23 @@ fun shareFile(context: Context, file: File) {
     context.startActivity(Intent.createChooser(intent, "Compartir CSV"))
 }
 
-@Composable
-fun StudentItem(student: SavedStudent) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = student.name, style = MaterialTheme.typography.bodyLarge)
-            Text(text = "ID: ${student.studentId}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Programa: ${student.academicProgram}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Email: ${student.email}", style = MaterialTheme.typography.bodySmall)
+
+
+
+fun copyFileToDownloads(context: Context, sourceFile: File): File {
+    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    if (!downloadsDir.exists()) downloadsDir.mkdirs()
+
+    val destinationFile = File(downloadsDir, sourceFile.name)
+
+    sourceFile.inputStream().use { input ->
+        destinationFile.outputStream().use { output ->
+            input.copyTo(output)
         }
     }
-}
 
+    // Opcional: notifica al sistema de que hay un nuevo archivo descargado
+    MediaScannerConnection.scanFile(context, arrayOf(destinationFile.absolutePath), null, null)
+
+    return destinationFile
+}

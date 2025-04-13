@@ -120,11 +120,17 @@
     <string name="relative_hours">Comienza en %1$d horas</string>
     <string name="hours">Horas</string>
     <string name="schedule_message">Todavía no tienes un horario de clases.\n Crea uno o solicita su aprobación a un administrador.</string>
+    <string name="today_non_working">Hoy es día no laborable, ¡disfruta tu descanso!</string>
+    <string name="today_in_period">Hoy se encuentra en un período vacacional, ¡disfruta tus vacaciones!</string>
+    <string name="last_class_indicator">¡Última clase, increíble!</string>
+    <string name="info_non_working_day">Día no laborable</string>
+    <string name="info_period">Próximo periodo vacacional</string>
     <string name="create_new_schedule">¡Crea un nuevo horario ahora!</string>
     <string name="class_of_subject">Clase de %1$s</string>
     <string name="next_class_in">Próxima clase en: %1$s</string>
     <string name="ends_in">Tienes %1$s para empezar</string>
     <string name="class_topic_label">Tema de la clase</string>
+    <string name="topic">Tema</string>
     <string name="class_starting">Iniciando clase…</string>
     <string name="class_started_success">Clase iniciada con éxito.</string>
     <string name="upcoming_classes_title">Tus próximas clases</string>

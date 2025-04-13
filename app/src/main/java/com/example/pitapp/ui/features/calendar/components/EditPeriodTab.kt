@@ -45,9 +45,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 import com.example.pitapp.model.Period
-import com.example.pitapp.ui.features.calendar.helpers.getEndLocalDate
-import com.example.pitapp.ui.features.calendar.helpers.getStartLocalDate
-import com.example.pitapp.ui.features.calendar.helpers.toTimestampStartOfDay
+import com.example.pitapp.model.getEndLocalDate
+import com.example.pitapp.model.getStartLocalDate
+import com.example.pitapp.model.toTimestampStartOfDay
 import com.example.pitapp.datasource.FireStoreManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

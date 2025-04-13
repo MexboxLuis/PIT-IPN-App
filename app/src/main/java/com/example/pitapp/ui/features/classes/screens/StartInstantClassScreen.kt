@@ -1,6 +1,8 @@
 package com.example.pitapp.ui.features.classes.screens
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -46,8 +48,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -61,6 +65,8 @@ import androidx.navigation.NavHostController
 import com.example.pitapp.R
 import com.example.pitapp.datasource.AuthManager
 import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.model.NonWorkingDay
+import com.example.pitapp.model.Period
 import com.example.pitapp.model.SavedClass
 import com.example.pitapp.model.Schedule
 import com.example.pitapp.ui.features.classes.components.InfoClassRowWithIcon
@@ -70,11 +76,15 @@ import com.example.pitapp.ui.shared.components.BackScaffold
 import com.example.pitapp.ui.shared.formatting.formatTitleCase
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StartInstantClassScreen(
     navController: NavHostController,
@@ -95,6 +105,10 @@ fun StartInstantClassScreen(
     val classCreated = remember { mutableStateOf(false) }
     val remainingTime = remember { mutableStateOf("") }
 
+    var currentMonth = remember { mutableStateOf(LocalDate.now()) }
+    var nonWorkingDays = remember { mutableStateOf<List<NonWorkingDay>>(emptyList()) }
+    var periods = remember { mutableStateOf<List<Period>>(emptyList()) }
+
     LaunchedEffect(Unit) {
         isSchedulesLoading.value = true
         fireStoreManager.getCurrentSchedules(tutorEmail) { result ->
@@ -108,6 +122,16 @@ fun StartInstantClassScreen(
                 isSchedulesLoading.value = false
             }
         }
+        val currentYear = currentMonth.value.year.toString()
+        val nextYear = (currentMonth.value.year + 1).toString()
+
+        val nonWorkingDaysCurrent = fireStoreManager.getNonWorkingDays(currentYear)
+        val nonWorkingDaysNext = fireStoreManager.getNonWorkingDays(nextYear)
+        nonWorkingDays.value = nonWorkingDaysCurrent + nonWorkingDaysNext
+
+        val periodsCurrent = fireStoreManager.getPeriods(currentYear)
+        val periodsNext = fireStoreManager.getPeriods(nextYear)
+        periods.value = periodsCurrent + periodsNext
     }
 
     LaunchedEffect(currentSchedules.value, classCreated.value) {
@@ -201,6 +225,20 @@ fun StartInstantClassScreen(
             delay(1000)
         }
     }
+    val today = LocalDate.now()
+
+    fun Timestamp.toLocalDate(): LocalDate {
+        return Instant.ofEpochMilli(this.seconds * 1000)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+    }
+
+    val isTodayNonWorking = nonWorkingDays.value.any { it.date.toLocalDate() == today }
+    val isTodayInPeriod = periods.value.any { period ->
+        val start = period.startDate.toLocalDate()
+        val end = period.endDate.toLocalDate()
+        !today.isBefore(start) && !today.isAfter(end)
+    }
 
     BackScaffold(
         navController = navController,
@@ -217,6 +255,19 @@ fun StartInstantClassScreen(
                 CircularProgressIndicator()
             } else if (schedulesError.value != null) {
                 Text(schedulesError.value!!, color = MaterialTheme.colorScheme.error)
+            } else if (isTodayNonWorking || isTodayInPeriod) {
+                // Si HOY cumple alguna de las condiciones, muestra el mensaje correspondiente
+                val todayMessage = if (isTodayNonWorking) {
+                    stringResource(R.string.today_non_working)
+                } else {
+                    stringResource(R.string.today_in_period)
+                }
+                Text(
+                    text = todayMessage,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(16.dp)
+                )
             } else if (currentSchedules.value.isEmpty()) {
 
                 Column(
@@ -228,7 +279,9 @@ fun StartInstantClassScreen(
                 ) {
                     UpcomingSchedules(
                         fireStoreManager = fireStoreManager,
-                        tutorEmail = tutorEmail
+                        tutorEmail = tutorEmail,
+                        nonWorkingDays = nonWorkingDays.value,
+                        periods = periods.value
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -452,15 +505,12 @@ fun StartInstantClassScreen(
                     }
                 }
                 if (currentSchedules.value.isNotEmpty() && !classCreated.value) {
-                    Spacer(modifier = Modifier.height(32.dp))
-                    SectionClassTitle(
-                        text = stringResource(R.string.upcoming_classes_title),
-                        icon = Icons.Default.CalendarMonth
-                    )
                     UpcomingSchedules(
                         fireStoreManager = fireStoreManager,
                         tutorEmail = tutorEmail,
-                        currentSubject = currentSubject.value
+                        currentSubject = currentSubject.value,
+                        nonWorkingDays = nonWorkingDays.value,
+                        periods = periods.value
                     )
                 }
             }

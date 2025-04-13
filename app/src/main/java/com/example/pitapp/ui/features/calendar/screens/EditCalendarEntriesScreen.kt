@@ -18,8 +18,8 @@ import com.example.pitapp.R
 import com.example.pitapp.ui.features.calendar.components.EditNonWorkingDayTab
 import com.example.pitapp.ui.features.calendar.components.EditPeriodTab
 import com.example.pitapp.model.Period
-import com.example.pitapp.ui.features.calendar.helpers.getEndLocalDate
-import com.example.pitapp.ui.features.calendar.helpers.getStartLocalDate
+import com.example.pitapp.model.getEndLocalDate
+import com.example.pitapp.model.getStartLocalDate
 import com.example.pitapp.datasource.FireStoreManager
 import java.time.LocalDate
 

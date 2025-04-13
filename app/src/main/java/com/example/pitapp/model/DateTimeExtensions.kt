@@ -1,8 +1,6 @@
-package com.example.pitapp.ui.features.calendar.helpers
+package com.example.pitapp.model
 
 import android.annotation.SuppressLint
-import com.example.pitapp.model.NonWorkingDay
-import com.example.pitapp.model.Period
 import com.google.firebase.Timestamp
 import java.time.LocalDate
 import java.time.ZoneId

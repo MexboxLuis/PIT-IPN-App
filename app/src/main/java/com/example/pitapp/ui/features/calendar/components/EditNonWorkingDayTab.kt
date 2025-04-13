@@ -42,8 +42,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 import com.example.pitapp.model.NonWorkingDay
-import com.example.pitapp.ui.features.calendar.helpers.getLocalDate
-import com.example.pitapp.ui.features.calendar.helpers.toTimestampStartOfDay
+import com.example.pitapp.model.getLocalDate
+import com.example.pitapp.model.toTimestampStartOfDay
 import com.example.pitapp.datasource.FireStoreManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
