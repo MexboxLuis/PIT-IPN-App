@@ -39,7 +39,7 @@ import com.example.pitapp.R
 import com.example.pitapp.model.SavedClass
 import com.example.pitapp.model.UserData
 import com.example.pitapp.ui.features.classes.helpers.getSubjectIcon
-import com.example.pitapp.ui.features.home.screens.ClassCardDetail
+
 import java.text.SimpleDateFormat
 import java.util.Locale
 

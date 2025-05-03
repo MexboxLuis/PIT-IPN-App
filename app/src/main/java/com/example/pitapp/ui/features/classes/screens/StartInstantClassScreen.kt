@@ -16,6 +16,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,10 +30,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.MoreTime
 import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Topic
 import androidx.compose.material3.Button
@@ -56,10 +60,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
@@ -76,10 +82,13 @@ import com.example.pitapp.ui.shared.components.BackScaffold
 import com.example.pitapp.ui.shared.formatting.formatTitleCase
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -96,6 +105,7 @@ fun StartInstantClassScreen(
     val currentSchedules = remember { mutableStateOf<List<Schedule>>(emptyList()) }
     val isSchedulesLoading = remember { mutableStateOf(false) }
     val schedulesError = remember { mutableStateOf<String?>(null) }
+    var isCalendarDataReady by remember { mutableStateOf(false) }
 
     val topic = remember { mutableStateOf("") }
     val classMessage = remember { mutableStateOf("") }
@@ -111,17 +121,20 @@ fun StartInstantClassScreen(
 
     LaunchedEffect(Unit) {
         isSchedulesLoading.value = true
-        fireStoreManager.getCurrentSchedules(tutorEmail) { result ->
-            result.onSuccess { schedules ->
-                currentSchedules.value = schedules
-                isSchedulesLoading.value = false
-                schedulesError.value = null
-            }.onFailure {
-                schedulesError.value =
-                    it.localizedMessage ?: context.getString(R.string.unknown_error)
-                isSchedulesLoading.value = false
+        try {
+            launch {
+                fireStoreManager.getCurrentSchedules(tutorEmail) { result ->
+                    result.onSuccess { schedules ->
+                        currentSchedules.value = schedules
+                        isSchedulesLoading.value = false
+                        schedulesError.value = null
+                    }.onFailure {
+                        schedulesError.value =
+                            it.localizedMessage ?: context.getString(R.string.unknown_error)
+                        isSchedulesLoading.value = false
+                    }
+                }
             }
-        }
         val currentYear = currentMonth.value.year.toString()
         val nextYear = (currentMonth.value.year + 1).toString()
 
@@ -132,6 +145,15 @@ fun StartInstantClassScreen(
         val periodsCurrent = fireStoreManager.getPeriods(currentYear)
         val periodsNext = fireStoreManager.getPeriods(nextYear)
         periods.value = periodsCurrent + periodsNext
+            } catch (e: Exception) {
+                schedulesError.value =
+                    e.localizedMessage ?: context.getString(R.string.unknown_error)
+                isSchedulesLoading.value = false
+
+        } finally {
+            if( isSchedulesLoading.value) isSchedulesLoading.value = false
+            if (!isCalendarDataReady) isCalendarDataReady = true
+        }
     }
 
     LaunchedEffect(currentSchedules.value, classCreated.value) {
@@ -251,23 +273,51 @@ fun StartInstantClassScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isSchedulesLoading.value) {
+            if (isSchedulesLoading.value || !isCalendarDataReady) {
+                Spacer(Modifier.weight(1f))
                 CircularProgressIndicator()
-            } else if (schedulesError.value != null) {
+                Spacer(Modifier.weight(1f))
+            }
+            else if (schedulesError.value != null) {
+                Spacer(Modifier.weight(1f))
                 Text(schedulesError.value!!, color = MaterialTheme.colorScheme.error)
+                Spacer(Modifier.weight(1f))
             } else if (isTodayNonWorking || isTodayInPeriod) {
-                // Si HOY cumple alguna de las condiciones, muestra el mensaje correspondiente
                 val todayMessage = if (isTodayNonWorking) {
                     stringResource(R.string.today_non_working)
                 } else {
-                    stringResource(R.string.today_in_period)
+                    val currentPeriod = periods.value.find { period ->
+                        val start = period.startDate.toLocalDate()
+                        val end   = period.endDate.toLocalDate()
+                        !today.isBefore(start) && !today.isAfter(end)
+                    }
+
+                    val formattedEndDate = currentPeriod
+                        ?.endDate
+                        ?.toLocalDate()
+                        ?.let { endLocalDate ->
+                            SimpleDateFormat("dd '${context.getString(R.string.of)}' MMMM", Locale.getDefault())
+                                .format(Date.from(endLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                        }
+                        ?: "—"
+
+                    stringResource(R.string.today_in_period, formattedEndDate)
                 }
-                Text(
-                    text = todayMessage,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(16.dp)
-                )
+
+                val todayIcon = if (isTodayNonWorking) {
+                    Icons.Filled.EventBusy
+                } else {
+                    Icons.Filled.Timelapse
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    NoClassInfoMessageCard(icon = todayIcon, message = todayMessage)
+                }
             } else if (currentSchedules.value.isEmpty()) {
 
                 Column(
@@ -514,6 +564,56 @@ fun StartInstantClassScreen(
                     )
                 }
             }
+        }
+    }
+}
+@Composable
+fun NoClassInfoMessageCard(
+    icon: ImageVector,
+    message: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 32.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            val infiniteTransition = rememberInfiniteTransition(label = "timer_icon_rotation")
+            val rotation by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 360f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 2000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "rotation"
+            )
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .rotate(rotation),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }

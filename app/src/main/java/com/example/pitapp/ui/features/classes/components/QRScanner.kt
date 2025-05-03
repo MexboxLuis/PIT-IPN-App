@@ -88,7 +88,6 @@ fun QRScanner(
                 setDesiredBarcodeFormats(ScanOptions.QR_CODE)
                 setBeepEnabled(true)
                 setOrientationLocked(true)
-                setCameraId(0)
             }
             launcher.launch(options)
         }

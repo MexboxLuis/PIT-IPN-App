@@ -6,6 +6,7 @@
     <string name="unknown_error">Error desconocido</string>
     <string name="delete">Eliminar</string>
     <string name="cancel">Cancelar</string>
+    <string name="of">de</string>
     <string name="save_changes">Guardar cambios</string>
     <string name="error_saving">Error al guardar los cambios.</string>
     <string name="day_mon">Lunes</string>
@@ -121,7 +122,7 @@
     <string name="hours">Horas</string>
     <string name="schedule_message">Todavía no tienes un horario de clases.\n Crea uno o solicita su aprobación a un administrador.</string>
     <string name="today_non_working">Hoy es día no laborable, ¡disfruta tu descanso!</string>
-    <string name="today_in_period">Hoy se encuentra en un período vacacional, ¡disfruta tus vacaciones!</string>
+    <string name="today_in_period">Hoy se encuentra en un período vacacional, ¡disfruta tus vacaciones y nos vemos el día %1$s!</string>
     <string name="last_class_indicator">¡Última clase, increíble!</string>
     <string name="info_non_working_day">Día no laborable</string>
     <string name="info_period">Próximo periodo vacacional</string>

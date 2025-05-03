@@ -145,7 +145,9 @@ fun UpcomingSchedules(
                     upcomingSchedules.value = emptyList()
                 }
             }
+
             delay(1000)
+
             isLoading.value = false
         }
     }

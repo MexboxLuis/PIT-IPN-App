@@ -4,6 +4,7 @@
     <string name="loading">Loading…</string>
     <string name="unknown_error">Unknown error</string>
     <string name="delete">Delete</string>
+    <string name="of">of</string>
     <string name="cancel">Cancel</string>
     <string name="save_changes">Save changes</string>
     <string name="error_saving">Error when saving changes.</string>
@@ -120,7 +121,7 @@
     <string name="hours">Hours</string>
     <string name="schedule_message">You don’t have a class schedule yet.\n Create one or ask an administrator to approve it.</string>
     <string name="today_non_working">Today is a non-working day, enjoy your break!</string>
-    <string name="today_in_period">Today falls within a vacation period, enjoy your vacation!</string>
+    <string name="today_in_period">Today falls within a vacation period, enjoy your vacation, see you on %1$s!</string>
     <string name="last_class_indicator">Last class, awesome!</string>
     <string name="info_non_working_day">Non-working day</string>
     <string name="info_period">Upcoming vacation period</string>

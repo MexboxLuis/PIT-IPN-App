@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <files-path name="my_files" path="." />
+
+    <!-- Añade esta línea: -->
+    <files-path name="internal_files" path="." />
+
+    <!-- Mantén las otras rutas que necesites, por ejemplo: -->
+    <external-path name="legacy_downloads" path="Download/" />
+    <external-files-path name="my_private_downloads" path="Download/" />
+    <!-- ... otras rutas que uses ... -->
+
 </paths>
