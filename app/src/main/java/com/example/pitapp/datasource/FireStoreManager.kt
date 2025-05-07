@@ -28,7 +28,10 @@ class FireStoreManager(
         email: String,
         name: String,
         surname: String,
-        imageUri: Uri?
+        imageUri: Uri?,
+        academicProgram: String? = null,
+        studentId: String? = null,
+        phoneNumber: String? = null
     ): Result<Boolean> {
         return try {
             val profilePictureUrl: String? = imageUri?.let { uri ->
@@ -42,7 +45,10 @@ class FireStoreManager(
                 "name" to name,
                 "surname" to surname,
                 "permission" to 0,
-                "profilePictureUrl" to profilePictureUrl
+                "profilePictureUrl" to profilePictureUrl,
+                "academicProgram" to academicProgram,
+                "studentId" to studentId,
+                "phoneNumber" to phoneNumber
             )
 
             firestore.collection("saved_users")

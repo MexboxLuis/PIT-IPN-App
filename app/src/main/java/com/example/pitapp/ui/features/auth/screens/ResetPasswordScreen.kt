@@ -1,27 +1,16 @@
 package com.example.pitapp.ui.features.auth.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,18 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.ui.shared.components.BackScaffold
 import com.example.pitapp.datasource.AuthManager
 import com.example.pitapp.ui.features.auth.helpers.isValidEmail
+import com.example.pitapp.ui.shared.components.BackScaffold
 import kotlinx.coroutines.launch
+import com.example.pitapp.ui.features.auth.components.*
 
 @Composable
 fun ResetPasswordScreen(
@@ -55,17 +41,17 @@ fun ResetPasswordScreen(
     var email by rememberSaveable { mutableStateOf("") }
     var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
-    val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
-
 
     BackScaffold(
         navController = navController,
         authManager = authManager,
         topBarTitle = null
     ) {
+
+        val scrollState = rememberScrollState()
+        val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,45 +61,33 @@ fun ResetPasswordScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.pit_logo),
-                contentDescription = null,
-                modifier = Modifier.size(84.dp)
-            )
+            AuthHeader()
             Spacer(modifier = Modifier.height(32.dp))
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it.trimEnd() },
-                label = { Text(text = stringResource(id = R.string.email)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Done
-                )
+
+            EmailTextField(
+                email = email,
+                onEmailChange = {
+                    email = it.trim()
+                    errorMessage = null
+                },
+                imeAction = ImeAction.Done
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            errorMessage?.let {
-                Text(
-                    text = stringResource(id = it.toInt()),
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            ErrorMessageText(errorMessage = errorMessage)
 
-            OutlinedButton(
+            AuthActionButton(
+                textResId = R.string.send_password_reset,
+                iconVector = Icons.AutoMirrored.Filled.Send,
                 onClick = {
-
                     if (!isValidEmail(email)) {
                         errorMessage = R.string.regex_email.toString()
-                        return@OutlinedButton
+                        return@AuthActionButton
                     }
-
                     coroutineScope.launch {
                         val result = authManager.resetPassword(email)
                         if (result.isSuccess) {
+                            errorMessage = null
                             onPasswordResetSent()
                             Toast.makeText(
                                 context,
@@ -121,35 +95,17 @@ fun ResetPasswordScreen(
                                 Toast.LENGTH_LONG
                             ).show()
                         } else {
-                            errorMessage = result.exceptionOrNull()?.message
+                            errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.toast_reset_password_failed)
                             Toast.makeText(
                                 context,
-                                R.string.toast_reset_password_failed,
+                                errorMessage,
                                 Toast.LENGTH_LONG
                             ).show()
                         }
                     }
-
                 },
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(horizontal = 16.dp),
                 enabled = email.isNotEmpty()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = stringResource(id = R.string.send_password_reset))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = null
-                    )
-                }
-
-            }
+            )
             Spacer(modifier = Modifier.height(64.dp))
         }
     }

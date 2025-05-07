@@ -46,16 +46,12 @@ import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NoBackpack
 import androidx.compose.material.icons.filled.Search
@@ -129,7 +125,6 @@ import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
-import java.util.Date
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -278,7 +273,7 @@ fun HomeScreen4Tutor(
             savedInstantClasses.value.forEach { (classId, savedClass) ->
                 val classDate = try {
                     savedClass.date.toDate()
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     null
                 }
                 val classLocalDate = classDate?.toInstant()?.atZone(ZoneId.systemDefault())

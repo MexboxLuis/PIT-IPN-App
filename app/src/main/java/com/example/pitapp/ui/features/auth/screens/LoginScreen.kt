@@ -50,11 +50,12 @@ import androidx.compose.ui.unit.dp
 import com.example.pitapp.R
 import com.example.pitapp.ui.shared.screens.LoadingScreen
 import com.example.pitapp.datasource.AuthManager
+import com.example.pitapp.ui.features.auth.components.AuthScreenBaseLayout
 import com.example.pitapp.ui.features.auth.helpers.isValidEmail
 import com.example.pitapp.ui.features.auth.helpers.isValidPassword
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import com.example.pitapp.ui.features.auth.components.*
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
@@ -69,138 +70,70 @@ fun LoginScreen(
     var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var isLoadingScreen by remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState()
-    val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
 
     Scaffold {
-        Box(modifier = Modifier.fillMaxSize()) {
-            if (!isLoadingScreen) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 32.dp)
-                        .nestedScroll(imeNestedScrollConnection)
-                        .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.pit_logo),
-                        contentDescription = null,
-                        modifier = Modifier.size(84.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        " ",
-                        style = MaterialTheme.typography.headlineLarge,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = {
-                            email = it.trimEnd()
-                            errorMessage = null
-                        },
-                        label = { Text(text = stringResource(id = R.string.email)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = {
-                            password = it.trimEnd()
-                            errorMessage = null
-                        },
-                        label = { Text(text = stringResource(id = R.string.password)) },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = null
-                                )
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+        AuthScreenBaseLayout(isLoading = isLoadingScreen) {
+            AuthHeader()
+            Spacer(modifier = Modifier.height(16.dp))
 
-                    errorMessage?.let {
-                        Text(
-                            text = stringResource(id = it.toInt()),
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+            EmailTextField(
+                email = email,
+                onEmailChange = {
+                    email = it.trim()
+                    errorMessage = null
+                },
+                imeAction = ImeAction.Next
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PasswordTextField(
+                password = password,
+                onPasswordChange = {
+                    password = it.trim()
+                    errorMessage = null
+                },
+                passwordVisible = passwordVisible,
+                onPasswordVisibilityChange = { passwordVisible = !passwordVisible },
+                imeAction = ImeAction.Done
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ErrorMessageText(errorMessage = errorMessage)
+
+            AuthActionButton(
+                textResId = R.string.login,
+                iconVector = Icons.AutoMirrored.Filled.Login,
+                onClick = {
+                    if (!isValidEmail(email)) {
+                        errorMessage = R.string.regex_email.toString()
+                        return@AuthActionButton
                     }
-
-                    OutlinedButton(
-                        onClick = {
-
-
-                            if (!isValidEmail(email)) {
-                                errorMessage = R.string.regex_email.toString()
-                                return@OutlinedButton
-                            }
-
-                            if (!isValidPassword(password)) {
-                                errorMessage = R.string.regex_password.toString()
-                                return@OutlinedButton
-                            }
-
-                            coroutineScope.launch {
-
-                                val result = authManager.loginWithEmail(email, password)
-                                isLoadingScreen = true
-                                if (result.isSuccess) {
-                                    errorMessage = null
-                                    onLoginSuccess()
-                                    delay(1000)
-                                    isLoadingScreen = false
-                                } else {
-                                    errorMessage = R.string.login_failed.toString()
-                                    delay(1000)
-                                    isLoadingScreen = false
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .padding(horizontal = 16.dp),
-                        enabled = email.isNotEmpty() && password.isNotEmpty()
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = stringResource(id = R.string.login))
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Login,
-                                contentDescription = null
-                            )
+                    if (!isValidPassword(password)) {
+                        errorMessage = R.string.regex_password.toString()
+                        return@AuthActionButton
+                    }
+                    coroutineScope.launch {
+                        isLoadingScreen = true
+                        val result = authManager.loginWithEmail(email, password)
+                        delay(1000)
+                        if (result.isSuccess) {
+                            errorMessage = null
+                            onLoginSuccess()
+                        } else {
+                            errorMessage = R.string.login_failed.toString()
                         }
+                        isLoadingScreen = false
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = onRegisterClick) {
-                        Text(text = stringResource(id = R.string.register_here))
-                    }
-                    TextButton(onClick = onResetPasswordClick) {
-                        Text(text = stringResource(id = R.string.forgot_password))
-                    }
-                }
-            } else {
-                LoadingScreen()
+                },
+                enabled = email.isNotEmpty() && password.isNotEmpty()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextButton(onClick = onRegisterClick) {
+                Text(text = stringResource(id = R.string.register_here))
+            }
+            TextButton(onClick = onResetPasswordClick) {
+                Text(text = stringResource(id = R.string.forgot_password))
             }
         }
     }

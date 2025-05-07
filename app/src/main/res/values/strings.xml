@@ -34,6 +34,7 @@
     <string name="classroom">Classroom</string>
     <string name="classroom_card_title_prefix">Classroom %d</string>
     <string name="email">Email</string>
+    <string name="academic_program">Academic Program</string>
 
     <!--        Screens     -->
     <string name="error_screen_message">Check your internet connection or contact the administrator.</string>
@@ -60,6 +61,10 @@
     <string name="regex_confirm_password">Passwords do not match.</string>
     <string name="log_out_message">Are you sure you want to log out?</string>
     <string name="yes_log_out">Yes, I want to</string>
+    <string name="role_teacher">I am teacher</string>
+    <string name="role_student">I am student</string>
+    <string name="phone_number">Phone number (10 digits)</string>
+
 
     <!--        Profile -->
     <string name="profile">Profile</string>
@@ -146,7 +151,6 @@
 <!--    add student form-->
     <string name="full_name">Full Name</string>
     <string name="student_id">Student ID</string>
-    <string name="academic_program">Academic Program</string>
     <string name="add_student">Add Student</string>
     <string name="student_id_prefix">ID: %1$s</string>
     <!--    class instant private components-->

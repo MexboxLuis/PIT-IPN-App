@@ -48,11 +48,12 @@ import com.example.pitapp.R
 import com.example.pitapp.ui.shared.components.BackScaffold
 import com.example.pitapp.ui.shared.screens.LoadingScreen
 import com.example.pitapp.datasource.AuthManager
+import com.example.pitapp.ui.features.auth.components.AuthScreenBaseLayout
 import com.example.pitapp.ui.features.auth.helpers.isValidEmail
 import com.example.pitapp.ui.features.auth.helpers.isValidPassword
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import com.example.pitapp.ui.features.auth.components.*
 @Composable
 fun RegisterDataScreen(
     navController: NavHostController,
@@ -67,164 +68,85 @@ fun RegisterDataScreen(
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isLoadingScreen by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val scrollState = rememberScrollState()
-    val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
 
-    if (!isLoadingScreen) {
-        BackScaffold(
-            navController = navController,
-            authManager = authManager,
-            topBarTitle = null
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 32.dp)
-                    .nestedScroll(imeNestedScrollConnection)
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+    BackScaffold(
+        navController = navController,
+        authManager = authManager,
+        topBarTitle = null
+    ) {
+        AuthScreenBaseLayout(isLoading = isLoadingScreen) {
+            AuthHeader()
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Image(
-                    painter = painterResource(id = R.drawable.pit_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(84.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    " ",
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = {
-                        email = it.trimEnd()
-                        errorMessage = null
-                    },
-                    label = { Text(text = stringResource(id = R.string.email)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = {
-                        password = it.trimEnd()
-                        errorMessage = null
-                    },
-                    label = { Text(text = stringResource(id = R.string.password)) },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Next
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = {
-                        confirmPassword = it.trimEnd()
-                        errorMessage = null
-                    },
-                    label = { Text(text = stringResource(id = R.string.confirm_password)) },
-                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            confirmPasswordVisible = !confirmPasswordVisible
-                        }) {
-                            Icon(
-                                imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+            EmailTextField(
+                email = email,
+                onEmailChange = {
+                    email = it.trim()
+                    errorMessage = null
+                },
+                imeAction = ImeAction.Next
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-                errorMessage?.let {
-                    Text(
-                        text = stringResource(id = it.toInt()),
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+            PasswordTextField(
+                password = password,
+                onPasswordChange = {
+                    password = it.trim()
+                    errorMessage = null
+                },
+                passwordVisible = passwordVisible,
+                onPasswordVisibilityChange = { passwordVisible = !passwordVisible },
+                imeAction = ImeAction.Next
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedButton(
-                    onClick = {
+            PasswordTextField(
+                password = confirmPassword,
+                onPasswordChange = {
+                    confirmPassword = it.trim()
+                    errorMessage = null
+                },
+                labelResId = R.string.confirm_password,
+                passwordVisible = confirmPasswordVisible,
+                onPasswordVisibilityChange = { confirmPasswordVisible = !confirmPasswordVisible },
+                imeAction = ImeAction.Done
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-                        if (!isValidEmail(email)) {
-                            errorMessage = R.string.regex_email.toString()
-                            return@OutlinedButton
-                        }
+            ErrorMessageText(errorMessage = errorMessage)
 
-                        if (!isValidPassword(password)) {
-                            errorMessage = R.string.regex_password.toString()
-                            return@OutlinedButton
-                        }
-
-                        if (password != confirmPassword) {
-                            errorMessage = R.string.regex_confirm_password.toString()
-                            return@OutlinedButton
-                        }
-
-                        coroutineScope.launch {
-                            isLoadingScreen = true
-                            val authResult = authManager.registerWithEmail(email, password)
-                            if (authResult.isSuccess) {
-                                onRegisterSuccess()
-                            } else {
-                                errorMessage = R.string.email_already_registered.toString()
-                            }
-                            delay(1000)
-                            isLoadingScreen = false
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    enabled = email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = stringResource(id = R.string.next))
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = null
-                        )
+            AuthActionButton(
+                textResId = R.string.next,
+                iconVector = Icons.Default.Person,
+                onClick = {
+                    if (!isValidEmail(email)) {
+                        errorMessage = R.string.regex_email.toString()
+                        return@AuthActionButton
                     }
-
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+                    if (!isValidPassword(password)) {
+                        errorMessage = R.string.regex_password.toString()
+                        return@AuthActionButton
+                    }
+                    if (password != confirmPassword) {
+                        errorMessage = R.string.regex_confirm_password.toString()
+                        return@AuthActionButton
+                    }
+                    coroutineScope.launch {
+                        isLoadingScreen = true
+                        val authResult = authManager.registerWithEmail(email, password)
+                        delay(1000)
+                        if (authResult.isSuccess) {
+                            errorMessage = null
+                            onRegisterSuccess()
+                        } else {
+                            errorMessage = R.string.email_already_registered.toString()
+                        }
+                        isLoadingScreen = false
+                    }
+                },
+                enabled = email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
         }
-    } else {
-        LoadingScreen()
     }
 }

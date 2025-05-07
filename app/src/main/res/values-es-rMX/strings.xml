@@ -61,6 +61,9 @@
     <string name="regex_confirm_password">Las contraseñas no coinciden.</string>
     <string name="log_out_message">¿Estás seguro que quieres cerrar sesión?</string>
     <string name="yes_log_out">Sí, quiero</string>
+    <string name="role_teacher">Soy Profesor</string>
+    <string name="role_student">Soy Estudiante</string>
+    <string name="phone_number">No. de teléfono (10 dígitos)</string>
 
     <!--        Profile     -->
     <string name="profile">Perfil</string>
@@ -281,6 +284,8 @@
     <string name="label_description">Descripción</string>
     <string name="delete_dialog_confirmation_question">¿Seguro que quieres eliminar el Salón %1$d?</string>
     <string name="delete_dialog_info_text">Esta acción eliminará el salón de la lista de disponibles y afectará la funcionalidad de los horarios. No impactará los registros históricos, pero recuerda reasignar los salones para evitar problemas en los horarios.</string>
+
+
 
 
 </resources>

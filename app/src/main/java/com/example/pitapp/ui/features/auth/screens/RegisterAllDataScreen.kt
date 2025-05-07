@@ -4,32 +4,13 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,25 +19,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
 import com.example.pitapp.R
-import com.example.pitapp.ui.shared.components.BackScaffold
-import com.example.pitapp.ui.shared.screens.LoadingScreen
 import com.example.pitapp.datasource.AuthManager
 import com.example.pitapp.datasource.FireStoreManager
-import kotlinx.coroutines.delay
+import com.example.pitapp.ui.features.auth.components.AuthActionButton
+import com.example.pitapp.ui.features.auth.components.AuthHeader
+import com.example.pitapp.ui.features.auth.components.AuthScreenBaseLayout
+import com.example.pitapp.ui.features.auth.components.GenericTextField
+import com.example.pitapp.ui.features.auth.components.ProfileImagePicker
+import com.example.pitapp.ui.features.auth.components.UserRole
+import com.example.pitapp.ui.shared.components.BackScaffold
 import kotlinx.coroutines.launch
 
 
@@ -68,163 +47,165 @@ fun RegisterAllDataScreen(
     email: String,
     onRegisterDataSuccess: () -> Unit
 ) {
-    val imageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+    var imageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            imageUri.value = uri
+            imageUri = uri
         }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+
     var name by rememberSaveable { mutableStateOf("") }
     var surname by rememberSaveable { mutableStateOf("") }
+
+    var selectedRole by remember { mutableStateOf(UserRole.TEACHER) }
+
+    var academicProgram by rememberSaveable { mutableStateOf("") }
+    var studentId by rememberSaveable { mutableStateOf("") }
+    var phoneNumber by rememberSaveable { mutableStateOf("") }
+
     var isLoadingScreen by remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState()
-    val imeNestedScrollConnection = rememberNestedScrollInteropConnection()
 
-    if (!isLoadingScreen) {
-        BackScaffold(navController = navController, authManager = authManager, topBarTitle = null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 32.dp)
-                    .nestedScroll(imeNestedScrollConnection)
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+    BackScaffold(
+        navController = navController,
+        authManager = authManager,
+        topBarTitle = null
+    ) {
+        AuthScreenBaseLayout(isLoading = isLoadingScreen) {
+            AuthHeader()
+            Text(
+                text = stringResource(id = R.string.your_email_is, email),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ProfileImagePicker(
+                imageUri = imageUri,
+                onImagePick = { launcher.launch("image/*") }
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            val roles = UserRole.entries.toTypedArray()
+            TabRow(
+                selectedTabIndex = selectedRole.ordinal,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.pit_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(84.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    " ",
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-                Text(
-                    text = stringResource(id = R.string.your_email_is, email),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                roles.forEach { role ->
+                    Tab(
+                        selected = selectedRole == role,
+                        onClick = {
+                            selectedRole = role
 
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(modifier = Modifier.padding(16.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .size(150.dp)
-                            .background(
-                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (imageUri.value != null) {
-                            Image(
-                                painter = rememberAsyncImagePainter(imageUri.value),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(100.dp)
-                            )
-                        }
-                    }
-                    IconButton(
-                        onClick = { launcher.launch("image/*") },
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape),
-                        )
-                    }
-                }
-
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text(text = stringResource(id = R.string.names)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = surname,
-                    onValueChange = { surname = it },
-                    label = { Text(text = stringResource(id = R.string.surnames)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedButton(
-                    onClick = {
-                        isLoadingScreen = true
-                        coroutineScope.launch {
-                            val selectedImageUri = imageUri.value
-                            val dataResult = fireStoreManager.registerUserData(
-                                email,
-                                name.trimEnd(),
-                                surname.trimEnd(),
-                                selectedImageUri
-                            )
-                            if (dataResult.isSuccess) {
-                                onRegisterDataSuccess()
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    R.string.error_uploading_data,
-                                    Toast.LENGTH_LONG
-                                ).show()
+                            if (role == UserRole.TEACHER) {
+                                academicProgram = ""
+                                studentId = ""
+                                phoneNumber = ""
                             }
-                            delay(1000)
-                            isLoadingScreen = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(0.8f),
-                    enabled = name.isNotEmpty() && surname.isNotEmpty()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = stringResource(id = R.string.register))
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null
-                        )
-                    }
-
+                        },
+                        text = { Text(stringResource(id = role.displayNameResId)) },
+                        selectedContentColor = MaterialTheme.colorScheme.primary,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            GenericTextField(
+                value = name,
+                onValueChange = { name = it },
+                labelResId = R.string.names,
+                imeAction = ImeAction.Next
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            GenericTextField(
+                value = surname,
+                onValueChange = { surname = it },
+                labelResId = R.string.surnames,
+                imeAction = ImeAction.Next
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            GenericTextField(
+                value = phoneNumber,
+                onValueChange = { newValue ->
+                    if (newValue.length <= 10 && newValue.all { it.isDigit() }) {
+                        phoneNumber = newValue
+                    }
+                },
+                labelResId = R.string.phone_number,
+                keyboardType = KeyboardType.Phone,
+                imeAction = if (selectedRole == UserRole.TEACHER) ImeAction.Done else ImeAction.Next,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (selectedRole == UserRole.STUDENT) {
+                GenericTextField(
+                    value = academicProgram,
+                    onValueChange = { academicProgram = it },
+                    labelResId = R.string.academic_program,
+                    imeAction = ImeAction.Next
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                GenericTextField(
+                    value = studentId,
+                    onValueChange = { studentId = it },
+                    labelResId = R.string.student_id,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
 
             }
+
+            val isStudentFieldsValid = if (selectedRole == UserRole.STUDENT) {
+                academicProgram.isNotBlank() && studentId.isNotBlank()
+            } else {
+                true
+            }
+
+            val isFormEnabled =
+                name.isNotBlank() && surname.isNotBlank() && phoneNumber.length == 10 && isStudentFieldsValid
+
+            AuthActionButton(
+                textResId = R.string.register,
+                iconVector = Icons.Default.Check,
+                onClick = {
+                    coroutineScope.launch {
+                        isLoadingScreen = true
+                        val result = fireStoreManager.registerUserData(
+                            email = email,
+                            name = name.trim(),
+                            surname = surname.trim(),
+                            imageUri = imageUri,
+                            academicProgram = if (selectedRole == UserRole.STUDENT) academicProgram.trim() else null,
+                            studentId = if (selectedRole == UserRole.STUDENT) studentId.trim() else null,
+                            phoneNumber = if (selectedRole == UserRole.STUDENT) phoneNumber.trim() else null
+                        )
+
+                        if (result.isSuccess) {
+                            onRegisterDataSuccess()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                result.exceptionOrNull()?.message
+                                    ?: context.getString(R.string.error_uploading_data),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        isLoadingScreen = false
+                    }
+                },
+                enabled = isFormEnabled
+            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
-    } else {
-        LoadingScreen()
     }
 }
-
