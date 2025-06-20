@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.CoPresent
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MeetingRoom
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
@@ -116,7 +117,14 @@ fun HomeScreen4Admin(
             subtitle = stringResource(id = R.string.class_schedules_subtitle),
             icon = Icons.Default.Schedule,
             onClick = { onClassSchedulesClick() }
-        )
+        ),
+         AdminCardData(
+             title = stringResource(id = R.string.students_title),
+             subtitle = stringResource(id = R.string.students_subtitle),
+             icon = Icons.Default.Person,
+             onClick = {  }
+         )
+
 
     )
 

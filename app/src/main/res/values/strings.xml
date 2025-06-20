@@ -91,6 +91,8 @@
     <string name="careers_subtitle">Explore career options</string>
     <string name="class_schedules_title">Class Schedules</string>
     <string name="class_schedules_subtitle">Management of class schedules and approvals</string>
+    <string name="students_title">Students</string>
+    <string name="students_subtitle">Manage all student profiles and information</string>
     <string name="search_section">Search in sections</string>
     <string name="no_filtered_section">We do not have that section yet.</string>
 

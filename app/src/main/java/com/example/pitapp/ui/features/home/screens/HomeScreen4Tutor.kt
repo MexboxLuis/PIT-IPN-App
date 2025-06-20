@@ -270,7 +270,7 @@ fun HomeScreen4Tutor(
             val studentsInPeriod = mutableListOf<SavedStudent>()
             val locale = Locale.getDefault()
 
-            savedInstantClasses.value.forEach { (classId, savedClass) ->
+            filteredSavedInstantClasses.value.forEach { (classId, savedClass) ->
                 val classDate = try {
                     savedClass.date.toDate()
                 } catch (_: Exception) {
@@ -317,7 +317,11 @@ fun HomeScreen4Tutor(
     TutorScaffold(
         navController = navController,
         fireStoreManager = fireStoreManager,
-        onFabClick = { scope.launch { filterSheetState.show() } }
+        onFabClick = filteredSavedInstantClasses.value
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+                { scope.launch { filterSheetState.show() } }
+            }
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {

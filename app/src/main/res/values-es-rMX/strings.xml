@@ -90,6 +90,8 @@
     <string name="careers_subtitle">Explora las opciones de carrera</string>
     <string name="class_schedules_title">Horarios de clases</string>
     <string name="class_schedules_subtitle">Gestión de horarios de clases y aprobaciones</string>
+    <string name="students_title">Estudiantes</string>
+    <string name="students_subtitle">Gestiona todos los perfiles e información de los estudiantes</string>
     <string name="search_section">Buscar secciones</string>
     <string name="no_filtered_section">Aún no contamos con esa sección.</string>
 
