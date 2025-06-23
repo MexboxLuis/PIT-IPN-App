@@ -35,6 +35,9 @@
     <string name="classroom">Salón</string>
     <string name="classroom_card_title_prefix">Salón %d</string>
     <string name="email">Correo electrónico</string>
+    <string name="phone_number">No. de teléfono (10 dígitos)</string>
+    <string name="student_id">Boleta</string>
+    <string name="academic_program">Programa académico</string>
 
     <!--        Screens     -->
     <string name="error_screen_message">Verifica tu conexión a internet o contacta al administrador.</string>
@@ -61,15 +64,22 @@
     <string name="regex_confirm_password">Las contraseñas no coinciden.</string>
     <string name="log_out_message">¿Estás seguro que quieres cerrar sesión?</string>
     <string name="yes_log_out">Sí, quiero</string>
-    <string name="role_teacher">Soy Profesor</string>
+    <string name="role_teacher">Soy Docente</string>
     <string name="role_student">Soy Estudiante</string>
-    <string name="phone_number">No. de teléfono (10 dígitos)</string>
+
 
     <!--        Profile     -->
     <string name="profile">Perfil</string>
     <string name="edit_data">Editar información del perfil</string>
     <string name="add_pic">Añade una foto</string>
     <string name="change_pic">Cambiar foto</string>
+    <string name="student">Estudiante</string>
+    <string name="teacher">Docente</string>
+    <string name="error_phone_digits">El número de teléfono debe tener 10 dígitos</string>
+    <string name="success_profile_saved">Datos guardados exitosamente</string>
+    <string name="no_user_data">No se encontraron datos para este usuario.</string>
+    <string name="error_loading_user">Error al cargar datos del usuario: %1$s</string>
+
 
     <!--        Home        -->
     <string name="headline_sheet">Haz una clase para tus alumnos.</string>
@@ -94,6 +104,36 @@
     <string name="students_subtitle">Gestiona todos los perfiles e información de los estudiantes</string>
     <string name="search_section">Buscar secciones</string>
     <string name="no_filtered_section">Aún no contamos con esa sección.</string>
+    <string name="filter_week">Semana</string>
+    <string name="filter_month">Mes</string>
+    <string name="filter_year">Año</string>
+    <string name="filter_all">Todos</string>
+    <string name="week_prefix">Semana del</string>
+    <string name="download_csv_summary">Descargar resumen CSV</string>
+
+    <string name="instant_class_summary">Resumen de clase</string>
+    <string name="search_students">Alumnos inscritos (%1$d)</string>
+    <string name="no_students_found">No se encontraron alumnos con esas características.</string>
+    <string name="no_class_info">No se encontró información para esta clase.</string>
+    <string name="tutor">Tutor</string>
+    <string name="date">Fecha</string>
+    <string name="download_attendance_list">Descargar lista de asistencia</string>
+    <string name="attendance_statistics">Estadísticas de Asistencia</string>
+    <string name="regular_students">Regulares</string>
+    <string name="irregular_students">Irregulares</string>
+    <string name="no_data_to_display">No hay datos para mostrar en esta vista.</string>
+    <string name="label_status">Estado</string>
+    <string name="label_program">Programa</string>
+    <string name="error_no_classes_to_export">No hay clases para exportar.</string>
+    <string name="error_different_tutors">Las clases pertenecen a tutores distintos; no se puede consolidar.</string>
+    <string name="share_csv">Compartir CSV</string>
+    <string name="downloads_channel_name">Descargas de la app</string>
+    <string name="downloads_channel_description">Notificaciones de archivos descargados</string>
+    <string name="download_complete_title">🎉 Descarga completada</string>
+    <string name="download_complete_text">Archivo %1$s</string>
+    <string name="download_complete_big_text">Ruta: %1$s\n\nToca para abrir o comparte desde aquí.</string>
+    <string name="share_file_action">Compartir</string>
+    <string name="default_downloaded_file_name">Archivo descargado</string>
 
 
     <!--      Permissions       -->
@@ -151,8 +191,7 @@
 
 <!--    add student form-->
     <string name="full_name">Nombre completo</string>
-    <string name="student_id">Boleta</string>
-    <string name="academic_program">Programa académico</string>
+
     <string name="add_student">Agregar estudiante</string>
     <string name="student_id_prefix">Boleta: %1$s</string>
     <!--    class instant private components-->

@@ -19,11 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.pitapp.R
-import com.example.pitapp.model.UserData
 import com.example.pitapp.datasource.FireStoreManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,16 +40,9 @@ fun MainTopAppBar(
     onProfileClick: () -> Unit
 ) {
 
-    var userData by remember { mutableStateOf<UserData?>(null) }
-    LaunchedEffect(Unit) {
-        fireStoreManager.getUserData { result ->
-            userData = if (result.isSuccess) {
-                result.getOrNull()
-            } else {
-                null
-            }
-        }
-    }
+    val userResult by fireStoreManager.getUserData().collectAsState(initial = null)
+    val userData = userResult?.getOrNull()
+
 
     TopAppBar(
         navigationIcon = {
@@ -89,7 +78,7 @@ fun MainTopAppBar(
         actions = {
             if (userData?.profilePictureUrl != null) {
                 AsyncImage(
-                    model = userData?.profilePictureUrl,
+                    model = userData.profilePictureUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .size(42.dp)

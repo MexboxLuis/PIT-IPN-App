@@ -7,7 +7,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import androidx.compose.ui.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -42,6 +41,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AddBox
+import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
@@ -50,10 +50,14 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.FilterListOff
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NoBackpack
+import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -86,6 +90,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -100,37 +105,37 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.example.pitapp.R
-import com.example.pitapp.ui.shared.components.BackScaffold
-import com.example.pitapp.ui.features.home.components.CreateClassSheet
-import com.example.pitapp.ui.shared.components.EmptyState
-import com.example.pitapp.ui.features.home.components.TutorScaffold
-import com.example.pitapp.ui.features.classes.components.SortOrder
 import com.example.pitapp.datasource.AuthManager
 import com.example.pitapp.datasource.FireStoreManager
-import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.Calendar
 import com.example.pitapp.model.SavedClass
 import com.example.pitapp.model.SavedStudent
 import com.example.pitapp.ui.features.classes.components.InstantClassCard
+import com.example.pitapp.ui.features.classes.components.SortOrder
 import com.example.pitapp.ui.features.classes.components.StudentRow
+import com.example.pitapp.ui.features.home.components.CreateClassSheet
+import com.example.pitapp.ui.features.home.components.TutorScaffold
+import com.example.pitapp.ui.shared.components.BackScaffold
+import com.example.pitapp.ui.shared.components.EmptyState
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.io.File
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
+import java.util.Calendar
+import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.sin
 
 enum class TimeFilter { NONE, WEEK, MONTH, YEAR }
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen4Tutor(
@@ -154,6 +159,7 @@ fun HomeScreen4Tutor(
     val pastStudentsByClassId =
         remember { mutableStateOf<Map<String, List<SavedStudent>>>(emptyMap()) }
 
+    val context = LocalContext.current
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.75f,
         targetValue = 0.3f,
@@ -490,20 +496,56 @@ fun HomeScreen4Tutor(
                         .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        "Filtrar Asistencias Por ${selectedTimeFilter.name} - ${
-                            selectedDate.format(
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = selectedDate.format(
                                 DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                            )
-                        }",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                            ),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        val filtersAreActive by remember(selectedTimeFilter, selectedDate) {
+                            derivedStateOf {
+                                selectedTimeFilter != TimeFilter.NONE ||
+                                        (selectedTimeFilter != TimeFilter.NONE && selectedDate != LocalDate.now())
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        if (filtersAreActive) {
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        selectedTimeFilter = TimeFilter.NONE
+                                        selectedDate = LocalDate.now()
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.FilterListOff,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                        val timeFilterOptions = TimeFilter.entries.toList()
+                        val timeFilterOptions = listOf(
+                            TimeFilter.WEEK to Icons.Default.DateRange,
+                            TimeFilter.MONTH to Icons.Default.CalendarToday,
+                            TimeFilter.YEAR to Icons.Default.Event,
+                            TimeFilter.NONE to Icons.Default.AllInbox
+                        )
 
-                        timeFilterOptions.forEachIndexed { index, filterType ->
+                        timeFilterOptions.forEachIndexed { index, (filterType, icon) ->
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(
                                     index = index,
@@ -512,19 +554,27 @@ fun HomeScreen4Tutor(
                                 onClick = {
                                     selectedTimeFilter = filterType
                                 },
-                                selected = (filterType == selectedTimeFilter)
-                            ) {
-                                Text(
-                                    when (filterType) {
-                                        TimeFilter.WEEK -> "Semana"
-                                        TimeFilter.MONTH -> "Mes"
-                                        TimeFilter.YEAR -> "Año"
-                                        TimeFilter.NONE -> "Todos"
-                                    }
-                                )
-                            }
+                                selected = (filterType == selectedTimeFilter),
+                                icon = {
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = null
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = when (filterType) {
+                                            TimeFilter.WEEK -> stringResource(id = R.string.filter_week)
+                                            TimeFilter.MONTH -> stringResource(id = R.string.filter_month)
+                                            TimeFilter.YEAR -> stringResource(id = R.string.filter_year)
+                                            TimeFilter.NONE -> stringResource(id = R.string.filter_all)
+                                        }
+                                    )
+                                }
+                            )
                         }
                     }
+
 
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -538,16 +588,28 @@ fun HomeScreen4Tutor(
 
                     AttendanceStatsPieChart(consolidatedStudentsForPeriod)
 
-                    Spacer(modifier = Modifier.height(24.dp))
-                    OutlinedButton(
-                        onClick = {
-                            scope.launch {
-                                selectedTimeFilter = TimeFilter.NONE
-                                selectedDate = LocalDate.now()
-                            }
+
+                    if (consolidatedStudentsForPeriod.isNotEmpty()) {
+                        OutlinedButton(
+                            onClick = {
+                                val classesWithStudents =
+                                    filteredSavedInstantClasses.value.mapNotNull { (classId, savedClass) ->
+                                        val studs = pastStudentsByClassId.value[classId].orEmpty()
+                                        if (studs.isNotEmpty()) savedClass to studs else null
+                                    }
+
+                                val csv = generateStudentsCsv(classesWithStudents, context)
+                                shareFile(context, csv)
+                                saveFileToDownloads(context, csv, "text/csv")
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = stringResource(id = R.string.download_csv_summary))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                            Icon(Icons.Default.Downloading, null)
                         }
-                    ) {
-                        Text(text = "Eliminar Filtros")
+
+                        Spacer(Modifier.height(16.dp))
                     }
 
                 }
@@ -577,26 +639,30 @@ fun PeriodSelector(
 ) {
     val locale = Locale.getDefault()
 
-    val weekFormatter = remember { DateTimeFormatter.ofPattern("'Semana del' dd MMM", locale) }
+    val context = LocalContext.current
+    val weekFormatter = remember { DateTimeFormatter.ofPattern("dd MMM", locale) }
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM yyyy", locale) }
     val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy", locale) }
 
     val currentPeriodText = remember(selectedFilterType, currentSelectedDate) {
         when (selectedFilterType) {
             TimeFilter.WEEK -> {
-                val firstDayOfWeek =
-                    WeekFields.of(locale).firstDayOfWeek
+                val firstDayOfWeek = WeekFields.of(locale).firstDayOfWeek
                 val startOfWeek = currentSelectedDate.with(firstDayOfWeek)
-                startOfWeek.format(weekFormatter)
+                val formattedDate = startOfWeek.format(weekFormatter)
+                val prefix = context.getString(R.string.week_prefix)
+                "$prefix $formattedDate"
             }
 
-            TimeFilter.MONTH -> YearMonth.from(currentSelectedDate).format(monthFormatter)
+            TimeFilter.MONTH -> YearMonth.from(currentSelectedDate)
+                .format(monthFormatter)
                 .replaceFirstChar { it.titlecase(locale) }
 
             TimeFilter.YEAR -> currentSelectedDate.format(yearFormatter)
             TimeFilter.NONE -> ""
         }
     }
+
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -635,7 +701,8 @@ fun PeriodSelector(
                     TimeFilter.NONE -> currentSelectedDate
                 }
                 onDateChange(newDate)
-            }) {
+            }
+        ) {
             Icon(imageVector = Icons.Filled.ChevronRight, contentDescription = null)
         }
     }
@@ -651,8 +718,25 @@ fun InstantClassSummaryScreen(
 ) {
     val savedClass = remember { mutableStateOf<SavedClass?>(null) }
     val students = remember { mutableStateOf<List<SavedStudent>>(emptyList()) }
+    val userEmail = authManager.getUserEmail() ?: ""
     val isLoading = remember { mutableStateOf(true) }
     val context = LocalContext.current
+
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredStudents = remember(searchQuery, students.value) {
+        if (searchQuery.isBlank()) {
+            students.value
+        } else {
+            val query = searchQuery.trim().lowercase()
+            students.value.filter { student ->
+                student.name.lowercase().contains(query) ||
+                        student.email.lowercase().contains(query) ||
+                        student.studentId.lowercase().contains(query) ||
+                        student.academicProgram.lowercase().contains(query)
+            }
+        }
+    }
 
     LaunchedEffect(classId) {
         isLoading.value = true
@@ -690,7 +774,7 @@ fun InstantClassSummaryScreen(
     BackScaffold(
         navController = navController,
         authManager = authManager,
-        topBarTitle = "Detalles de la Clase"
+        topBarTitle = stringResource(id = R.string.instant_class_summary),
     ) {
 
         when {
@@ -714,12 +798,20 @@ fun InstantClassSummaryScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item {
-                        ClassSummaryCard(savedClass = currentClass, enabled = true, onClick = {
-                            val csvFile =
-                                generateStudentsCsv(currentClass, currentStudents, context)
-                            shareFile(context, csvFile)
-                            saveFileToDownloads(context, csvFile, "text/csv")
-                        })
+                        ClassSummaryCard(
+                            userEmail = userEmail,
+                            savedClass = currentClass,
+                            enabled = true,
+                            onClick = {
+                                val csvFile =
+                                    generateStudentsCsv(
+                                        listOf(currentClass to currentStudents),
+                                        context
+                                    )
+                                shareFile(context, csvFile)
+                                saveFileToDownloads(context, csvFile, "text/csv")
+                            }
+                        )
                     }
 
                     if (currentStudents.isNotEmpty()) {
@@ -727,31 +819,54 @@ fun InstantClassSummaryScreen(
                             AttendanceStatsCard(students = currentStudents)
                         }
                     }
+
                     item {
-                        Text(
-                            text = "Alumnos Inscritos (${currentStudents.size})",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(top = 8.dp)
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            label = {
+                                Text(
+                                    text = stringResource(
+                                        id = R.string.search_students,
+                                        filteredStudents.size
+                                    )
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            singleLine = true,
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+                                        if (searchQuery.isNotEmpty()) searchQuery = ""
+                                    }
+                                ) {
+                                    if (searchQuery.isNotEmpty())
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = null
+                                        )
+                                    else
+                                        Icon(
+                                            imageVector = Icons.Default.Search,
+                                            contentDescription = null
+                                        )
+                                }
+
+                            }
                         )
                     }
 
-                    if (currentStudents.isEmpty()) {
+                    if (filteredStudents.isEmpty()) {
                         item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 32.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "No hay alumnos inscritos en esta clase.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            EmptyState(
+                                icon = Icons.Default.PersonSearch,
+                                message = stringResource(id = R.string.no_students_found)
+                            )
                         }
                     } else {
-                        items(currentStudents) { student ->
+                        items(filteredStudents) { student ->
                             StudentRow(student = student)
                         }
                     }
@@ -770,7 +885,7 @@ fun InstantClassSummaryScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No se encontró información para esta clase.",
+                        text = stringResource(id = R.string.no_class_info),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -781,6 +896,7 @@ fun InstantClassSummaryScreen(
 
 @Composable
 fun ClassSummaryCard(
+    userEmail: String,
     savedClass: SavedClass,
     enabled: Boolean,
     onClick: () -> Unit
@@ -788,7 +904,7 @@ fun ClassSummaryCard(
 
     val formattedDateTime = remember(savedClass.date) {
         try {
-            val sdf = SimpleDateFormat("HH:mm dd-MMM-yyyy", Locale.getDefault())
+            val sdf = SimpleDateFormat("HH:mm 'hr \t' dd/MMM/yyyy", Locale.getDefault())
             sdf.format(savedClass.date.toDate())
         } catch (_: Exception) {
             savedClass.date.toDate().toString()
@@ -821,25 +937,26 @@ fun ClassSummaryCard(
 
             HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
 
+            if (savedClass.tutorEmail != userEmail)
+                DetailSummaryCardRow(
+                    icon = Icons.Default.Email,
+                    label = stringResource(id = R.string.tutor),
+                    value = savedClass.tutorEmail
+                )
             DetailSummaryCardRow(
-                icon = Icons.Default.Email,
-                label = "Tutor",
-                value = savedClass.tutorEmail
+                icon = Icons.Default.CalendarToday,
+                label = stringResource(id = R.string.date),
+                value = formattedDateTime
             )
             DetailSummaryCardRow(
                 icon = Icons.Default.LocationOn,
-                label = "Salón",
+                label = stringResource(id = R.string.classroom),
                 value = savedClass.classroom
             )
             DetailSummaryCardRow(
                 icon = Icons.AutoMirrored.Filled.MenuBook,
-                label = "Tópico",
+                label = stringResource(id = R.string.topic),
                 value = savedClass.topic
-            )
-            DetailSummaryCardRow(
-                icon = Icons.Default.CalendarToday,
-                label = "Fecha",
-                value = formattedDateTime
             )
             OutlinedButton(
                 onClick = onClick,
@@ -847,7 +964,10 @@ fun ClassSummaryCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
-                Text("Descargar lista de asistencia", textAlign = TextAlign.Center)
+                Text(
+                    text = stringResource(id = R.string.download_attendance_list),
+                    textAlign = TextAlign.Center
+                )
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                 Icon(imageVector = Icons.Default.Downloading, contentDescription = null)
             }
@@ -901,6 +1021,9 @@ fun AttendanceStatsCard(students: List<SavedStudent>) {
 
 @Composable
 fun AttendanceStatsPieChart(students: List<SavedStudent>) {
+
+    val context = LocalContext.current
+
     if (students.isEmpty()) {
         return
     }
@@ -910,14 +1033,12 @@ fun AttendanceStatsPieChart(students: List<SavedStudent>) {
         val regCount = students.count { it.regular }
         val noRegCount = total - regCount
         val progMap = students
-            .groupBy { it.academicProgram.takeIf { it.isNotBlank() } ?: "Desconocido" }
+            .groupBy { it.academicProgram.takeIf { it.isNotBlank() } ?: "" }
             .mapValues { it.value.size }
         Triple(regCount, noRegCount, progMap)
     }
 
     var selectedView by remember { mutableStateOf(StatsViewType.REGULARITY) }
-
-
 
     Column(
         modifier = Modifier
@@ -925,7 +1046,7 @@ fun AttendanceStatsPieChart(students: List<SavedStudent>) {
             .padding(16.dp)
     ) {
         Text(
-            text = "Estadísticas de Asistencia",
+            text = stringResource(id = R.string.attendance_statistics),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
@@ -945,11 +1066,11 @@ fun AttendanceStatsPieChart(students: List<SavedStudent>) {
                 StatsViewType.REGULARITY -> {
                     listOfNotNull(
                         if (regularCount > 0) PieEntry(
-                            "Regulares",
+                            context.getString(R.string.regular_students),
                             regularCount.toFloat()
                         ) else null,
                         if (irregularCount > 0) PieEntry(
-                            "Irregulares",
+                            context.getString(R.string.irregular_students),
                             irregularCount.toFloat()
                         ) else null
                     )
@@ -991,7 +1112,7 @@ fun AttendanceStatsPieChart(students: List<SavedStudent>) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "No hay datos para mostrar en esta vista.",
+                    text = stringResource(id = R.string.no_data_to_display),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1040,7 +1161,15 @@ fun SegmentedButtonRow(
                 ),
                 onClick = { onSelectionChange(viewType) },
                 selected = selectedView == viewType,
-                label = { Text(if (viewType == StatsViewType.REGULARITY) "Status" else "Programa") }
+                label = {
+                    Text(
+                        text =
+                            if (viewType == StatsViewType.REGULARITY)
+                                stringResource(R.string.label_status)
+                            else
+                                stringResource(R.string.label_program)
+                    )
+                }
             )
         }
     }
@@ -1189,77 +1318,72 @@ fun PieChart(entries: List<PieEntry>, colors: List<Color>, highlightedIndex: Int
 
 
 fun generateStudentsCsv(
-    savedClass: SavedClass,
-    students: List<SavedStudent>,
+    classesWithStudents: List<Pair<SavedClass, List<SavedStudent>>>,
     context: Context
 ): File {
 
-    val dateFormat = SimpleDateFormat("yyyy_MM_dd_HH-mm", Locale.getDefault())
-    val formattedDate = dateFormat.format(savedClass.date.toDate())
+    require(classesWithStudents.isNotEmpty()) { context.getString(R.string.error_no_classes_to_export) }
 
-    val fileName = "asistenca_${savedClass.tutorEmail.substringBefore("@")}_${
-        savedClass.subject.substringBefore(" ")
-    }_${savedClass.topic.substringBefore(" ")}_$formattedDate.csv"
+    val firstTutor = classesWithStudents.first().first.tutorEmail
+    require(classesWithStudents.all { it.first.tutorEmail == firstTutor }) {
+        context.getString(R.string.error_different_tutors)
+    }
 
+    val timeStamp = SimpleDateFormat("yyyy_MM_dd_HH-mm", Locale.getDefault())
+        .format(System.currentTimeMillis())
+
+    @Suppress("SpellCheckingInspection")
+    val fileName = "asistencia_${firstTutor.substringBefore("@")}_$timeStamp.csv"
     val file = File(context.filesDir, fileName)
 
-    csvWriter {
-        charset = StandardCharsets.UTF_8.name()
-
-    }.open(file, append = false) {
-
-        writeRow(
-            listOf(
-                "Fecha",
-                "Nombre del alumno asesorado",
-                "Boleta",
-                "Horario",
-                "Tema Visto",
-                "Programa Educativo",
-                "Correo Electrónico",
-                "Regular o irregular"
-            )
-        )
-
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val timeFormat = SimpleDateFormat("HH:00", Locale.getDefault())
-        val date = dateFormat.format(savedClass.date.toDate())
-
-
-        for (student in students) {
-            val startTime = try {
-                timeFormat.format(savedClass.date.toDate())
-            } catch (_: Exception) {
-                context.getString(R.string.unknown_error)
-            }
-
-            val endTime = try {
-                val calendar = Calendar.getInstance().apply {
-                    time = savedClass.date.toDate()
-                    add(Calendar.HOUR_OF_DAY, 1)
-                }
-                timeFormat.format(calendar.time)
-            } catch (_: Exception) {
-                context.getString(R.string.unknown_error)
-            }
-
-
-            val schedule = "$startTime - $endTime"
-
+    csvWriter { charset = StandardCharsets.UTF_8.name() }
+        .open(file, append = false) {
+            @Suppress("SpellCheckingInspection")
             writeRow(
                 listOf(
-                    date,
-                    student.name,
-                    student.studentId,
-                    schedule,
-                    savedClass.topic,
-                    student.academicProgram,
-                    student.email,
-                    if (student.regular) "Regular" else "Irregular"
+                    "Fecha",
+                    "Nombre del alumno asesorado",
+                    "Boleta",
+                    "Horario",
+                    "Tema Visto",
+                    "Programa Educativo",
+                    "Correo Electrónico",
+                    "Regular o irregular"
                 )
             )
+
+            val dateFmt = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val hourFmt = SimpleDateFormat("HH:00", Locale.getDefault())
+
+            for ((savedClass, students) in classesWithStudents) {
+                val classDate = savedClass.date.toDate()
+                val dateStr = dateFmt.format(classDate)
+
+                val startHour = hourFmt.format(classDate)
+                val endHour = hourFmt.format(
+                    Calendar.getInstance().apply {
+                        time = classDate; add(Calendar.HOUR_OF_DAY, 1)
+                    }.time
+                )
+                val schedule = "$startHour - $endHour"
+
+                for (student in students) {
+                    writeRow(
+                        listOf(
+                            dateStr,
+                            student.name,
+                            student.studentId,
+                            schedule,
+                            savedClass.topic,
+                            student.academicProgram,
+                            student.email,
+                            if (student.regular) context.getString(R.string.student_regular)
+                            else context.getString(R.string.student_irregular)
+                        )
+                    )
+                }
+            }
         }
-    }
     return file
 }
 
@@ -1276,7 +1400,7 @@ fun shareFile(context: Context, file: File) {
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    context.startActivity(Intent.createChooser(intent, "Compartir CSV"))
+    context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_csv)))
 }
 
 
@@ -1315,16 +1439,16 @@ private fun notifyDownloadComplete(context: Context, uri: Uri) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val channel = NotificationChannel(
             channelId,
-            "Descargas de la app",
+            context.getString(R.string.downloads_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Notificaciones de archivos descargados"
+            description = context.getString(R.string.downloads_channel_description)
         }
         manager.createNotificationChannel(channel)
     }
 
     val fileName = getFileNameFromUri(context, uri)
-        ?: "archivo descargado"
+        ?: context.getString(R.string.default_downloaded_file_name)
     val userFriendlyPath =
         "${Environment.DIRECTORY_DOWNLOADS}/$fileName"
 
@@ -1339,11 +1463,11 @@ private fun notifyDownloadComplete(context: Context, uri: Uri) {
 
     val notification = NotificationCompat.Builder(context, channelId)
         .setSmallIcon(R.drawable.pit_logo)
-        .setContentTitle("🎉 Descarga completada")
-        .setContentText("Archivo ${fileName}")
+        .setContentTitle(context.getString(R.string.download_complete_title))
+        .setContentText(context.getString(R.string.download_complete_text, fileName))
         .setStyle(
             NotificationCompat.BigTextStyle()
-                .bigText("Ruta: ${userFriendlyPath}\n\nToca para abrir o comparte desde aquí.")
+                .bigText(context.getString(R.string.download_complete_big_text, userFriendlyPath))
         )
         .setColor(ContextCompat.getColor(context, R.color.white))
         .setColorized(true)
@@ -1352,7 +1476,7 @@ private fun notifyDownloadComplete(context: Context, uri: Uri) {
         .setContentIntent(pi)
         .addAction(
             R.drawable.pit_logo,
-            "Compartir",
+            context.getString(R.string.share_file_action),
             PendingIntent.getActivity(
                 context, 1,
                 Intent.createChooser(
@@ -1362,7 +1486,7 @@ private fun notifyDownloadComplete(context: Context, uri: Uri) {
                         type = context.contentResolver.getType(uri)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     },
-                    "Compartir archivo"
+                    context.getString(R.string.share_file_action)
                 ),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )

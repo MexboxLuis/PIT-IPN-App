@@ -34,6 +34,8 @@
     <string name="classroom">Classroom</string>
     <string name="classroom_card_title_prefix">Classroom %d</string>
     <string name="email">Email</string>
+    <string name="phone_number">Phone number (10 digits)</string>
+    <string name="student_id">Student ID</string>
     <string name="academic_program">Academic Program</string>
 
     <!--        Screens     -->
@@ -63,7 +65,7 @@
     <string name="yes_log_out">Yes, I want to</string>
     <string name="role_teacher">I am teacher</string>
     <string name="role_student">I am student</string>
-    <string name="phone_number">Phone number (10 digits)</string>
+
 
 
     <!--        Profile -->
@@ -71,6 +73,14 @@
     <string name="edit_data">Edit profile data</string>
     <string name="add_pic">Add a picture</string>
     <string name="change_pic">Change picture</string>
+    <string name="student">Student</string>
+    <string name="teacher">Teacher</string>
+    <string name="error_phone_digits">The phone number must be 10 digits</string>
+    <string name="success_profile_saved">Profile data saved successfully</string>
+    <string name="no_user_data">No user data found.</string>
+    <string name="error_loading_user">Error loading user data: %1$s</string>
+
+
 
     <!--        Home     -->
     <string name="headline_sheet">Make a class for your students.</string>
@@ -95,6 +105,37 @@
     <string name="students_subtitle">Manage all student profiles and information</string>
     <string name="search_section">Search in sections</string>
     <string name="no_filtered_section">We do not have that section yet.</string>
+    <string name="filter_week">Week</string>
+    <string name="filter_month">Month</string>
+    <string name="filter_year">Year</string>
+    <string name="filter_all">All</string>
+    <string name="week_prefix">Week of</string>
+    <string name="download_csv_summary">Download CSV summary</string>
+
+    <!--    temporal mexbox del futuro, esto se acomodara cuando la termines -->
+    <string name="instant_class_summary">Class Summary</string>
+    <string name="search_students">Enrolled Students (%1$d)</string>
+    <string name="no_students_found">No students found matching that criteria.</string>
+    <string name="no_class_info">No information found for this class.</string>
+    <string name="tutor">Tutor</string>
+    <string name="date">Date</string>
+    <string name="download_attendance_list">Download attendance list</string>
+    <string name="attendance_statistics">Attendance Statistics</string>
+    <string name="regular_students">Regular</string>
+    <string name="irregular_students">Irregular</string>
+    <string name="no_data_to_display">No data to display in this view.</string>
+    <string name="label_status">Status</string>
+    <string name="label_program">Program</string>
+    <string name="error_no_classes_to_export">There are no classes to export.</string>
+    <string name="error_different_tutors">The classes belong to different tutors; consolidation is not possible.</string>
+    <string name="share_csv">Share CSV</string>
+    <string name="downloads_channel_name">App Downloads</string>
+    <string name="downloads_channel_description">Notifications for downloaded files</string>
+    <string name="download_complete_title">🎉 Download complete</string>
+    <string name="download_complete_text">File %1$s</string>
+    <string name="download_complete_big_text">Path: %1$s\n\nTap to open or share from here.</string>
+    <string name="share_file_action">Share</string>
+    <string name="default_downloaded_file_name">Downloaded file</string>
 
 
     <!--      Permissions       -->
@@ -112,6 +153,8 @@
     <string name="search_by_email">Search by email</string>
     <string name="error_loading_tutors">Error loading tutors: %1$s</string>
     <string name="no_tutors_found">No tutors found.</string>
+
+
 
     <!--        Classes     -->
     <string name="tutor_classes_title">Tutors\' Classes</string>
@@ -152,7 +195,6 @@
     <string name="network_error">Network error. Please try again.</string>
 <!--    add student form-->
     <string name="full_name">Full Name</string>
-    <string name="student_id">Student ID</string>
     <string name="add_student">Add Student</string>
     <string name="student_id_prefix">ID: %1$s</string>
     <!--    class instant private components-->

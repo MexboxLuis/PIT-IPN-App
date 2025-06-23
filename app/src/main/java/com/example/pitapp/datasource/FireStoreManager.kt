@@ -13,6 +13,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -62,33 +65,39 @@ class FireStoreManager(
         }
     }
 
-    fun getUserData(onDataChanged: (Result<UserData?>) -> Unit) {
+
+
+    fun getUserData(): Flow<Result<UserData?>> {
         val email = authManager.getUserEmail()
 
-        if (email == null) {
-            onDataChanged(Result.failure(Exception("User is not logged in or email not available.")))
-            return
-        }
-
-        val documentReference = firestore.collection("saved_users").document(email)
-
-        documentReference.addSnapshotListener { documentSnapshot, error ->
-            if (error != null) {
-                onDataChanged(Result.failure(Exception("Error retrieving user data: ${error.localizedMessage}")))
-                return@addSnapshotListener
+        return callbackFlow {
+            if (email == null) {
+                trySend(Result.failure(Exception("User is not logged in or email not available.")))
+                close()
+                return@callbackFlow
             }
 
-            if (documentSnapshot != null && documentSnapshot.exists()) {
-                val userData = UserData(
-                    email = documentSnapshot.getString("email") ?: "",
-                    name = documentSnapshot.getString("name") ?: "",
-                    surname = documentSnapshot.getString("surname") ?: "",
-                    profilePictureUrl = documentSnapshot.getString("profilePictureUrl"),
-                    permission = documentSnapshot.getLong("permission")?.toInt() ?: 0
-                )
-                onDataChanged(Result.success(userData))
-            } else {
-                onDataChanged(Result.failure(Exception("No user data found for this email.")))
+            val documentReference = firestore.collection("saved_users").document(email)
+            val registration = documentReference.addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Result.failure(Exception("Error retrieving user data: ${error.localizedMessage}")))
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    try {
+                        val userDataObject = snapshot.toObject(UserData::class.java)
+                        trySend(Result.success(userDataObject))
+                    } catch (e: Exception) {
+                        trySend(Result.failure(Exception("Error parsing user data: ${e.localizedMessage}")))
+                    }
+                } else {
+                    trySend(Result.success(null))
+                }
+            }
+            awaitClose {
+                registration.remove()
             }
         }
     }
@@ -96,27 +105,23 @@ class FireStoreManager(
     suspend fun updateUserData(
         name: String,
         surname: String,
-        newImageUri: Uri?
+        newImageUri: Uri? = null,
+        phoneNumber: String? = null,
+        setProfilePictureToNull: Boolean = false // <-- Nuevo parámetro
     ): Result<Unit> {
         val email = authManager.getUserEmail()
             ?: return Result.failure(Exception("User is not logged in or email not available."))
 
         val storageRef = storage.reference
 
-        suspend fun updateFireStore(profilePictureUrl: String?) {
-            val userUpdates = if (profilePictureUrl != null) {
-                mapOf(
-                    "name" to name,
-                    "surname" to surname,
-                    "profilePictureUrl" to profilePictureUrl
-                )
-            } else {
-                mapOf(
-                    "name" to name,
-                    "surname" to surname,
-                    "profilePictureUrl" to null
-                )
-            }
+        // Función interna para actualizar Firestore (sin cambios)
+        suspend fun updateFireStoreInManager(profilePictureUrlForFirestore: String?) { // Renombrada para evitar confusión con la de ProfileScreen
+            val userUpdates = mutableMapOf<String, Any?>(
+                "name" to name,
+                "surname" to surname,
+                "phoneNumber" to phoneNumber
+            )
+            userUpdates["profilePictureUrl"] = profilePictureUrlForFirestore // Usar el parámetro
 
             try {
                 firestore.collection("saved_users")
@@ -124,10 +129,11 @@ class FireStoreManager(
                     .update(userUpdates)
                     .await()
             } catch (e: Exception) {
-                throw Exception(e.localizedMessage)
+                throw Exception("Error updating Firestore: ${e.localizedMessage}")
             }
         }
 
+        // Función interna para borrar imagen antigua del storage (sin cambios)
         suspend fun deleteOldImageIfNeeded(oldUrl: String?) {
             oldUrl?.let {
                 val oldImageRef = storage.getReferenceFromUrl(it)
@@ -135,10 +141,12 @@ class FireStoreManager(
                     oldImageRef.delete().await()
                 } catch (e: StorageException) {
                     if (e.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) {
+                        // Si el error no es "no encontrado", relanzar. Si es "no encontrado", está bien.
                         throw e
                     } else {
 
                     }
+                    // Si es ERROR_OBJECT_NOT_FOUND, no hacemos nada, ya no existe.
                 }
             }
         }
@@ -147,24 +155,28 @@ class FireStoreManager(
             val currentUserData = firestore.collection("saved_users").document(email).get().await()
             val oldProfilePictureUrl = currentUserData.getString("profilePictureUrl")
 
-            val newProfilePictureUrl: String? = when {
-                newImageUri != null -> {
-                    deleteOldImageIfNeeded(oldProfilePictureUrl)
+            val finalProfilePictureUrl: String? = when {
+                setProfilePictureToNull -> { // Caso 1: Usuario quiere borrar la imagen
+                    deleteOldImageIfNeeded(oldProfilePictureUrl) // Borrar del storage
+                    null // URL para Firestore será null
+                }
+                newImageUri != null -> { // Caso 2: Usuario sube una nueva imagen
+                    deleteOldImageIfNeeded(oldProfilePictureUrl) // Borrar la antigua del storage
                     val newImageRef = storageRef.child("$email/images/${UUID.randomUUID()}.jpg")
                     newImageRef.putFile(newImageUri).await()
-                    newImageRef.downloadUrl.await().toString()
+                    newImageRef.downloadUrl.await().toString() // Nueva URL para Firestore
                 }
-
-                else -> null
+                else -> oldProfilePictureUrl // Caso 3: No hay cambios en la imagen, mantener la antigua
             }
 
-            updateFireStore(newProfilePictureUrl)
+            updateFireStoreInManager(finalProfilePictureUrl) // Actualizar Firestore con la URL decidida
 
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to update user data: ${e.localizedMessage}"))
         }
     }
+
 
     suspend fun deleteImageFromStorage(imageUrl: String?) {
         imageUrl?.let {
