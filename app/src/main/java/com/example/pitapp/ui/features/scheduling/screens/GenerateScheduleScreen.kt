@@ -63,6 +63,7 @@ fun GenerateScheduleScreen(
     fireStoreManager: FireStoreManager
 ) {
     val tutorEmail = authManager.getUserEmail() ?: ""
+    val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
 
     var startYearState by remember { mutableStateOf(currentYear.toString()) }
@@ -139,24 +140,23 @@ fun GenerateScheduleScreen(
         }
 
         val startMonth = startMonthState.toIntOrNull()
+        val startYear = startYearState.toIntOrNull()
+
         if (startMonth == null) {
             startMonthError = true
             startMonthErrorText = context.getString(R.string.invalid_months)
+            isValid = false
+        } else if (startYear != null && (
+                    startYear < currentYear || (startYear == currentYear && startMonth < currentMonth))
+        ) {
+            startMonthError = true
+            startMonthErrorText = context.getString(R.string.start_month_before_current)
             isValid = false
         } else {
             startMonthError = false
             startMonthErrorText = ""
         }
 
-        val startYear = startYearState.toIntOrNull()
-        if (startYear == null || startYear < currentYear) {
-            startYearError = true
-            startYearErrorText = context.getString(R.string.invalid_year)
-            isValid = false
-        } else {
-            startYearError = false
-            startYearErrorText = ""
-        }
 
         val endMonth = endMonthState.toIntOrNull()
         if (endMonth == null) {

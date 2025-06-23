@@ -107,21 +107,20 @@ class FireStoreManager(
         surname: String,
         newImageUri: Uri? = null,
         phoneNumber: String? = null,
-        setProfilePictureToNull: Boolean = false // <-- Nuevo parámetro
+        setProfilePictureToNull: Boolean = false
     ): Result<Unit> {
         val email = authManager.getUserEmail()
             ?: return Result.failure(Exception("User is not logged in or email not available."))
 
         val storageRef = storage.reference
 
-        // Función interna para actualizar Firestore (sin cambios)
-        suspend fun updateFireStoreInManager(profilePictureUrlForFirestore: String?) { // Renombrada para evitar confusión con la de ProfileScreen
+        suspend fun updateFireStoreInManager(profilePictureUrlForFireStore: String?) {
             val userUpdates = mutableMapOf<String, Any?>(
                 "name" to name,
                 "surname" to surname,
                 "phoneNumber" to phoneNumber
             )
-            userUpdates["profilePictureUrl"] = profilePictureUrlForFirestore // Usar el parámetro
+            userUpdates["profilePictureUrl"] = profilePictureUrlForFireStore
 
             try {
                 firestore.collection("saved_users")
@@ -129,11 +128,10 @@ class FireStoreManager(
                     .update(userUpdates)
                     .await()
             } catch (e: Exception) {
-                throw Exception("Error updating Firestore: ${e.localizedMessage}")
+                throw Exception("Error updating FireStore: ${e.localizedMessage}")
             }
         }
 
-        // Función interna para borrar imagen antigua del storage (sin cambios)
         suspend fun deleteOldImageIfNeeded(oldUrl: String?) {
             oldUrl?.let {
                 val oldImageRef = storage.getReferenceFromUrl(it)
@@ -141,12 +139,10 @@ class FireStoreManager(
                     oldImageRef.delete().await()
                 } catch (e: StorageException) {
                     if (e.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) {
-                        // Si el error no es "no encontrado", relanzar. Si es "no encontrado", está bien.
                         throw e
                     } else {
 
                     }
-                    // Si es ERROR_OBJECT_NOT_FOUND, no hacemos nada, ya no existe.
                 }
             }
         }
@@ -156,20 +152,20 @@ class FireStoreManager(
             val oldProfilePictureUrl = currentUserData.getString("profilePictureUrl")
 
             val finalProfilePictureUrl: String? = when {
-                setProfilePictureToNull -> { // Caso 1: Usuario quiere borrar la imagen
-                    deleteOldImageIfNeeded(oldProfilePictureUrl) // Borrar del storage
-                    null // URL para Firestore será null
+                setProfilePictureToNull -> {
+                    deleteOldImageIfNeeded(oldProfilePictureUrl)
+                    null
                 }
-                newImageUri != null -> { // Caso 2: Usuario sube una nueva imagen
-                    deleteOldImageIfNeeded(oldProfilePictureUrl) // Borrar la antigua del storage
+                newImageUri != null -> {
+                    deleteOldImageIfNeeded(oldProfilePictureUrl)
                     val newImageRef = storageRef.child("$email/images/${UUID.randomUUID()}.jpg")
                     newImageRef.putFile(newImageUri).await()
-                    newImageRef.downloadUrl.await().toString() // Nueva URL para Firestore
+                    newImageRef.downloadUrl.await().toString()
                 }
-                else -> oldProfilePictureUrl // Caso 3: No hay cambios en la imagen, mantener la antigua
+                else -> oldProfilePictureUrl
             }
 
-            updateFireStoreInManager(finalProfilePictureUrl) // Actualizar Firestore con la URL decidida
+            updateFireStoreInManager(finalProfilePictureUrl)
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -177,21 +173,6 @@ class FireStoreManager(
         }
     }
 
-
-    suspend fun deleteImageFromStorage(imageUrl: String?) {
-        imageUrl?.let {
-            try {
-                val imageRef = storage.getReferenceFromUrl(it)
-                imageRef.delete().await()
-            } catch (e: StorageException) {
-                if (e.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) {
-                    throw e
-                } else {
-
-                }
-            }
-        }
-    }
 
     fun getAllUsersSnapshot(onResult: (Result<List<UserData>>) -> Unit) {
         firestore.collection("saved_users")
@@ -209,6 +190,19 @@ class FireStoreManager(
                 } else {
                     onResult(Result.success(emptyList()))
                 }
+            }
+    }
+
+    fun getAllTutorsWithPermissionOne(callback: (Result<List<UserData>>) -> Unit) {
+        firestore.collection("saved_users")
+            .whereEqualTo("permission", 1)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val tutors = querySnapshot.documents.mapNotNull { it.toObject(UserData::class.java) }
+                callback(Result.success(tutors))
+            }
+            .addOnFailureListener { exception ->
+                callback(Result.failure(exception))
             }
     }
 
@@ -309,7 +303,6 @@ class FireStoreManager(
         }
     }
 
-
     fun addClassroom(classroom: Classroom, callback: (Result<Unit>) -> Unit) {
         firestore.collection("saved_classrooms")
             .document(classroom.number.toString())
@@ -364,7 +357,6 @@ class FireStoreManager(
                 callback(Result.failure(e))
             }
     }
-
 
     fun getClassrooms(callback: (Result<List<Classroom>>) -> Unit) {
         firestore.collection("saved_classrooms")

@@ -11,7 +11,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import com.example.pitapp.R
 import com.example.pitapp.datasource.FireStoreManager
 
 @Composable
@@ -33,7 +35,7 @@ fun TutorScaffold(
         floatingActionButton = {
             if (onFabClick != null)
                 ExtendedFloatingActionButton(
-                    text = { Text(text = "Resumir Clases") },
+                    text = { Text(text = stringResource(R.string.summarize_classes)) },
                     icon = { Icon(Icons.Filled.AutoGraph, contentDescription = null) },
                     onClick = onFabClick
                 )

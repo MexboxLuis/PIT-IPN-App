@@ -74,6 +74,7 @@
     <string name="add_pic">Añade una foto</string>
     <string name="change_pic">Cambiar foto</string>
     <string name="student">Estudiante</string>
+    <string name="admin">Administrador</string>
     <string name="teacher">Docente</string>
     <string name="error_phone_digits">El número de teléfono debe tener 10 dígitos</string>
     <string name="success_profile_saved">Datos guardados exitosamente</string>
@@ -110,6 +111,7 @@
     <string name="filter_all">Todos</string>
     <string name="week_prefix">Semana del</string>
     <string name="download_csv_summary">Descargar resumen CSV</string>
+    <string name="summarize_classes">Resumir Clases</string>
 
     <string name="instant_class_summary">Resumen de clase</string>
     <string name="search_students">Alumnos inscritos (%1$d)</string>
@@ -134,6 +136,26 @@
     <string name="download_complete_big_text">Ruta: %1$s\n\nToca para abrir o comparte desde aquí.</string>
     <string name="share_file_action">Compartir</string>
     <string name="default_downloaded_file_name">Archivo descargado</string>
+
+    <string name="all_tutor_past_classes">Clases impartidas</string>
+    <string name="search_classes">Buscar clases…</string>
+    <string name="peer_tutoring_tab">Tutoría entre Pares</string>
+    <string name="advisories_tab">Asesorías</string>
+    <string name="no_peer_tutors_with_past_classes">No hay tutorías entre pares con clases pasadas registradas.</string>
+    <string name="no_advisors_with_past_classes">No hay asesorías con clases pasadas registradas.</string>
+    <string name="summarize_button">Resumir</string>
+    <string name="summary_for_tutor">Resumen de %1$s</string>
+    <string name="no_classes_match_filter_for_tutor">Ninguna clase de este tutor coincide con el filtro.</string>
+
+    <string name="unknown_program">Programa Desconocido</string>
+    <string name="view_by_tutor">Tutor</string>
+    <string name="view_by_program">Carrera</string>
+    <string name="no_data_for_selected_view">No hay datos para mostrar en esta vista.</string>
+    <string name="no_peer_tutoring_classes_to_summarize">No hay clases de tutoría entre pares para resumir.</string>
+    <string name="global_summary_peer_tutoring_title">Resumen General</string>
+    <string name="peer_tutoring_summary">Resumen de Tutorías entre Pares</string>
+    <string name="download_global_peer_tutoring_summary">Descargar resumen global de tutoría entre pares</string>
+    <string name="error_no_peer_tutoring_classes_to_export">No hay clases de tutoría entre pares para exportar.</string>
 
 
     <!--      Permissions       -->
@@ -263,6 +285,7 @@
     <string name="invalid_months">Meses inválidos (deben estar entre 1 y 12).</string>
     <string name="start_year">Año de Inicio</string>
     <string name="end_year">Año de Fin</string>
+    <string name="start_month_before_current">El mes de inicio debe ser posterior al mes actual.</string>
     <string name="invalid_year">El año de inicio debe ser mayor o igual al actual</string>
     <string name="start_date_before_end_date">El año/mes de inicio no puede ser posterior al año/mes de fin.</string>
     <string name="select_days_and_time">Selecciona los días y la hora (7–19):</string>

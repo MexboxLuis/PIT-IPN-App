@@ -143,7 +143,11 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = if (isStudent) stringResource(R.string.student) else stringResource(R.string.teacher),
+                        text = when {
+                            isStudent -> stringResource(id = R.string.student)
+                            userData.permission == 2 -> "Admin"
+                            else -> stringResource(id = R.string.tutor)
+                        },
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

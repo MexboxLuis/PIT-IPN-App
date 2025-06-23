@@ -74,6 +74,7 @@
     <string name="add_pic">Add a picture</string>
     <string name="change_pic">Change picture</string>
     <string name="student">Student</string>
+    <string name="admin">Admin</string>
     <string name="teacher">Teacher</string>
     <string name="error_phone_digits">The phone number must be 10 digits</string>
     <string name="success_profile_saved">Profile data saved successfully</string>
@@ -111,6 +112,7 @@
     <string name="filter_all">All</string>
     <string name="week_prefix">Week of</string>
     <string name="download_csv_summary">Download CSV summary</string>
+    <string name="summarize_classes">Summarize Classes</string>
 
     <!--    temporal mexbox del futuro, esto se acomodara cuando la termines -->
     <string name="instant_class_summary">Class Summary</string>
@@ -136,6 +138,27 @@
     <string name="download_complete_big_text">Path: %1$s\n\nTap to open or share from here.</string>
     <string name="share_file_action">Share</string>
     <string name="default_downloaded_file_name">Downloaded file</string>
+
+    <string name="all_tutor_past_classes">Taught Classes</string>
+    <string name="search_classes">Search classes…</string>
+    <string name="peer_tutoring_tab">Peer Tutoring</string>
+    <string name="advisories_tab">Advisories</string>
+    <string name="no_peer_tutors_with_past_classes">No peer tutoring sessions with past classes found.</string>
+    <string name="no_advisors_with_past_classes">No advisories with past classes found.</string>
+    <string name="summarize_button">Summarize</string>
+    <string name="summary_for_tutor">Summary of %1$s</string>
+    <string name="no_classes_match_filter_for_tutor">No classes for this tutor match the filter.</string>
+
+    <string name="unknown_program">Unknown Program</string>
+    <string name="view_by_tutor">Tutor</string>
+    <string name="view_by_program">Career</string>
+    <string name="no_data_for_selected_view">No data available for this view.</string>
+    <string name="no_peer_tutoring_classes_to_summarize">No peer tutoring classes available to summarize.</string>
+    <string name="global_summary_peer_tutoring_title">Global Summary</string>
+    <string name="peer_tutoring_summary">Peer Tutoring Summary</string>
+    <string name="download_global_peer_tutoring_summary">Download global peer tutoring summary</string>
+    <string name="error_no_peer_tutoring_classes_to_export">There are no peer tutoring classes to export.</string>
+
 
 
     <!--      Permissions       -->
@@ -265,6 +288,7 @@
     <string name="invalid_months">Invalid months (must be between 1 and 12).</string>
     <string name="start_year">Start Year</string>
     <string name="end_year">End Year</string>
+    <string name="start_month_before_current">The start month must be after the current month.</string>
     <string name="invalid_year">Start Year must be greater or equal than the current</string>
     <string name="start_date_before_end_date">The start year/month cannot be after the end year/month.</string>
     <string name="select_days_and_time">Select the days and time (07hr–19hr)</string>

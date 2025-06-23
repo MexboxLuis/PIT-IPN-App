@@ -55,6 +55,7 @@ import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FilterListOff
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NoBackpack
 import androidx.compose.material.icons.filled.PersonSearch
@@ -504,7 +505,7 @@ fun HomeScreen4Tutor(
                     ) {
                         Text(
                             text = selectedDate.format(
-                                DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                                DateTimeFormatter.ofPattern("dd/MMM/yyyy")
                             ),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
@@ -853,7 +854,12 @@ fun InstantClassSummaryScreen(
                                             contentDescription = null
                                         )
                                 }
-
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Group,
+                                    contentDescription = null
+                                )
                             }
                         )
                     }
