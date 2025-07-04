@@ -187,7 +187,7 @@ fun RegisterAllDataScreen(
                             imageUri = imageUri,
                             academicProgram = if (selectedRole == UserRole.STUDENT) academicProgram.trim() else null,
                             studentId = if (selectedRole == UserRole.STUDENT) studentId.trim() else null,
-                            phoneNumber = if (selectedRole == UserRole.STUDENT) phoneNumber.trim() else null
+                            phoneNumber = phoneNumber.trim()
                         )
 
                         if (result.isSuccess) {

@@ -145,7 +145,7 @@ fun ProfileScreen(
                     Text(
                         text = when {
                             isStudent -> stringResource(id = R.string.student)
-                            userData.permission == 2 -> "Admin"
+                            userData.permission == 2 -> stringResource(id = R.string.admin)
                             else -> stringResource(id = R.string.tutor)
                         },
                         style = MaterialTheme.typography.labelLarge,

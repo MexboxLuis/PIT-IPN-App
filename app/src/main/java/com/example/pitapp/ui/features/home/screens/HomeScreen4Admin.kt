@@ -67,7 +67,8 @@ fun HomeScreen4Admin(
     onClassroomsClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onCareersClick: () -> Unit,
-    onClassSchedulesClick: () -> Unit
+    onClassSchedulesClick: () -> Unit,
+    onStudentsClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
@@ -76,18 +77,6 @@ fun HomeScreen4Admin(
 
     var searchQuery by remember { mutableStateOf("") }
     val items = listOf(
-        AdminCardData(
-            title = stringResource(id = R.string.permission_requests_title),
-            subtitle = stringResource(id = R.string.permission_requests_subtitle),
-            icon = Icons.Default.Email,
-            onClick = onPermissionRequestsClick
-        ),
-        AdminCardData(
-            title = stringResource(id = R.string.tutors_title),
-            subtitle = stringResource(id = R.string.tutors_subtitle),
-            icon = Icons.Default.CoPresent,
-            onClick = onTutorsClick
-        ),
         AdminCardData(
             title = stringResource(id = R.string.classes_title),
             subtitle = stringResource(id = R.string.classes_subtitle),
@@ -101,10 +90,28 @@ fun HomeScreen4Admin(
             onClick = { onClassroomsClick() }
         ),
         AdminCardData(
+            title = stringResource(id = R.string.class_schedules_title),
+            subtitle = stringResource(id = R.string.class_schedules_subtitle),
+            icon = Icons.Default.Schedule,
+            onClick = { onClassSchedulesClick() }
+        ),
+        AdminCardData(
             title = stringResource(id = R.string.calendar_title),
             subtitle = stringResource(id = R.string.calendar_subtitle),
             icon = Icons.Default.CalendarMonth,
             onClick = { onCalendarClick() }
+        ),
+        AdminCardData(
+            title = stringResource(id = R.string.permission_requests_title),
+            subtitle = stringResource(id = R.string.permission_requests_subtitle),
+            icon = Icons.Default.Email,
+            onClick = onPermissionRequestsClick
+        ),
+        AdminCardData(
+            title = stringResource(id = R.string.tutors_title),
+            subtitle = stringResource(id = R.string.tutors_subtitle),
+            icon = Icons.Default.CoPresent,
+            onClick = onTutorsClick
         ),
         AdminCardData(
             title = stringResource(id = R.string.careers_title),
@@ -112,17 +119,12 @@ fun HomeScreen4Admin(
             icon = Icons.Default.Work,
             onClick = { onCareersClick() }
         ),
-        AdminCardData(
-            title = stringResource(id = R.string.class_schedules_title),
-            subtitle = stringResource(id = R.string.class_schedules_subtitle),
-            icon = Icons.Default.Schedule,
-            onClick = { onClassSchedulesClick() }
-        ),
+
          AdminCardData(
              title = stringResource(id = R.string.students_title),
              subtitle = stringResource(id = R.string.students_subtitle),
              icon = Icons.Default.Person,
-             onClick = {  }
+             onClick = { onStudentsClick() }
          )
 
 

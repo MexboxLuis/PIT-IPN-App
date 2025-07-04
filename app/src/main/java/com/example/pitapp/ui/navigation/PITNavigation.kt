@@ -36,6 +36,7 @@ import com.example.pitapp.ui.features.permissions.screens.TutorsScreen
 import com.example.pitapp.datasource.AuthManager
 import com.example.pitapp.datasource.FireStoreManager
 import com.example.pitapp.datasource.PreferencesManager
+import com.example.pitapp.ui.features.classes.screens.StudentsScreen
 
 
 @Composable
@@ -231,6 +232,14 @@ fun PITNavigation(
 
         composable(route = "startInstantClassScreen") {
             StartInstantClassScreen(
+                navController = navController,
+                authManager = authManager,
+                fireStoreManager = fireStoreManager
+            )
+        }
+
+        composable(route = "studentsScreen"){
+            StudentsScreen(
                 navController = navController,
                 authManager = authManager,
                 fireStoreManager = fireStoreManager

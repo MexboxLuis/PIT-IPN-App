@@ -77,7 +77,8 @@ fun HomeScreen(
                     onClassroomsClick = { navController.navigate("classroomsScreen") },
                     onCalendarClick = { navController.navigate("calendarScreen") },
                     onCareersClick = { navController.navigate("careersScreen") },
-                    onClassSchedulesClick = { navController.navigate("classSchedulesScreen") }
+                    onClassSchedulesClick = { navController.navigate("classSchedulesScreen") },
+                    onStudentsClick = { navController.navigate("studentsScreen") }
                 )
 
                 else -> ErrorScreen()
