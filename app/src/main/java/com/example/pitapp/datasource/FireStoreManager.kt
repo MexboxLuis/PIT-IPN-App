@@ -9,8 +9,6 @@ import com.example.pitapp.model.SavedStudent
 import com.example.pitapp.model.Schedule
 import com.example.pitapp.model.UserData
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
@@ -216,6 +214,18 @@ class FireStoreManager(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception("Error updating the permit: ${e.localizedMessage}"))
+        }
+    }
+
+    suspend fun studentIdExists(studentId: String): Boolean {
+        return try {
+            val querySnapshot = firestore.collection("saved_users")
+                .whereEqualTo("studentId", studentId)
+                .get()
+                .await()
+            !querySnapshot.isEmpty
+        } catch (_: Exception) {
+            false
         }
     }
 
@@ -730,72 +740,6 @@ class FireStoreManager(
             }
             .addOnFailureListener { e -> callback(Result.failure(e)) }
     }
-
-    fun getClassesAttendedByStudentViaCollectionGroup(
-        studentBoleta: String, // Este es el studentId (boleta) del alumno
-        callback: (Result<List<Pair<String, SavedClass>>>) -> Unit // Pair(classDocId, SavedClass)
-    ) {
-        val attendedClassesList = mutableListOf<Pair<String, SavedClass>>()
-        // Usamos un contador para saber cuándo todas las clases han sido recuperadas
-        var classFetchCounter = 0
-        val classDocReferencesToFetch = mutableListOf<DocumentReference>()
-
-        firestore.collectionGroup("students") // Nombre de la subcolección
-            .whereEqualTo(FieldPath.documentId(), studentBoleta) // Filtra por el ID del documento (boleta)
-            .get()
-            .addOnSuccessListener { studentDocsSnapshot ->
-                if (studentDocsSnapshot.isEmpty) {
-                    callback(Result.success(emptyList())) // Estudiante no encontrado en ninguna subcolección 'students'
-                    return@addOnSuccessListener
-                }
-
-                // Obtenemos las referencias a los documentos de las clases padre
-                studentDocsSnapshot.documents.forEach { studentDocInClass ->
-                    // studentDocInClass.reference es la DocumentReference al documento del estudiante en la subcolección.
-                    // studentDocInClass.reference.parent es la DocumentReference a la colección "students".
-                    // studentDocInClass.reference.parent.parent es la DocumentReference al documento de la CLASE.
-                    studentDocInClass.reference.parent.parent?.let { classDocRef ->
-                        classDocReferencesToFetch.add(classDocRef)
-                    }
-                }
-
-                if (classDocReferencesToFetch.isEmpty()) {
-                    callback(Result.success(emptyList()))
-                    return@addOnSuccessListener
-                }
-
-                // Ahora, obtenemos los datos de cada clase
-                classDocReferencesToFetch.forEach { classDocRef ->
-                    classDocRef.get()
-                        .addOnSuccessListener { classDocumentSnapshot ->
-                            val savedClass = classDocumentSnapshot.toObject(SavedClass::class.java)
-                            if (savedClass != null) {
-                                attendedClassesList.add(classDocumentSnapshot.id to savedClass)
-                            }
-                            synchronized(this) {
-                                classFetchCounter++
-                                if (classFetchCounter == classDocReferencesToFetch.size) {
-                                    callback(Result.success(attendedClassesList.sortedByDescending { it.second.date }))
-                                }
-                            }
-                        }
-                        .addOnFailureListener { exception ->
-                            // Manejar error al obtener una clase específica
-                            synchronized(this) {
-                                classFetchCounter++
-                                if (classFetchCounter == classDocReferencesToFetch.size) {
-                                    // Devolver lo que se haya podido obtener
-                                    callback(Result.success(attendedClassesList.sortedByDescending { it.second.date }))
-                                }
-                            }
-                        }
-                }
-            }
-            .addOnFailureListener { exception ->
-                callback(Result.failure(exception))
-            }
-    }
-
 
 
     private fun createOrUpdateSavedStudent(

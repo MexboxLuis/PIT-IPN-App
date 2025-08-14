@@ -65,6 +65,8 @@ fun RegisterAllDataScreen(
     var phoneNumber by rememberSaveable { mutableStateOf("") }
 
     var isLoadingScreen by remember { mutableStateOf(false) }
+    var studentIdError by remember { mutableStateOf<String?>(null) }
+
 
     BackScaffold(
         navController = navController,
@@ -155,18 +157,30 @@ fun RegisterAllDataScreen(
 
                 GenericTextField(
                     value = studentId,
-                    onValueChange = { studentId = it },
+                    onValueChange = {
+                        if (it.length <= 10 && it.all { char -> char.isDigit() })
+                            studentId = it
+                        studentIdError = null
+                    },
                     labelResId = R.string.student_id,
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 )
+                if (studentIdError != null) {
+                    Text(
+                        text = studentIdError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
 
             }
 
             val isStudentFieldsValid = if (selectedRole == UserRole.STUDENT) {
-                academicProgram.isNotBlank() && studentId.isNotBlank()
+                academicProgram.isNotBlank() && studentId.isNotBlank() && studentId.length == 10
             } else {
                 true
             }
@@ -180,25 +194,36 @@ fun RegisterAllDataScreen(
                 onClick = {
                     coroutineScope.launch {
                         isLoadingScreen = true
-                        val result = fireStoreManager.registerUserData(
-                            email = email,
-                            name = name.trim(),
-                            surname = surname.trim(),
-                            imageUri = imageUri,
-                            academicProgram = if (selectedRole == UserRole.STUDENT) academicProgram.trim() else null,
-                            studentId = if (selectedRole == UserRole.STUDENT) studentId.trim() else null,
-                            phoneNumber = phoneNumber.trim()
-                        )
 
-                        if (result.isSuccess) {
-                            onRegisterDataSuccess()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                result.exceptionOrNull()?.message
-                                    ?: context.getString(R.string.error_uploading_data),
-                                Toast.LENGTH_LONG
-                            ).show()
+                        val isValid = if (selectedRole == UserRole.STUDENT) {
+                            val exists = fireStoreManager.studentIdExists(studentId.trim())
+                            if (exists) {
+                                studentIdError = context.getString(R.string.error_student_id_exists)
+                                false
+                            } else true
+                        } else true
+
+                        if (isValid) {
+                            val result = fireStoreManager.registerUserData(
+                                email = email,
+                                name = name.trim(),
+                                surname = surname.trim(),
+                                imageUri = imageUri,
+                                academicProgram = if (selectedRole == UserRole.STUDENT) academicProgram.trim() else null,
+                                studentId = if (selectedRole == UserRole.STUDENT) studentId.trim() else null,
+                                phoneNumber = phoneNumber.trim()
+                            )
+
+                            if (result.isSuccess) {
+                                onRegisterDataSuccess()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    result.exceptionOrNull()?.message
+                                        ?: context.getString(R.string.error_uploading_data),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
                         isLoadingScreen = false
                     }
