@@ -54,6 +54,7 @@ import com.example.pitapp.R
 import com.example.pitapp.datasource.AuthManager
 import com.example.pitapp.datasource.FireStoreManager
 import com.example.pitapp.ui.features.profile.components.ProfileImage
+import com.example.pitapp.ui.features.profile.helpers.formatPhoneNumber
 import com.example.pitapp.ui.shared.components.BackScaffold
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -448,20 +449,5 @@ fun ProfileScreen(
     }
 }
 
-fun formatPhoneNumber(phone: String): String {
-    return if (phone.length == 10) {
-        return if (phone.startsWith("55")) {
-            val prefix = phone.substring(2, 6)
-            val lineNumber = phone.substring(6)
-            "+52 (55) $prefix-$lineNumber"
-        } else {
-            val areaCode = phone.substring(0, 3)
-            val prefix = phone.substring(3, 6)
-            val lineNumber = phone.substring(6)
-            "+52 ($areaCode) $prefix-$lineNumber"
-        }
-    } else {
-        "+52 $phone"
-    }
-}
+
 

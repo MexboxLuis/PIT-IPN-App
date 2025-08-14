@@ -29,9 +29,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.EventBusy
-import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.MoreTime
 import androidx.compose.material.icons.filled.PlayCircleOutline
@@ -76,7 +74,7 @@ import com.example.pitapp.model.Period
 import com.example.pitapp.model.SavedClass
 import com.example.pitapp.model.Schedule
 import com.example.pitapp.ui.features.classes.components.InfoClassRowWithIcon
-import com.example.pitapp.ui.features.classes.components.SectionClassTitle
+import com.example.pitapp.ui.features.classes.components.NoClassInfoMessageCard
 import com.example.pitapp.ui.features.classes.components.UpcomingSchedules
 import com.example.pitapp.ui.shared.components.BackScaffold
 import com.example.pitapp.ui.shared.formatting.formatTitleCase
@@ -564,56 +562,6 @@ fun StartInstantClassScreen(
                     )
                 }
             }
-        }
-    }
-}
-@Composable
-fun NoClassInfoMessageCard(
-    icon: ImageVector,
-    message: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 32.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-
-            val infiniteTransition = rememberInfiniteTransition(label = "timer_icon_rotation")
-            val rotation by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = 360f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 2000, easing = LinearEasing),
-                    repeatMode = RepeatMode.Restart
-                ),
-                label = "rotation"
-            )
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(48.dp)
-                    .rotate(rotation),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-            )
         }
     }
 }
