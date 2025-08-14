@@ -2,6 +2,18 @@
     <!--        Shared strings      -->
     <string name="app_name">PITApp</string>
     <string name="loading">Loading…</string>
+    <string name="no_internet_title">No Internet Connection</string>
+    <string name="no_internet_description">Check your connection, internet is required to validate the most recent information.</string>
+    <string name="clock_skew_title">Incorrect Device Time</string>
+    <string name="clock_skew_description">To continue, enable automatic date and time or adjust it manually to match the server time.</string>
+    <string name="time_policy_title">Required Time Configuration</string>
+    <string name="time_policy_auto_time_ok">Automatic settings</string>
+    <string name="time_policy_auto_time_error">Automatic time setting is required</string>
+    <string name="time_policy_zone_ok">Mexico City</string>
+    <string name="time_policy_zone_error">%1$s (only available in Mexico City)</string>
+    <string name="time_policy_offset_ok">UTC-6</string>
+    <string name="time_policy_offset_error">Incorrect time zone, UTC-6 is required</string>
+    <string name="open_settings_button">Open date and time settings</string>
     <string name="unknown_error">Unknown error</string>
     <string name="delete">Delete</string>
     <string name="of">of</string>

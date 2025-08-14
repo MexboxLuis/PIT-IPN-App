@@ -7,10 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
-import com.example.pitapp.ui.navigation.PITNavigation
-import com.example.pitapp.ui.theme.PITAppTheme
+import com.example.pitapp.core.devicepolicy.AppGuard
 import com.example.pitapp.datasource.AuthManager
 import com.example.pitapp.datasource.FireStoreManager
+import com.example.pitapp.ui.navigation.PITNavigation
+import com.example.pitapp.ui.theme.PITAppTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -21,7 +22,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PITAppTheme {
-                PITApp()
+                AppGuard{
+                    PITApp()
+                }
             }
         }
     }
@@ -45,4 +48,9 @@ fun PITApp() {
         fireStoreManager = fireStoreManager
     )
 }
+
+
+
+
+
 
